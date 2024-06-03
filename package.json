@@ -1,0 +1,22 @@
+{
+  "name": "@dialectlabs/actions-ui",
+  "version": "0.1.0-beta.0",
+  "license": "Apache-2.0",
+  "private": false,
+  "sideEffects": false,
+  "module": "src/index.ts",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dialectlabs/actions-ui"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
+    "tsup": "^8.1.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
