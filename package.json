@@ -1,6 +1,6 @@
 {
   "name": "@dialectlabs/actions-ui",
-  "version": "0.1.0-beta.0",
+  "version": "0.1.0-beta.1",
   "license": "Apache-2.0",
   "private": false,
   "sideEffects": false,
@@ -23,6 +23,9 @@
     },
     "./index.css": "./dist/index.css"
   },
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
