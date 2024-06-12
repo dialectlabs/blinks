@@ -1,6 +1,6 @@
 {
   "name": "@dialectlabs/actions-ui",
-  "version": "0.1.0-beta.4",
+  "version": "0.1.0-beta.5",
   "license": "Apache-2.0",
   "private": false,
   "sideEffects": true,
@@ -47,8 +47,7 @@
     "prettier-plugin-tailwindcss": "^0.5.13",
     "tailwindcss": "^3.4.3",
     "tsup": "^8.1.0",
-    "typescript": "^5.0.0",
-    "@types/bun": "latest"
+    "typescript": "^5.0.0"
   },
   "peerDependencies": {
     "@solana/web3.js": "^1.91.0",
