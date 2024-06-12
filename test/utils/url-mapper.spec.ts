@@ -250,6 +250,137 @@ describe('ActionsURLMapper', () => {
       // assert
       expect(result).toBe(expected);
     });
+
+    test('should map multiple url segments with ** wildcard correctly', () => {
+      // arrange
+      const actionsConfig: ActionsJsonConfig = {
+        rules: [
+          {
+            pathPattern: '/trade/**',
+            apiPath: 'https://actions.dialect.to/api/sanctum/trade/**',
+          },
+        ],
+      };
+      const actionsUrlMapper = new ActionsURLMapper(actionsConfig);
+      const input = 'https://example.com/trade/1/2/3/4?param=value';
+      const expected =
+        'https://actions.dialect.to/api/sanctum/trade/1/2/3/4?param=value';
+
+      // act
+      const result = actionsUrlMapper.mapUrl(input);
+
+      // assert
+      expect(result).toBe(expected);
+    });
+
+    test('should map path with * and ** wildcards correctly', () => {
+      // arrange
+      const actionsConfig: ActionsJsonConfig = {
+        rules: [
+          {
+            pathPattern: '/trade/a/*/c/**',
+            apiPath: 'https://actions.dialect.to/api/sanctum/trade/a/*/c/**',
+          },
+        ],
+      };
+      const actionsUrlMapper = new ActionsURLMapper(actionsConfig);
+      const input = 'https://example.com/trade/a/b/c/d/e/f?param=value';
+      const expected =
+        'https://actions.dialect.to/api/sanctum/trade/a/b/c/d/e/f?param=value';
+
+      // act
+      const result = actionsUrlMapper.mapUrl(input);
+
+      // assert
+      expect(result).toBe(expected);
+    });
+
+    test('should map path with multiple * and ** wildcards correctly', () => {
+      // arrange
+      const actionsConfig: ActionsJsonConfig = {
+        rules: [
+          {
+            pathPattern: '/trade/a/*/*/**',
+            apiPath: 'https://actions.dialect.to/api/sanctum/trade/a/*/*/**',
+          },
+        ],
+      };
+      const actionsUrlMapper = new ActionsURLMapper(actionsConfig);
+      const input = 'https://example.com/trade/a/b/c/d/e/f?param=value';
+      const expected =
+        'https://actions.dialect.to/api/sanctum/trade/a/b/c/d/e/f?param=value';
+
+      // act
+      const result = actionsUrlMapper.mapUrl(input);
+
+      // assert
+      expect(result).toBe(expected);
+    });
+
+    test('should map path with single segment wildcard correctly', () => {
+      // arrange
+      const actionsConfig: ActionsJsonConfig = {
+        rules: [
+          {
+            pathPattern: '/trade/a/*',
+            apiPath: 'https://actions.dialect.to/api/sanctum/trade/a/*',
+          },
+        ],
+      };
+      const actionsUrlMapper = new ActionsURLMapper(actionsConfig);
+      const input = 'https://example.com/trade/a/b?param=value';
+      const expected =
+        'https://actions.dialect.to/api/sanctum/trade/a/b?param=value';
+
+      // act
+      const result = actionsUrlMapper.mapUrl(input);
+
+      // assert
+      expect(result).toBe(expected);
+    });
+
+    test('should not map path if * does not match a single segment', () => {
+      // arrange
+      const actionsConfig: ActionsJsonConfig = {
+        rules: [
+          {
+            pathPattern: '/trade/a/*',
+            apiPath: 'https://actions.dialect.to/api/sanctum/trade/a/*',
+          },
+        ],
+      };
+      const actionsUrlMapper = new ActionsURLMapper(actionsConfig);
+      const input = 'https://example.com/trade/a/b/c?param=value';
+      const expected = null;
+
+      // act
+      const result = actionsUrlMapper.mapUrl(input);
+
+      // assert
+      expect(result).toBe(expected);
+    });
+
+    test('should map full URL with ** wildcard correctly', () => {
+      // arrange
+      const actionsConfig: ActionsJsonConfig = {
+        rules: [
+          {
+            pathPattern: 'https://example.com/trade/**',
+            apiPath: 'https://actions.dialect.to/api/sanctum/trade/**',
+          },
+        ],
+      };
+      const actionsUrlMapper = new ActionsURLMapper(actionsConfig);
+      const input = 'https://example.com/trade/path/segment?param=value';
+      const expected =
+        'https://actions.dialect.to/api/sanctum/trade/path/segment?param=value';
+
+      // act
+      const result = actionsUrlMapper.mapUrl(input);
+
+      // assert
+      expect(result).toBe(expected);
+    });
   });
 
   describe('Wildcard catch-all rules', () => {
