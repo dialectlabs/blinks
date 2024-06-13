@@ -62,7 +62,7 @@ export const ActionLayout = ({
         <span className="mb-0.5 text-text font-semibold text-white">
           {title}
         </span>
-        <span className="mb-4 text-subtext text-twitter-neutral-40">
+        <span className="mb-4 whitespace-pre-wrap text-subtext text-twitter-neutral-40">
           {description}
         </span>
         <div className="flex flex-col gap-3">
