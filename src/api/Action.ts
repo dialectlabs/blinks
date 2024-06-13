@@ -119,6 +119,9 @@ export class ActionComponent {
     const response = await fetch(this.href, {
       method: 'POST',
       body: JSON.stringify({ account } as ActionsSpecPostRequestBody),
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
 
     if (!response.ok) {
