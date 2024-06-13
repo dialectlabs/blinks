@@ -83,6 +83,9 @@ const buttonLabelMap: Record<ExecutionStatus, string | null> = {
   error: 'Failed',
 };
 
+const SOFT_LIMIT_BUTTONS = 10;
+const SOFT_LIMIT_INPUTS = 3;
+
 export const ActionContainer = ({
   action,
   websiteUrl,
@@ -106,7 +109,8 @@ export const ActionContainer = ({
           executionState.executingAction
             ? executionState.executingAction === it
             : true,
-        ) ?? [],
+        )
+        .toSpliced(SOFT_LIMIT_BUTTONS) ?? [],
     [action, executionState.executingAction],
   );
   const inputs = useMemo(
@@ -117,7 +121,8 @@ export const ActionContainer = ({
           executionState.executingAction
             ? executionState.executingAction === it
             : true,
-        ) ?? [],
+        )
+        .toSpliced(SOFT_LIMIT_INPUTS) ?? [],
     [action, executionState.executingAction],
   );
 

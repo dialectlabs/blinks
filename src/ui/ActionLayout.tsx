@@ -102,7 +102,7 @@ const ActionInput = ({ placeholder, name, button, disabled }: InputProps) => {
         value={value}
         disabled={disabled}
         onChange={(e) => onChange(e.target.value)}
-        className="ml-4 flex-1 bg-transparent outline-none placeholder:text-twitter-neutral-50 disabled:text-twitter-neutral-50"
+        className="ml-4 flex-1 truncate bg-transparent outline-none placeholder:text-twitter-neutral-50 disabled:text-twitter-neutral-50"
       />
       <div className="my-2 mr-2">
         <ActionButton
