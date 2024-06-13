@@ -53,7 +53,7 @@ export const ActionLayout = ({
           <a
             href={websiteUrl}
             target="_blank"
-            className="mb-1.5 truncate text-subtext text-twitter-neutral-50 hover:cursor-pointer"
+            className="mb-1.5 truncate text-subtext text-twitter-neutral-50 hover:cursor-pointer hover:underline"
             rel="noreferrer"
           >
             {websiteText ?? websiteUrl}
