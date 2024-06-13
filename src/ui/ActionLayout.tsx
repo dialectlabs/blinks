@@ -1,12 +1,13 @@
+import { useState } from 'react';
 import { Button } from './Button';
 import { CheckIcon, SpinnerDots } from './icons';
-import { useState } from 'react';
 
 interface LayoutProps {
   image?: string;
   error?: string | null;
   success?: string | null;
-  website?: string;
+  websiteUrl?: string | null;
+  websiteText?: string | null;
   title: string;
   description: string;
   buttons?: ButtonProps[];
@@ -31,36 +32,42 @@ export const ActionLayout = ({
   title,
   description,
   image,
-  website,
+  websiteUrl,
+  websiteText,
   buttons,
   inputs,
   error,
   success,
 }: LayoutProps) => {
   return (
-    <div className="w-full rounded-2xl bg-twitter-neutral-80 overflow-hidden mt-3 shadow-action border border-twitter-accent">
+    <div className="mt-3 w-full overflow-hidden rounded-2xl border border-twitter-accent bg-twitter-neutral-80 shadow-action">
       {image && (
         <img
-          className="w-full aspect-square object-cover object-left"
+          className="aspect-square w-full object-cover object-left"
           src={image}
           alt="action-image"
         />
       )}
-      <div className="p-5 flex flex-col">
-        {website && (
-          <span className="text-subtext text-twitter-neutral-50 mb-1.5 truncate">
-            {website}
-          </span>
+      <div className="flex flex-col p-5">
+        {websiteUrl && (
+          <a
+            href={websiteUrl}
+            target="_blank"
+            className="mb-1.5 truncate text-subtext text-twitter-neutral-50 hover:cursor-pointer"
+            rel="noreferrer"
+          >
+            {websiteText ?? websiteUrl}
+          </a>
         )}
-        <span className="text-text text-white font-semibold mb-0.5">
+        <span className="mb-0.5 text-text font-semibold text-white">
           {title}
         </span>
-        <span className="text-subtext text-twitter-neutral-40 mb-4">
+        <span className="mb-4 text-subtext text-twitter-neutral-40">
           {description}
         </span>
         <div className="flex flex-col gap-3">
           {buttons && buttons.length > 0 && (
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex flex-wrap items-center gap-2">
               {buttons?.map((it, index) => (
                 <div key={index} className="flex-auto">
                   <ActionButton {...it} />
@@ -71,12 +78,12 @@ export const ActionLayout = ({
           {inputs?.map((input) => <ActionInput key={input.name} {...input} />)}
         </div>
         {success && (
-          <span className="flex justify-center text-subtext text-twitter-success mt-4">
+          <span className="mt-4 flex justify-center text-subtext text-twitter-success">
             {success}
           </span>
         )}
         {error && !success && (
-          <span className="flex justify-center text-subtext text-twitter-error mt-4">
+          <span className="mt-4 flex justify-center text-subtext text-twitter-error">
             {error}
           </span>
         )}
@@ -89,13 +96,13 @@ const ActionInput = ({ placeholder, name, button, disabled }: InputProps) => {
   const [value, onChange] = useState('');
 
   return (
-    <div className="rounded-full flex items-center gap-2 border border-[#3D4144]">
+    <div className="flex items-center gap-2 rounded-full border border-[#3D4144]">
       <input
         placeholder={placeholder || 'Type here...'}
         value={value}
         disabled={disabled}
         onChange={(e) => onChange(e.target.value)}
-        className="bg-transparent ml-4 flex-1 outline-none placeholder:text-twitter-neutral-50 disabled:text-twitter-neutral-50"
+        className="ml-4 flex-1 bg-transparent outline-none placeholder:text-twitter-neutral-50 disabled:text-twitter-neutral-50"
       />
       <div className="my-2 mr-2">
         <ActionButton

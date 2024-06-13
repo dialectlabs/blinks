@@ -90,6 +90,10 @@ export const ActionContainer = ({
   action: Action;
   websiteUrl?: string;
 }) => {
+  const websiteText = useMemo(
+    () => (websiteUrl ? new URL(websiteUrl).hostname : null),
+    [websiteUrl],
+  );
   const [executionState, dispatch] = useReducer(executionReducer, {
     status: 'idle',
   });
@@ -178,7 +182,8 @@ export const ActionContainer = ({
     <ActionLayout
       title={action.title}
       description={action.description}
-      website={websiteUrl}
+      websiteUrl={websiteUrl}
+      websiteText={websiteText}
       image={action.icon}
       error={
         executionState.status !== 'success'
@@ -186,8 +191,8 @@ export const ActionContainer = ({
           : null
       }
       success={executionState.successMessage}
-      buttons={buttons.map((component) => asButtonProps(component))}
-      inputs={inputs.map((component) => asInputProps(component))}
+      buttons={buttons.map(asButtonProps)}
+      inputs={inputs.map(asInputProps)}
     />
   );
 };
