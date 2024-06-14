@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useReducer } from 'react';
-import { Action, ActionComponent, type ActionCallbacksConfig } from '../api';
+import {
+  Action,
+  ActionComponent,
+  type ActionCallbacksConfig,
+  type ActionContext,
+} from '../api';
 import { isSignTransactionError } from '../utils/type-guards.ts';
 import type { ButtonProps } from './ActionLayout';
 import { ActionLayout } from './ActionLayout';
@@ -142,20 +147,29 @@ export const ActionContainer = ({
 
     dispatch({ type: ExecutionType.INITIATE, executingAction: component });
 
+    const context: ActionContext = {
+      action: component.parent,
+      originalUrl: websiteUrl ?? component.parent.url,
+      triggeredLinkedAction: component,
+    };
+
     try {
-      const account = await action.adapter.connect();
+      const account = await action.adapter.connect(context);
       if (!account) {
         dispatch({ type: ExecutionType.RESET });
         return;
       }
 
       const tx = await component.post(account);
-      const signResult = await action.adapter.signTransaction(tx.transaction);
+      const signResult = await action.adapter.signTransaction(
+        tx.transaction,
+        context,
+      );
 
       if (!signResult || isSignTransactionError(signResult)) {
         dispatch({ type: ExecutionType.RESET });
       } else {
-        await action.adapter.confirmTransaction(signResult.signature);
+        await action.adapter.confirmTransaction(signResult.signature, context);
         dispatch({
           type: ExecutionType.FINISH,
           successMessage: tx.message,

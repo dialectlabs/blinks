@@ -17,13 +17,14 @@ export class Action {
   ) {
     // if no links present, fallback to original solana pay spec
     if (!_data.links?.actions) {
-      this._actions = [new ActionComponent(_data.label, _url)];
+      this._actions = [new ActionComponent(this, _data.label, _url)];
       return;
     }
 
     const urlObj = new URL(_url);
     this._actions = _data.links.actions.map((action) => {
       return new ActionComponent(
+        this,
         action.label,
         urlObj.origin + action.href,
         action.parameters,
@@ -84,12 +85,13 @@ export class ActionComponent {
   private parameterValue: string = '';
 
   constructor(
+    private _parent: Action,
     private _label: string,
     private _href: string,
     private _parameters?: [Parameter],
   ) {}
 
-  private get href() {
+  public get href() {
     if (this.parameter) {
       return this._href.replace(
         `{${this.parameter.name}}`,
@@ -98,6 +100,10 @@ export class ActionComponent {
     }
 
     return this._href;
+  }
+
+  public get parent() {
+    return this._parent;
   }
 
   public get label() {
