@@ -44,41 +44,26 @@ export class ActionConfig implements ActionAdapter {
     return this.adapter.signTransaction(tx);
   }
 
-  confirmTransaction(signature: string): Promise<void> {
-    let retry = 0;
-    const RETRY_TIMEOUT = 5000;
-    const MAX_RETRIES = 5;
+  async confirmTransaction(signature: string): Promise<void> {
+    if (!this.connection) {
+      throw new Error('Unable to confirm transaction');
+    }
 
-    return new Promise((res, rej) => {
-      const confirm = async () => {
-        const latestBlockhash = await this.connection.getLatestBlockhash();
-        if (retry > MAX_RETRIES) {
-          rej(new Error('Unable to confirm transaction'));
-          return;
-        }
+    try {
+      const latestBlockhashData =
+        await this.connection.getLatestBlockhash('confirmed');
 
-        retry += 1;
+      const res = await this.connection.confirmTransaction({
+        signature,
+        lastValidBlockHeight: latestBlockhashData.lastValidBlockHeight,
+        blockhash: latestBlockhashData.blockhash,
+      });
 
-        try {
-          const result = await this.connection.confirmTransaction({
-            lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
-            blockhash: latestBlockhash.blockhash,
-            signature,
-          });
-
-          if (result.value.err) {
-            setTimeout(confirm, RETRY_TIMEOUT);
-            return;
-          }
-
-          res();
-        } catch (e) {
-          setTimeout(confirm, RETRY_TIMEOUT);
-          return;
-        }
-      };
-
-      confirm();
-    });
+      if (res.value.err) {
+        return Promise.reject(new Error('Transaction execution failed'));
+      }
+    } catch {
+      throw new Error('Unable to confirm transaction');
+    }
   }
 }
