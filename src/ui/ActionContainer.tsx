@@ -1,5 +1,5 @@
-import { useMemo, useReducer } from 'react';
-import { Action, ActionComponent } from '../api';
+import { useEffect, useMemo, useReducer } from 'react';
+import { Action, ActionComponent, type ActionCallbacksConfig } from '../api';
 import { isSignTransactionError } from '../utils/type-guards.ts';
 import type { ButtonProps } from './ActionLayout';
 import { ActionLayout } from './ActionLayout';
@@ -89,9 +89,11 @@ const SOFT_LIMIT_INPUTS = 3;
 export const ActionContainer = ({
   action,
   websiteUrl,
+  callbacks,
 }: {
   action: Action;
   websiteUrl?: string;
+  callbacks?: Partial<ActionCallbacksConfig>;
 }) => {
   const websiteText = useMemo(
     () => (websiteUrl ? new URL(websiteUrl).hostname : null),
@@ -100,6 +102,10 @@ export const ActionContainer = ({
   const [executionState, dispatch] = useReducer(executionReducer, {
     status: 'idle',
   });
+
+  useEffect(() => {
+    callbacks?.onActionMount?.(action, websiteUrl ?? action.url);
+  }, [callbacks, action, websiteUrl]);
 
   const buttons = useMemo(
     () =>

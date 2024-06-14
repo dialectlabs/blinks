@@ -31,6 +31,10 @@ export class Action {
     });
   }
 
+  public get url() {
+    return this._url;
+  }
+
   public get icon() {
     return this._data.icon;
   }
