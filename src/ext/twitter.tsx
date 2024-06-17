@@ -102,7 +102,7 @@ async function handleNewNode(
   const action = await Action.fetch(actionApiUrl, config).catch(() => null);
   const state = action ? getExtendedActionState(action) : null;
 
-  if (!action || !state || checkSecurity(state, options.securityLevel)) {
+  if (!action || !state || !checkSecurity(state, options.securityLevel)) {
     return;
   }
 

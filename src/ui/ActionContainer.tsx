@@ -251,7 +251,7 @@ export const ActionContainer = ({
     if (actionState === 'malicious' && executionState.status === 'blocked') {
       return (
         <Snackbar variant="error">
-          <div className="text-caption mb-3">
+          <div className="text-caption">
             This Action has been flagged as an unsafe action, & has been
             blocked. If you believe this action has been blocked in error,
             please{' '}
@@ -262,12 +262,14 @@ export const ActionContainer = ({
             {!isPassingSecurityCheck &&
               ' Your actions provider blocks execution of this action.'}
           </div>
-          <button
-            className="text-caption font-semibold"
-            onClick={() => dispatch({ type: ExecutionType.UNBLOCK })}
-          >
-            Ignore warning & proceed
-          </button>
+          {isPassingSecurityCheck && (
+            <button
+              className="text-caption mt-3 font-semibold"
+              onClick={() => dispatch({ type: ExecutionType.UNBLOCK })}
+            >
+              Ignore warning & proceed
+            </button>
+          )}
         </Snackbar>
       );
     }

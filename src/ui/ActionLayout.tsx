@@ -1,7 +1,15 @@
 import { useState, type ReactNode } from 'react';
 import type { ExtendedActionState } from '../api';
+import { Badge } from './Badge.tsx';
 import { Button } from './Button';
-import { CheckIcon, SpinnerDots } from './icons';
+import {
+  CheckIcon,
+  CheckShieldIcon,
+  ExclamationShieldIcon,
+  InfoShieldIcon,
+  LinkIcon,
+  SpinnerDots,
+} from './icons';
 
 type ActionType = ExtendedActionState;
 
@@ -56,16 +64,32 @@ export const ActionLayout = ({
         />
       )}
       <div className="flex flex-col p-5">
-        {websiteUrl && (
-          <a
-            href={websiteUrl}
-            target="_blank"
-            className="mb-1.5 truncate text-subtext text-twitter-neutral-50 hover:cursor-pointer hover:underline"
-            rel="noreferrer"
-          >
-            {websiteText ?? websiteUrl}
-          </a>
-        )}
+        <div className="mb-2 flex items-center gap-2">
+          {websiteUrl && (
+            <a
+              href={websiteUrl}
+              target="_blank"
+              className="inline-flex items-center truncate text-subtext text-twitter-neutral-50 hover:cursor-pointer hover:underline"
+              rel="noreferrer"
+            >
+              <LinkIcon className="mr-2" />
+              {websiteText ?? websiteUrl}
+            </a>
+          )}
+          {type === 'malicious' && (
+            <Badge variant="error" icon={<ExclamationShieldIcon />}>
+              Blocked
+            </Badge>
+          )}
+          {type === 'trusted' && (
+            <Badge variant="success" icon={<CheckShieldIcon />}>
+              Trusted
+            </Badge>
+          )}
+          {type === 'unknown' && (
+            <Badge variant="warning" icon={<InfoShieldIcon />} />
+          )}
+        </div>
         <span className="mb-0.5 text-text font-semibold text-white">
           {title}
         </span>
