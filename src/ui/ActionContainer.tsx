@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer } from 'react';
+import { useEffect, useMemo, useReducer, useState } from 'react';
 import {
   Action,
   ActionComponent,
@@ -26,6 +26,7 @@ enum ExecutionType {
   FAIL = 'FAIL',
   RESET = 'RESET',
   UNBLOCK = 'UNBLOCK',
+  BLOCK = 'BLOCK',
 }
 
 type ActionValue =
@@ -47,6 +48,9 @@ type ActionValue =
     }
   | {
       type: ExecutionType.UNBLOCK;
+    }
+  | {
+      type: ExecutionType.BLOCK;
     };
 
 const executionReducer = (
@@ -74,6 +78,10 @@ const executionReducer = (
       return {
         status: 'idle',
       };
+    case ExecutionType.BLOCK:
+      return {
+        status: 'blocked',
+      };
     case ExecutionType.UNBLOCK:
       return {
         status: 'idle',
@@ -100,6 +108,12 @@ const buttonLabelMap: Record<ExecutionStatus, string | null> = {
   error: 'Failed',
 };
 
+const lookupActionState = (
+  action: Action,
+): 'trusted' | 'malicious' | 'unknown' => {
+  return ActionsRegistry.getInstance().lookup(action.url)?.state ?? 'unknown';
+};
+
 const SOFT_LIMIT_BUTTONS = 10;
 const SOFT_LIMIT_INPUTS = 3;
 
@@ -112,21 +126,18 @@ export const ActionContainer = ({
   websiteUrl?: string;
   callbacks?: Partial<ActionCallbacksConfig>;
 }) => {
-  const type = useMemo(
-    () => ActionsRegistry.getInstance().lookup(action.url)?.state ?? 'unknown',
-    [action.url],
-  );
+  const [actionState, setActionState] = useState(lookupActionState(action));
   const websiteText = useMemo(
     () => (websiteUrl ? new URL(websiteUrl).hostname : null),
     [websiteUrl],
   );
   const [executionState, dispatch] = useReducer(executionReducer, {
-    status: type !== 'malicious' ? 'idle' : 'blocked',
+    status: actionState !== 'malicious' ? 'idle' : 'blocked',
   });
 
   useEffect(() => {
-    callbacks?.onActionMount?.(action, websiteUrl ?? action.url, type);
-  }, [callbacks, action, websiteUrl, type]);
+    callbacks?.onActionMount?.(action, websiteUrl ?? action.url, actionState);
+  }, [callbacks, action, websiteUrl, actionState]);
 
   const buttons = useMemo(
     () =>
@@ -161,11 +172,18 @@ export const ActionContainer = ({
       component.setValue(params[component.parameter.name]);
     }
 
+    const newActionState = lookupActionState(action);
+    if (newActionState === 'malicious' && actionState !== 'malicious') {
+      setActionState(newActionState);
+      dispatch({ type: ExecutionType.BLOCK });
+      return;
+    }
+
     dispatch({ type: ExecutionType.INITIATE, executingAction: component });
 
     const context: ActionContext = {
       action: component.parent,
-      actionType: type,
+      actionType: actionState,
       originalUrl: websiteUrl ?? component.parent.url,
       triggeredLinkedAction: component,
     };
@@ -221,7 +239,7 @@ export const ActionContainer = ({
   };
 
   const disclaimer = useMemo(() => {
-    if (type === 'malicious' && executionState.status === 'blocked') {
+    if (actionState === 'malicious' && executionState.status === 'blocked') {
       return (
         <Snackbar variant="error">
           <div className="text-caption mb-3">
@@ -243,7 +261,7 @@ export const ActionContainer = ({
       );
     }
 
-    if (type === 'unknown') {
+    if (actionState === 'unknown') {
       return (
         <Snackbar variant="warning">
           This Action has not yet been registered. Only use it if you trust the
@@ -253,11 +271,11 @@ export const ActionContainer = ({
     }
 
     return null;
-  }, [type, executionState.status]);
+  }, [actionState, executionState.status]);
 
   return (
     <ActionLayout
-      type={type}
+      type={actionState}
       title={action.title}
       description={action.description}
       websiteUrl={websiteUrl}
