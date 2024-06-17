@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
 
-type BadgeVariant = 'warning' | 'error' | 'success';
+type BadgeVariant = 'warning' | 'error' | 'default';
 
 interface Props {
   variant?: BadgeVariant;
@@ -13,11 +13,11 @@ interface Props {
 const variantClasses: Record<BadgeVariant, string> = {
   error: 'bg-twitter-error/10 text-twitter-error',
   warning: 'bg-twitter-warning/10 text-twitter-warning',
-  success: 'bg-twitter-success/10 text-twitter-success',
+  default: 'bg-[#B3B3B31A] text-[#888989]',
 };
 
 export const Badge = ({
-  variant = 'warning',
+  variant = 'default',
   children,
   className,
   icon,
@@ -26,16 +26,16 @@ export const Badge = ({
     <div
       className={clsx(
         variantClasses[variant],
-        'text-caption inline-flex h-5 items-center justify-center gap-1 rounded-full font-semibold leading-none',
+        'inline-flex items-center justify-center gap-1 rounded-full text-subtext font-semibold leading-none',
         className,
         {
-          'aspect-square w-5': !children && icon,
-          'px-2.5': children,
+          'aspect-square p-1': !children && icon,
+          'px-1.5 py-1': children,
         },
       )}
     >
       {children && <span>{children}</span>}
-      {icon && <span>{icon}</span>}
+      {icon && <div>{icon}</div>}
     </div>
   );
 };

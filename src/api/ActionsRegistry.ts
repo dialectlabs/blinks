@@ -49,8 +49,14 @@ export interface RegisteredAction {
 
 export type ExtendedActionState = RegisteredAction['state'] | 'unknown';
 
-export const getExtendedActionState = (action: Action): ExtendedActionState => {
-  return ActionsRegistry.getInstance().lookup(action.url)?.state ?? 'unknown';
+export const getExtendedActionState = (
+  actionOrUrl: Action | string,
+): ExtendedActionState => {
+  return (
+    ActionsRegistry.getInstance().lookup(
+      typeof actionOrUrl === 'string' ? actionOrUrl : actionOrUrl.url,
+    )?.state ?? 'unknown'
+  );
 };
 
 async function fetchActionsRegistryConfig(): Promise<ActionsRegistryConfig> {

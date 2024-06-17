@@ -4,7 +4,6 @@ import { Badge } from './Badge.tsx';
 import { Button } from './Button';
 import {
   CheckIcon,
-  CheckShieldIcon,
   ExclamationShieldIcon,
   InfoShieldIcon,
   LinkIcon,
@@ -41,6 +40,21 @@ export interface InputProps {
   button: ButtonProps;
 }
 
+const Linkable = ({
+  url,
+  children,
+}: {
+  url?: string | null;
+  children: ReactNode | ReactNode[];
+}) =>
+  url ? (
+    <a href={url} target="_blank" rel="noopener noreferrer">
+      {children}
+    </a>
+  ) : (
+    <>{children}</>
+  );
+
 export const ActionLayout = ({
   title,
   description,
@@ -57,11 +71,13 @@ export const ActionLayout = ({
   return (
     <div className="mt-3 w-full overflow-hidden rounded-2xl border border-twitter-accent bg-twitter-neutral-80 shadow-action">
       {image && (
-        <img
-          className="aspect-square w-full object-cover object-left"
-          src={image}
-          alt="action-image"
-        />
+        <Linkable url={websiteUrl}>
+          <img
+            className="aspect-square w-full object-cover object-left"
+            src={image}
+            alt="action-image"
+          />
+        </Linkable>
       )}
       <div className="flex flex-col p-5">
         <div className="mb-2 flex items-center gap-2">
@@ -70,25 +86,39 @@ export const ActionLayout = ({
               href={websiteUrl}
               target="_blank"
               className="inline-flex items-center truncate text-subtext text-twitter-neutral-50 hover:cursor-pointer hover:underline"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               <LinkIcon className="mr-2" />
               {websiteText ?? websiteUrl}
             </a>
           )}
-          {type === 'malicious' && (
-            <Badge variant="error" icon={<ExclamationShieldIcon />}>
-              Blocked
-            </Badge>
-          )}
-          {type === 'trusted' && (
-            <Badge variant="success" icon={<CheckShieldIcon />}>
-              Trusted
-            </Badge>
-          )}
-          {type === 'unknown' && (
-            <Badge variant="warning" icon={<InfoShieldIcon />} />
-          )}
+          <a
+            href="https://docs.dialect.to/documentation/actions/security"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center"
+          >
+            {type === 'malicious' && (
+              <Badge
+                variant="error"
+                icon={<ExclamationShieldIcon width={13} height={13} />}
+              >
+                Blocked
+              </Badge>
+            )}
+            {type === 'trusted' && (
+              <Badge
+                variant="default"
+                icon={<InfoShieldIcon width={13} height={13} />}
+              />
+            )}
+            {type === 'unknown' && (
+              <Badge
+                variant="warning"
+                icon={<InfoShieldIcon width={13} height={13} />}
+              />
+            )}
+          </a>
         </div>
         <span className="mb-0.5 text-text font-semibold text-white">
           {title}

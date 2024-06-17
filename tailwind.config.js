@@ -15,7 +15,7 @@ export default {
             20: '#eff3f4',
           },
           accent: '#1d9bf0',
-          success: '#12DC88',
+          success: '#12dc88',
           error: '#ff5e5e',
           warning: '#ff9900',
         },

@@ -18,14 +18,10 @@ export const Snackbar = ({ variant = 'warning', children }: Props) => {
     <div
       className={clsx(
         variantClasses[variant],
-        'text-caption rounded-lg border p-3',
+        'rounded-lg border p-3 text-subtext',
       )}
     >
-      {typeof children === 'string' ? (
-        <span className="text-caption">{children}</span>
-      ) : (
-        children
-      )}
+      {children}
     </div>
   );
 };

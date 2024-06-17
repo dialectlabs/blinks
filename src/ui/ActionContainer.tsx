@@ -115,11 +115,13 @@ const SOFT_LIMIT_INPUTS = 3;
 export const ActionContainer = ({
   action,
   websiteUrl,
+  websiteText,
   callbacks,
-  securityLevel = 'all',
+  securityLevel = 'only-trusted',
 }: {
   action: Action;
   websiteUrl?: string;
+  websiteText?: string;
   callbacks?: Partial<ActionCallbacksConfig>;
   securityLevel?: SecurityLevel;
 }) => {
@@ -127,15 +129,14 @@ export const ActionContainer = ({
     getExtendedActionState(action),
   );
 
-  // adding a ui check as well, to make sure, that on runtime registry lookups, we are not allowing the action to be executed
+  // adding ui check as well, to make sure, that on runtime registry lookups, we are not allowing the action to be executed
   const isPassingSecurityCheck = checkSecurity(actionState, securityLevel);
 
-  const websiteText = useMemo(
-    () => (websiteUrl ? new URL(websiteUrl).hostname : null),
-    [websiteUrl],
-  );
   const [executionState, dispatch] = useReducer(executionReducer, {
-    status: actionState !== 'malicious' ? 'idle' : 'blocked',
+    status:
+      actionState !== 'malicious' && isPassingSecurityCheck
+        ? 'idle'
+        : 'blocked',
   });
 
   useEffect(() => {
@@ -176,7 +177,12 @@ export const ActionContainer = ({
     }
 
     const newActionState = getExtendedActionState(action);
-    if (newActionState === 'malicious' && actionState !== 'malicious') {
+    // if action state has changed, and it doesn't pass the security check or became malicious, block the action
+    if (
+      newActionState !== actionState &&
+      (!checkSecurity(newActionState, securityLevel) ||
+        newActionState === 'malicious')
+    ) {
       setActionState(newActionState);
       dispatch({ type: ExecutionType.BLOCK });
       return;
@@ -226,10 +232,7 @@ export const ActionContainer = ({
     loading:
       executionState.status === 'executing' &&
       it === executionState.executingAction,
-    disabled:
-      !isPassingSecurityCheck ||
-      action.disabled ||
-      executionState.status !== 'idle',
+    disabled: action.disabled || executionState.status !== 'idle',
     variant: buttonVariantMap[executionState.status],
     onClick: (params?: Record<string, string>) => execute(it, params),
   });
@@ -238,10 +241,7 @@ export const ActionContainer = ({
     return {
       // since we already filter this, we can safely assume that parameter is not null
       placeholder: it.parameter!.label,
-      disabled:
-        !isPassingSecurityCheck ||
-        action.disabled ||
-        executionState.status !== 'idle',
+      disabled: action.disabled || executionState.status !== 'idle',
       name: it.parameter!.name,
       button: asButtonProps(it),
     };
@@ -251,20 +251,25 @@ export const ActionContainer = ({
     if (actionState === 'malicious' && executionState.status === 'blocked') {
       return (
         <Snackbar variant="error">
-          <div className="text-caption">
+          <p>
             This Action has been flagged as an unsafe action, & has been
             blocked. If you believe this action has been blocked in error,
             please{' '}
-            <a href="#" className="cursor-pointer underline">
+            <a
+              href="#"
+              className="cursor-pointer underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               submit an issue
             </a>
             .
             {!isPassingSecurityCheck &&
-              ' Your actions provider blocks execution of this action.'}
-          </div>
+              ' Your action provider blocks execution of this action.'}
+          </p>
           {isPassingSecurityCheck && (
             <button
-              className="text-caption mt-3 font-semibold"
+              className="mt-3 font-semibold"
               onClick={() => dispatch({ type: ExecutionType.UNBLOCK })}
             >
               Ignore warning & proceed
@@ -277,10 +282,20 @@ export const ActionContainer = ({
     if (actionState === 'unknown') {
       return (
         <Snackbar variant="warning">
-          This Action has not yet been registered. Only use it if you trust the
-          source.
-          {!isPassingSecurityCheck &&
-            ' Your actions provider blocks execution of this action.'}
+          <p>
+            This Action has not yet been registered. Only use it if you trust
+            the source.
+            {!isPassingSecurityCheck &&
+              ' Your action provider blocks execution of this action.'}
+          </p>
+          <a
+            className="mt-3 block font-semibold"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Report
+          </a>
         </Snackbar>
       );
     }

@@ -9,6 +9,7 @@ import {
 import { checkSecurity, type SecurityLevel } from '../shared';
 import { ActionContainer } from '../ui';
 import { noop } from '../utils/constants';
+import { isInterstitial } from '../utils/interstitial-url.ts';
 import { ActionsURLMapper, type ActionsJsonConfig } from '../utils/url-mapper';
 
 type ObserverSecurityLevel = SecurityLevel;
@@ -19,7 +20,7 @@ export interface ObserverOptions {
 }
 
 const DEFAULT_OPTIONS: ObserverOptions = {
-  securityLevel: 'all',
+  securityLevel: 'only-trusted',
 };
 
 export function setupTwitterObserver(
@@ -85,47 +86,69 @@ async function handleNewNode(
   const anchor = linkPreview.children[0] as HTMLAnchorElement;
   const shortenedUrl = anchor.href;
   const actionUrl = await resolveTwitterShortenedUrl(shortenedUrl);
-  const actionsJson = await fetch(actionUrl.origin + '/actions.json').then(
-    (res) => res.json() as Promise<ActionsJsonConfig>,
-  );
+  const interstitialData = isInterstitial(actionUrl);
 
-  const actionsUrlMapper = new ActionsURLMapper(actionsJson);
+  let actionApiUrl: string | null;
+  if (interstitialData.isInterstitial) {
+    actionApiUrl = interstitialData.decodedActionUrl;
+  } else {
+    const actionsJson = await fetch(actionUrl.origin + '/actions.json').then(
+      (res) => res.json() as Promise<ActionsJsonConfig>,
+    );
 
-  const actionApiUrl = actionsUrlMapper.mapUrl(actionUrl);
+    const actionsUrlMapper = new ActionsURLMapper(actionsJson);
 
-  console.log('found action api url', actionApiUrl);
+    actionApiUrl = actionsUrlMapper.mapUrl(actionUrl);
+  }
 
-  if (!actionApiUrl) {
+  const state = actionApiUrl ? getExtendedActionState(actionApiUrl) : null;
+  if (!actionApiUrl || !state || !checkSecurity(state, options.securityLevel)) {
     return;
   }
 
   const action = await Action.fetch(actionApiUrl, config).catch(() => null);
-  const state = action ? getExtendedActionState(action) : null;
 
-  if (!action || !state || !checkSecurity(state, options.securityLevel)) {
+  if (!action) {
     return;
   }
 
   rootElement.parentElement?.replaceChildren(
-    createAction(actionUrl.toString(), action, callbacks, options),
+    createAction({
+      originalUrl: actionUrl,
+      action,
+      callbacks,
+      options,
+      isInterstitial: interstitialData.isInterstitial,
+    }),
   );
 }
 
-function createAction(
-  originalUrl: string,
-  action: Action,
-  callbacks: Partial<ActionCallbacksConfig>,
-  options: ObserverOptions,
-) {
+function createAction({
+  originalUrl,
+  action,
+  callbacks,
+  options,
+  isInterstitial,
+}: {
+  originalUrl: URL;
+  action: Action;
+  callbacks: Partial<ActionCallbacksConfig>;
+  options: ObserverOptions;
+  isInterstitial: boolean;
+}) {
   const container = document.createElement('div');
   container.className = 'dialect-action-root-container';
 
   const actionRoot = createRoot(container);
+  const websiteText = isInterstitial
+    ? new URL(action.url).hostname
+    : originalUrl.hostname;
 
   actionRoot.render(
     <ActionContainer
       action={action}
-      websiteUrl={originalUrl}
+      websiteUrl={originalUrl.toString()}
+      websiteText={websiteText}
       callbacks={callbacks}
       securityLevel={options.securityLevel}
     />,
