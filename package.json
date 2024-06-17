@@ -53,5 +53,8 @@
     "@solana/web3.js": "^1.91.0",
     "react": ">=18",
     "react-dom": ">=18"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1"
   }
 }

@@ -16,12 +16,15 @@ export default {
           },
           accent: '#1d9bf0',
           success: '#00c466',
-          error: '#ff6f6f',
+          error: '#ff5e5e',
+          warning: '#ff9900',
         },
       },
       fontSize: {
+        // assuming twitter font size base - 15px
         text: ['1rem', '1.2rem'],
         subtext: ['0.867rem', '1.067rem'],
+        caption: ['0.73333rem', '0.93333rem'],
       },
       boxShadow: {
         action:

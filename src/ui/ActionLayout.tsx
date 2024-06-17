@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Button } from './Button';
 import { CheckIcon, SpinnerDots } from './icons';
+
+type ActionType = 'trusted' | 'malicious' | 'unknown';
 
 interface LayoutProps {
   image?: string;
@@ -8,6 +10,8 @@ interface LayoutProps {
   success?: string | null;
   websiteUrl?: string | null;
   websiteText?: string | null;
+  disclaimer?: ReactNode;
+  type: ActionType;
   title: string;
   description: string;
   buttons?: ButtonProps[];
@@ -34,6 +38,8 @@ export const ActionLayout = ({
   image,
   websiteUrl,
   websiteText,
+  type,
+  disclaimer,
   buttons,
   inputs,
   error,
@@ -65,6 +71,7 @@ export const ActionLayout = ({
         <span className="mb-4 whitespace-pre-wrap text-subtext text-twitter-neutral-40">
           {description}
         </span>
+        {disclaimer && <div className="mb-4">{disclaimer}</div>}
         <div className="flex flex-col gap-3">
           {buttons && buttons.length > 0 && (
             <div className="flex flex-wrap items-center gap-2">

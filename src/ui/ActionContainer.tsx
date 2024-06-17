@@ -8,8 +8,9 @@ import {
 import { isSignTransactionError } from '../utils/type-guards.ts';
 import type { ButtonProps } from './ActionLayout';
 import { ActionLayout } from './ActionLayout';
+import { Snackbar } from './Snackbar.tsx';
 
-type ExecutionStatus = 'idle' | 'executing' | 'success' | 'error';
+type ExecutionStatus = 'blocked' | 'idle' | 'executing' | 'success' | 'error';
 
 interface ExecutionState {
   status: ExecutionStatus;
@@ -23,6 +24,7 @@ enum ExecutionType {
   FINISH = 'FINISH',
   FAIL = 'FAIL',
   RESET = 'RESET',
+  UNBLOCK = 'UNBLOCK',
 }
 
 type ActionValue =
@@ -41,6 +43,9 @@ type ActionValue =
     }
   | {
       type: ExecutionType.RESET;
+    }
+  | {
+      type: ExecutionType.UNBLOCK;
     };
 
 const executionReducer = (
@@ -68,6 +73,10 @@ const executionReducer = (
       return {
         status: 'idle',
       };
+    case ExecutionType.UNBLOCK:
+      return {
+        status: 'idle',
+      };
   }
 };
 
@@ -75,6 +84,7 @@ const buttonVariantMap: Record<
   ExecutionStatus,
   'default' | 'error' | 'success'
 > = {
+  blocked: 'default',
   idle: 'default',
   executing: 'default',
   success: 'success',
@@ -82,6 +92,7 @@ const buttonVariantMap: Record<
 };
 
 const buttonLabelMap: Record<ExecutionStatus, string | null> = {
+  blocked: null,
   idle: null,
   executing: 'Executing',
   success: 'Completed',
@@ -100,12 +111,13 @@ export const ActionContainer = ({
   websiteUrl?: string;
   callbacks?: Partial<ActionCallbacksConfig>;
 }) => {
+  const type = 'unknown' as 'unknown' | 'malicious' | 'trusted';
   const websiteText = useMemo(
     () => (websiteUrl ? new URL(websiteUrl).hostname : null),
     [websiteUrl],
   );
   const [executionState, dispatch] = useReducer(executionReducer, {
-    status: 'idle',
+    status: type !== 'malicious' ? 'idle' : 'blocked',
   });
 
   useEffect(() => {
@@ -203,8 +215,44 @@ export const ActionContainer = ({
     };
   };
 
+  const disclaimer = useMemo(() => {
+    if (type === 'malicious' && executionState.status === 'blocked') {
+      return (
+        <Snackbar variant="error">
+          <div className="text-caption mb-3">
+            This Action has been flagged as an unsafe action, & has been
+            blocked. If you believe this action has been blocked in error,
+            please{' '}
+            <a href="#" className="cursor-pointer underline">
+              submit an issue
+            </a>
+            .
+          </div>
+          <button
+            className="text-caption font-semibold"
+            onClick={() => dispatch({ type: ExecutionType.UNBLOCK })}
+          >
+            Ignore warning & proceed
+          </button>
+        </Snackbar>
+      );
+    }
+
+    if (type === 'unknown') {
+      return (
+        <Snackbar variant="warning">
+          This Action has not yet been registered. Only use it if you trust the
+          source
+        </Snackbar>
+      );
+    }
+
+    return null;
+  }, [type, executionState.status]);
+
   return (
     <ActionLayout
+      type={type}
       title={action.title}
       description={action.description}
       websiteUrl={websiteUrl}
@@ -218,6 +266,7 @@ export const ActionContainer = ({
       success={executionState.successMessage}
       buttons={buttons.map(asButtonProps)}
       inputs={inputs.map(asInputProps)}
+      disclaimer={disclaimer}
     />
   );
 };
