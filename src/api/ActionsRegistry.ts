@@ -48,6 +48,15 @@ export interface RegisteredAction {
 async function fetchActionsRegistryConfig(): Promise<ActionsRegistryConfig> {
   try {
     const response = await fetch('https://actions-registry.dialectapi.to/all');
+
+    if (!response.ok) {
+      console.error(
+        'Failed to fetch actions registry config',
+        await response.json(),
+      );
+      return { actions: [] };
+    }
+
     return await response.json();
   } catch (e) {
     console.error('Failed to fetch actions registry config', e);

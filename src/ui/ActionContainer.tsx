@@ -2,6 +2,7 @@ import { useEffect, useMemo, useReducer } from 'react';
 import {
   Action,
   ActionComponent,
+  ActionsRegistry,
   type ActionCallbacksConfig,
   type ActionContext,
 } from '../api';
@@ -111,7 +112,10 @@ export const ActionContainer = ({
   websiteUrl?: string;
   callbacks?: Partial<ActionCallbacksConfig>;
 }) => {
-  const type = 'unknown' as 'unknown' | 'malicious' | 'trusted';
+  const type = useMemo(
+    () => ActionsRegistry.getInstance().lookup(action.url)?.state ?? 'unknown',
+    [action.url],
+  );
   const websiteText = useMemo(
     () => (websiteUrl ? new URL(websiteUrl).hostname : null),
     [websiteUrl],
@@ -121,8 +125,8 @@ export const ActionContainer = ({
   });
 
   useEffect(() => {
-    callbacks?.onActionMount?.(action, websiteUrl ?? action.url);
-  }, [callbacks, action, websiteUrl]);
+    callbacks?.onActionMount?.(action, websiteUrl ?? action.url, type);
+  }, [callbacks, action, websiteUrl, type]);
 
   const buttons = useMemo(
     () =>
@@ -161,6 +165,7 @@ export const ActionContainer = ({
 
     const context: ActionContext = {
       action: component.parent,
+      actionType: type,
       originalUrl: websiteUrl ?? component.parent.url,
       triggeredLinkedAction: component,
     };

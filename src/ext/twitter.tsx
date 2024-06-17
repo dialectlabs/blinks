@@ -1,5 +1,10 @@
 import { createRoot } from 'react-dom/client';
-import { Action, type ActionAdapter, type ActionCallbacksConfig } from '../api';
+import {
+  Action,
+  ActionsRegistry,
+  type ActionAdapter,
+  type ActionCallbacksConfig,
+} from '../api';
 import { ActionContainer } from '../ui';
 import { noop } from '../utils/constants';
 import { ActionsURLMapper, type ActionsJsonConfig } from '../utils/url-mapper';
@@ -10,22 +15,31 @@ export function setupTwitterObserver(
 ) {
   const twitterReactRoot = document.getElementById('react-root')!;
 
-  // entrypoint
-  const observer = new MutationObserver((mutations) => {
-    // it's fast to iterate like this
-    for (let i = 0; i < mutations.length; i++) {
-      const mutation = mutations[i];
-      for (let j = 0; j < mutation.addedNodes.length; j++) {
-        const node = mutation.addedNodes[j];
-        if (node.nodeType !== Node.ELEMENT_NODE) {
-          return;
-        }
-        handleNewNode(node as Element, config, callbacks).catch(noop);
-      }
-    }
-  });
+  const refreshRegistry = async () => {
+    await ActionsRegistry.getInstance().init();
 
-  observer.observe(twitterReactRoot, { childList: true, subtree: true });
+    setTimeout(refreshRegistry, 1000 * 60 * 10); // every 10 minutes
+  };
+
+  // if we don't have the registry, then we don't show anything
+  refreshRegistry().then(() => {
+    // entrypoint
+    const observer = new MutationObserver((mutations) => {
+      // it's fast to iterate like this
+      for (let i = 0; i < mutations.length; i++) {
+        const mutation = mutations[i];
+        for (let j = 0; j < mutation.addedNodes.length; j++) {
+          const node = mutation.addedNodes[j];
+          if (node.nodeType !== Node.ELEMENT_NODE) {
+            return;
+          }
+          handleNewNode(node as Element, config, callbacks).catch(noop);
+        }
+      }
+    });
+
+    observer.observe(twitterReactRoot, { childList: true, subtree: true });
+  });
 }
 
 async function handleNewNode(

@@ -4,6 +4,7 @@ import { ActionComponent, type Action } from './Action.ts';
 export interface ActionContext {
   originalUrl: string;
   action: Action;
+  actionType: 'trusted' | 'malicious' | 'unknown';
   triggeredLinkedAction: ActionComponent;
 }
 
