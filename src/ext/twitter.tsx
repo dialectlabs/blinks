@@ -2,17 +2,32 @@ import { createRoot } from 'react-dom/client';
 import {
   Action,
   ActionsRegistry,
+  getExtendedActionState,
   type ActionAdapter,
   type ActionCallbacksConfig,
 } from '../api';
+import { checkSecurity, type SecurityLevel } from '../shared';
 import { ActionContainer } from '../ui';
 import { noop } from '../utils/constants';
 import { ActionsURLMapper, type ActionsJsonConfig } from '../utils/url-mapper';
 
+type ObserverSecurityLevel = SecurityLevel;
+
+export interface ObserverOptions {
+  // trusted > unknown > malicious
+  securityLevel: ObserverSecurityLevel;
+}
+
+const DEFAULT_OPTIONS: ObserverOptions = {
+  securityLevel: 'all',
+};
+
 export function setupTwitterObserver(
   config: ActionAdapter,
   callbacks: Partial<ActionCallbacksConfig> = {},
+  options: Partial<ObserverOptions> = DEFAULT_OPTIONS,
 ) {
+  const mergedOptions = { ...DEFAULT_OPTIONS, ...options };
   const twitterReactRoot = document.getElementById('react-root')!;
 
   const refreshRegistry = async () => {
@@ -33,7 +48,12 @@ export function setupTwitterObserver(
           if (node.nodeType !== Node.ELEMENT_NODE) {
             return;
           }
-          handleNewNode(node as Element, config, callbacks).catch(noop);
+          handleNewNode(
+            node as Element,
+            config,
+            callbacks,
+            mergedOptions,
+          ).catch(noop);
         }
       }
     });
@@ -46,6 +66,7 @@ async function handleNewNode(
   node: Element,
   config: ActionAdapter,
   callbacks: Partial<ActionCallbacksConfig>,
+  options: ObserverOptions,
 ) {
   const element = node as Element;
   // first quick filtration
@@ -79,13 +100,14 @@ async function handleNewNode(
   }
 
   const action = await Action.fetch(actionApiUrl, config).catch(() => null);
+  const state = action ? getExtendedActionState(action) : null;
 
-  if (!action) {
+  if (!action || !state || checkSecurity(state, options.securityLevel)) {
     return;
   }
 
   rootElement.parentElement?.replaceChildren(
-    createAction(actionUrl.toString(), action, callbacks),
+    createAction(actionUrl.toString(), action, callbacks, options),
   );
 }
 
@@ -93,6 +115,7 @@ function createAction(
   originalUrl: string,
   action: Action,
   callbacks: Partial<ActionCallbacksConfig>,
+  options: ObserverOptions,
 ) {
   const container = document.createElement('div');
   container.className = 'dialect-action-root-container';
@@ -104,6 +127,7 @@ function createAction(
       action={action}
       websiteUrl={originalUrl}
       callbacks={callbacks}
+      securityLevel={options.securityLevel}
     />,
   );
 

@@ -1,3 +1,5 @@
+import { Action } from './Action.ts';
+
 export class ActionsRegistry {
   private static instance: ActionsRegistry | null = null;
   private actionsByHost: Record<string, RegisteredAction>;
@@ -44,6 +46,12 @@ export interface RegisteredAction {
   host: string;
   state: 'trusted' | 'malicious';
 }
+
+export type ExtendedActionState = RegisteredAction['state'] | 'unknown';
+
+export const getExtendedActionState = (action: Action): ExtendedActionState => {
+  return ActionsRegistry.getInstance().lookup(action.url)?.state ?? 'unknown';
+};
 
 async function fetchActionsRegistryConfig(): Promise<ActionsRegistryConfig> {
   try {

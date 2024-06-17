@@ -2,10 +2,11 @@ import { useEffect, useMemo, useReducer, useState } from 'react';
 import {
   Action,
   ActionComponent,
-  ActionsRegistry,
+  getExtendedActionState,
   type ActionCallbacksConfig,
   type ActionContext,
 } from '../api';
+import { checkSecurity, type SecurityLevel } from '../shared';
 import { isSignTransactionError } from '../utils/type-guards.ts';
 import type { ButtonProps } from './ActionLayout';
 import { ActionLayout } from './ActionLayout';
@@ -108,12 +109,6 @@ const buttonLabelMap: Record<ExecutionStatus, string | null> = {
   error: 'Failed',
 };
 
-const lookupActionState = (
-  action: Action,
-): 'trusted' | 'malicious' | 'unknown' => {
-  return ActionsRegistry.getInstance().lookup(action.url)?.state ?? 'unknown';
-};
-
 const SOFT_LIMIT_BUTTONS = 10;
 const SOFT_LIMIT_INPUTS = 3;
 
@@ -121,12 +116,20 @@ export const ActionContainer = ({
   action,
   websiteUrl,
   callbacks,
+  securityLevel = 'all',
 }: {
   action: Action;
   websiteUrl?: string;
   callbacks?: Partial<ActionCallbacksConfig>;
+  securityLevel?: SecurityLevel;
 }) => {
-  const [actionState, setActionState] = useState(lookupActionState(action));
+  const [actionState, setActionState] = useState(
+    getExtendedActionState(action),
+  );
+
+  // adding a ui check as well, to make sure, that on runtime registry lookups, we are not allowing the action to be executed
+  const isPassingSecurityCheck = checkSecurity(actionState, securityLevel);
+
   const websiteText = useMemo(
     () => (websiteUrl ? new URL(websiteUrl).hostname : null),
     [websiteUrl],
@@ -172,7 +175,7 @@ export const ActionContainer = ({
       component.setValue(params[component.parameter.name]);
     }
 
-    const newActionState = lookupActionState(action);
+    const newActionState = getExtendedActionState(action);
     if (newActionState === 'malicious' && actionState !== 'malicious') {
       setActionState(newActionState);
       dispatch({ type: ExecutionType.BLOCK });
@@ -223,7 +226,10 @@ export const ActionContainer = ({
     loading:
       executionState.status === 'executing' &&
       it === executionState.executingAction,
-    disabled: action.disabled || executionState.status !== 'idle',
+    disabled:
+      !isPassingSecurityCheck ||
+      action.disabled ||
+      executionState.status !== 'idle',
     variant: buttonVariantMap[executionState.status],
     onClick: (params?: Record<string, string>) => execute(it, params),
   });
@@ -232,7 +238,10 @@ export const ActionContainer = ({
     return {
       // since we already filter this, we can safely assume that parameter is not null
       placeholder: it.parameter!.label,
-      disabled: action.disabled || executionState.status !== 'idle',
+      disabled:
+        !isPassingSecurityCheck ||
+        action.disabled ||
+        executionState.status !== 'idle',
       name: it.parameter!.name,
       button: asButtonProps(it),
     };
@@ -250,6 +259,8 @@ export const ActionContainer = ({
               submit an issue
             </a>
             .
+            {!isPassingSecurityCheck &&
+              ' Your actions provider blocks execution of this action.'}
           </div>
           <button
             className="text-caption font-semibold"
@@ -265,13 +276,15 @@ export const ActionContainer = ({
       return (
         <Snackbar variant="warning">
           This Action has not yet been registered. Only use it if you trust the
-          source
+          source.
+          {!isPassingSecurityCheck &&
+            ' Your actions provider blocks execution of this action.'}
         </Snackbar>
       );
     }
 
     return null;
-  }, [actionState, executionState.status]);
+  }, [actionState, executionState.status, isPassingSecurityCheck]);
 
   return (
     <ActionLayout

@@ -1,8 +1,9 @@
 import { useState, type ReactNode } from 'react';
+import type { ExtendedActionState } from '../api';
 import { Button } from './Button';
 import { CheckIcon, SpinnerDots } from './icons';
 
-type ActionType = 'trusted' | 'malicious' | 'unknown';
+type ActionType = ExtendedActionState;
 
 interface LayoutProps {
   image?: string;
