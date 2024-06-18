@@ -14,10 +14,19 @@ export default {
             30: '#d9d9d9',
             20: '#eff3f4',
           },
-          accent: '#1d9bf0',
+          accent: {
+            DEFAULT: '#1d9bf0',
+            darker: '#428cd2',
+          },
           success: '#12dc88',
-          error: '#ff5e5e',
-          warning: '#ff9900',
+          error: {
+            DEFAULT: '#ff5e5e',
+            lighter: '#ff7373',
+          },
+          warning: {
+            DEFAULT: '#ff9900',
+            lighter: '#ffb23d',
+          },
         },
       },
       fontSize: {

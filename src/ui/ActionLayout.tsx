@@ -69,7 +69,7 @@ export const ActionLayout = ({
   success,
 }: LayoutProps) => {
   return (
-    <div className="mt-3 w-full overflow-hidden rounded-2xl border border-twitter-accent bg-twitter-neutral-80 shadow-action">
+    <div className="mt-3 w-full cursor-default overflow-hidden rounded-2xl border border-twitter-accent bg-twitter-neutral-80 shadow-action">
       {image && (
         <Linkable url={websiteUrl}>
           <img
@@ -85,7 +85,7 @@ export const ActionLayout = ({
             <a
               href={websiteUrl}
               target="_blank"
-              className="inline-flex items-center truncate text-subtext text-twitter-neutral-50 hover:cursor-pointer hover:underline"
+              className="inline-flex items-center truncate text-subtext text-twitter-neutral-50 transition-colors hover:cursor-pointer hover:text-[#949CA4] hover:underline motion-reduce:transition-none"
               rel="noopener noreferrer"
             >
               <LinkIcon className="mr-2" />
@@ -158,7 +158,7 @@ const ActionInput = ({ placeholder, name, button, disabled }: InputProps) => {
   const [value, onChange] = useState('');
 
   return (
-    <div className="flex items-center gap-2 rounded-full border border-[#3D4144]">
+    <div className="flex items-center gap-2 rounded-full border border-[#3D4144] transition-colors focus-within:border-twitter-accent motion-reduce:transition-none">
       <input
         placeholder={placeholder || 'Type here...'}
         value={value}

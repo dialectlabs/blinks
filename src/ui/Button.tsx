@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { PropsWithChildren } from 'react';
 
 export const Button = ({
@@ -12,13 +13,13 @@ export const Button = ({
 } & PropsWithChildren) => {
   const buttonStyle = disabled
     ? 'bg-twitter-neutral-70 text-twitter-neutral-50'
-    : 'bg-twitter-accent text-white';
+    : 'bg-twitter-accent hover:bg-twitter-accent-darker text-white';
   return (
     <button
-      className={
-        'flex w-full items-center justify-center rounded-full px-6 py-3 text-text font-semibold ' +
-        buttonStyle
-      }
+      className={clsx(
+        'flex w-full items-center justify-center rounded-full px-6 py-3 text-text font-semibold transition-colors motion-reduce:transition-none',
+        buttonStyle,
+      )}
       disabled={disabled}
       onClick={onClick}
     >

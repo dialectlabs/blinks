@@ -269,7 +269,7 @@ export const ActionContainer = ({
           </p>
           {isPassingSecurityCheck && (
             <button
-              className="mt-3 font-semibold"
+              className="hover:text-twitter-error-lighter mt-3 font-semibold transition-colors motion-reduce:transition-none"
               onClick={() => dispatch({ type: ExecutionType.UNBLOCK })}
             >
               Ignore warning & proceed
@@ -289,7 +289,7 @@ export const ActionContainer = ({
               ' Your action provider blocks execution of this action.'}
           </p>
           <a
-            className="mt-3 block font-semibold"
+            className="hover:text-twitter-warning-lighter mt-3 block font-semibold transition-colors motion-reduce:transition-none"
             href="#"
             target="_blank"
             rel="noopener noreferrer"
