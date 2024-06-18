@@ -289,7 +289,7 @@ export const ActionContainer = ({
               ' Your action provider blocks execution of this action.'}
           </p>
           <a
-            className="hover:text-twitter-warning-lighter mt-3 block font-semibold transition-colors motion-reduce:transition-none"
+            className="hover:text-twitter-warning-lighter mt-3 inline-block font-semibold transition-colors motion-reduce:transition-none"
             href="#"
             target="_blank"
             rel="noopener noreferrer"
