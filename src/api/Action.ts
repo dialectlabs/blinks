@@ -23,12 +23,11 @@ export class Action {
 
     const urlObj = new URL(_url);
     this._actions = _data.links.actions.map((action) => {
-      return new ActionComponent(
-        this,
-        action.label,
-        urlObj.origin + action.href,
-        action.parameters,
-      );
+      const href = action.href.startsWith('http')
+        ? action.href
+        : urlObj.origin + action.href;
+
+      return new ActionComponent(this, action.label, href, action.parameters);
     });
   }
 
