@@ -1,15 +1,31 @@
-# @dialectlabs/actions-ui
+# @dialectlabs/blinks &mdash; the [Actions](https://github.com/dialectlabs/actions) Interface
 
-To install dependencies:
+## Usage
+### Chrome Extension
 
-```bash
-bun install
+Package provides an entrypoint function with styled for X Blink components
+
+```ts
+// contentScript.ts
+import { setupTwitterObserver } from "@dialectlabs/blinks/ext/twitter";
+import { ActionConfig } from "@dialectlabs/blinks";
+
+// your RPC_URL is used to create a connection to confirm the transaction after action execution
+setupTwitterObserver(new ActionConfig(RPC_URL, {
+  signTransaction: async (tx: string) => { ... },
+  connect: async () => { ... }
+}))
+
+// or
+
+import { type ActionAdapter } from "@dialectlabs/blinks";
+
+class MyActionAdapter implements ActionAdapter {
+  async signTransaction(tx: string) { ... }
+  async connect() { ... }
+  async confirmTransaction(sig: string) { ... }
+}
+
+setupTwitterObserver(new MyActionAdapter());
 ```
 
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.0.35. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
