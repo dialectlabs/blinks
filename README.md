@@ -29,3 +29,6 @@ class MyActionAdapter implements ActionAdapter {
 setupTwitterObserver(new MyActionAdapter());
 ```
 
+## Learn More:
+
+- [Join our Discord](https://discord.gg/saydialect) - join the community and ask us a question
