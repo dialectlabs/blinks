@@ -10,6 +10,7 @@ import { checkSecurity, type SecurityLevel } from '../shared';
 import { ActionContainer } from '../ui';
 import { noop } from '../utils/constants';
 import { isInterstitial } from '../utils/interstitial-url.ts';
+import { proxify } from '../utils/proxify.ts';
 import { ActionsURLMapper, type ActionsJsonConfig } from '../utils/url-mapper';
 
 type ObserverSecurityLevel = SecurityLevel;
@@ -92,7 +93,8 @@ async function handleNewNode(
   if (interstitialData.isInterstitial) {
     actionApiUrl = interstitialData.decodedActionUrl;
   } else {
-    const actionsJson = await fetch(actionUrl.origin + '/actions.json').then(
+    const actionsJsonUrl = actionUrl.origin + '/actions.json';
+    const actionsJson = await fetch(proxify(actionsJsonUrl)).then(
       (res) => res.json() as Promise<ActionsJsonConfig>,
     );
 
