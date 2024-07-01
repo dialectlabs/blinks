@@ -269,7 +269,7 @@ export const ActionContainer = ({
           </p>
           {isPassingSecurityCheck && (
             <button
-              className="hover:text-twitter-error-lighter mt-3 font-semibold transition-colors motion-reduce:transition-none"
+              className="mt-3 font-semibold transition-colors hover:text-twitter-error-lighter motion-reduce:transition-none"
               onClick={() => dispatch({ type: ExecutionType.UNBLOCK })}
             >
               Ignore warning & proceed
@@ -284,12 +284,12 @@ export const ActionContainer = ({
         <Snackbar variant="warning">
           <p>
             This Action has not yet been registered. Only use it if you trust
-            the source.
+            the source. It will not unfurl on X until it is registered.
             {!isPassingSecurityCheck &&
               ' Your action provider blocks execution of this action.'}
           </p>
           <a
-            className="hover:text-twitter-warning-lighter mt-3 inline-block font-semibold transition-colors motion-reduce:transition-none"
+            className="mt-3 inline-block font-semibold transition-colors hover:text-twitter-warning-lighter motion-reduce:transition-none"
             href="#"
             target="_blank"
             rel="noopener noreferrer"
