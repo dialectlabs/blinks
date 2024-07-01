@@ -3,6 +3,8 @@ import {
   Action,
   ActionsRegistry,
   getExtendedActionState,
+  getExtendedInterstitialState,
+  getExtendedWebsiteState,
   type ActionAdapter,
   type ActionCallbacksConfig,
 } from '../api';
@@ -17,11 +19,48 @@ type ObserverSecurityLevel = SecurityLevel;
 
 export interface ObserverOptions {
   // trusted > unknown > malicious
-  securityLevel: ObserverSecurityLevel;
+  securityLevel:
+    | ObserverSecurityLevel
+    | Record<'websites' | 'interstitials' | 'actions', ObserverSecurityLevel>;
+}
+
+interface NormalizedObserverOptions {
+  securityLevel: Record<
+    'websites' | 'interstitials' | 'actions',
+    ObserverSecurityLevel
+  >;
 }
 
 const DEFAULT_OPTIONS: ObserverOptions = {
   securityLevel: 'only-trusted',
+};
+
+const normalizeOptions = (
+  options: Partial<ObserverOptions>,
+): NormalizedObserverOptions => {
+  return {
+    ...DEFAULT_OPTIONS,
+    ...options,
+    securityLevel: (() => {
+      if (!options.securityLevel) {
+        return {
+          websites: DEFAULT_OPTIONS.securityLevel as ObserverSecurityLevel,
+          interstitials: DEFAULT_OPTIONS.securityLevel as ObserverSecurityLevel,
+          actions: DEFAULT_OPTIONS.securityLevel as ObserverSecurityLevel,
+        };
+      }
+
+      if (typeof options.securityLevel === 'string') {
+        return {
+          websites: options.securityLevel,
+          interstitials: options.securityLevel,
+          actions: options.securityLevel,
+        };
+      }
+
+      return options.securityLevel;
+    })(),
+  };
 };
 
 export function setupTwitterObserver(
@@ -29,7 +68,7 @@ export function setupTwitterObserver(
   callbacks: Partial<ActionCallbacksConfig> = {},
   options: Partial<ObserverOptions> = DEFAULT_OPTIONS,
 ) {
-  const mergedOptions = { ...DEFAULT_OPTIONS, ...options };
+  const mergedOptions = normalizeOptions(options);
   const twitterReactRoot = document.getElementById('react-root')!;
 
   const refreshRegistry = async () => {
@@ -68,7 +107,7 @@ async function handleNewNode(
   node: Element,
   config: ActionAdapter,
   callbacks: Partial<ActionCallbacksConfig>,
-  options: ObserverOptions,
+  options: NormalizedObserverOptions,
 ) {
   const element = node as Element;
   // first quick filtration
@@ -91,8 +130,24 @@ async function handleNewNode(
 
   let actionApiUrl: string | null;
   if (interstitialData.isInterstitial) {
+    const interstitialState = getExtendedInterstitialState(
+      actionUrl.toString(),
+    );
+
+    if (
+      !checkSecurity(interstitialState, options.securityLevel.interstitials)
+    ) {
+      return;
+    }
+
     actionApiUrl = interstitialData.decodedActionUrl;
   } else {
+    const websiteState = getExtendedWebsiteState(actionUrl.toString());
+
+    if (!checkSecurity(websiteState, options.securityLevel.websites)) {
+      return;
+    }
+
     const actionsJsonUrl = actionUrl.origin + '/actions.json';
     const actionsJson = await fetch(proxify(actionsJsonUrl)).then(
       (res) => res.json() as Promise<ActionsJsonConfig>,
@@ -104,7 +159,11 @@ async function handleNewNode(
   }
 
   const state = actionApiUrl ? getExtendedActionState(actionApiUrl) : null;
-  if (!actionApiUrl || !state || !checkSecurity(state, options.securityLevel)) {
+  if (
+    !actionApiUrl ||
+    !state ||
+    !checkSecurity(state, options.securityLevel.actions)
+  ) {
     return;
   }
 
@@ -135,7 +194,7 @@ function createAction({
   originalUrl: URL;
   action: Action;
   callbacks: Partial<ActionCallbacksConfig>;
-  options: ObserverOptions;
+  options: NormalizedObserverOptions;
   isInterstitial: boolean;
 }) {
   const container = document.createElement('div');
@@ -143,7 +202,6 @@ function createAction({
 
   const actionRoot = createRoot(container);
 
-  const websiteUrl = isInterstitial ? null : originalUrl.toString();
   const websiteText = isInterstitial
     ? new URL(action.url).hostname
     : originalUrl.hostname;
@@ -151,10 +209,10 @@ function createAction({
   actionRoot.render(
     <ActionContainer
       action={action}
-      websiteUrl={websiteUrl}
+      websiteUrl={originalUrl.toString()}
       websiteText={websiteText}
       callbacks={callbacks}
-      securityLevel={options.securityLevel}
+      securityLevel={options.securityLevel.actions}
     />,
   );
 
