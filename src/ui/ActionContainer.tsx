@@ -120,8 +120,8 @@ export const ActionContainer = ({
   securityLevel = 'only-trusted',
 }: {
   action: Action;
-  websiteUrl?: string;
-  websiteText?: string;
+  websiteUrl?: string | null;
+  websiteText?: string | null;
   callbacks?: Partial<ActionCallbacksConfig>;
   securityLevel?: SecurityLevel;
 }) => {
@@ -269,7 +269,7 @@ export const ActionContainer = ({
           </p>
           {isPassingSecurityCheck && (
             <button
-              className="hover:text-twitter-error-lighter mt-3 font-semibold transition-colors motion-reduce:transition-none"
+              className="mt-3 font-semibold transition-colors hover:text-twitter-error-lighter motion-reduce:transition-none"
               onClick={() => dispatch({ type: ExecutionType.UNBLOCK })}
             >
               Ignore warning & proceed
@@ -289,7 +289,7 @@ export const ActionContainer = ({
               ' Your action provider blocks execution of this action.'}
           </p>
           <a
-            className="hover:text-twitter-warning-lighter mt-3 inline-block font-semibold transition-colors motion-reduce:transition-none"
+            className="mt-3 inline-block font-semibold transition-colors hover:text-twitter-warning-lighter motion-reduce:transition-none"
             href="#"
             target="_blank"
             rel="noopener noreferrer"

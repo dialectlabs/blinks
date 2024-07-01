@@ -92,6 +92,11 @@ export const ActionLayout = ({
               {websiteText ?? websiteUrl}
             </a>
           )}
+          {websiteText && !websiteUrl && (
+            <span className="inline-flex items-center truncate text-subtext text-twitter-neutral-50">
+              {websiteText}
+            </span>
+          )}
           <a
             href="https://docs.dialect.to/documentation/actions/security"
             target="_blank"

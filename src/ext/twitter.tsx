@@ -140,6 +140,8 @@ function createAction({
   container.className = 'dialect-action-root-container';
 
   const actionRoot = createRoot(container);
+
+  const websiteUrl = isInterstitial ? null : originalUrl.toString();
   const websiteText = isInterstitial
     ? new URL(action.url).hostname
     : originalUrl.hostname;
@@ -147,7 +149,7 @@ function createAction({
   actionRoot.render(
     <ActionContainer
       action={action}
-      websiteUrl={originalUrl.toString()}
+      websiteUrl={websiteUrl}
       websiteText={websiteText}
       callbacks={callbacks}
       securityLevel={options.securityLevel}
