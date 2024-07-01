@@ -1,3 +1,4 @@
+import { proxify } from '../../test/utils/proxify.ts';
 import type { ActionAdapter } from './ActionConfig.ts';
 import type {
   ActionError,
@@ -68,7 +69,7 @@ export class Action {
   }
 
   static async fetch(apiUrl: string, adapter: ActionAdapter) {
-    const response = await fetch(apiUrl, {
+    const response = await fetch(proxify(apiUrl), {
       headers: {
         Accept: 'application/json',
       },
@@ -129,7 +130,7 @@ export class ActionComponent {
   }
 
   public async post(account: string) {
-    const response = await fetch(this.href, {
+    const response = await fetch(proxify(this._href), {
       method: 'POST',
       body: JSON.stringify({ account } as ActionsSpecPostRequestBody),
       headers: {

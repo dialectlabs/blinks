@@ -1,4 +1,5 @@
 import { createRoot } from 'react-dom/client';
+import { proxify } from '../../test/utils/proxify.ts';
 import {
   Action,
   ActionsRegistry,
@@ -92,7 +93,8 @@ async function handleNewNode(
   if (interstitialData.isInterstitial) {
     actionApiUrl = interstitialData.decodedActionUrl;
   } else {
-    const actionsJson = await fetch(actionUrl.origin + '/actions.json').then(
+    const actionsJsonUrl = actionUrl.origin + '/actions.json';
+    const actionsJson = await fetch(proxify(actionsJsonUrl)).then(
       (res) => res.json() as Promise<ActionsJsonConfig>,
     );
 
@@ -106,7 +108,10 @@ async function handleNewNode(
     return;
   }
 
-  const action = await Action.fetch(actionApiUrl, config).catch(() => null);
+  const action = await Action.fetch(
+    proxify(actionApiUrl).toString(),
+    config,
+  ).catch(() => null);
 
   if (!action) {
     return;
