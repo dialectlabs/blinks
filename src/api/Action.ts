@@ -1,4 +1,4 @@
-import { proxify } from '../../test/utils/proxify.ts';
+import { proxify } from '../utils/proxify.ts';
 import type { ActionAdapter } from './ActionConfig.ts';
 import type {
   ActionError,
@@ -69,14 +69,17 @@ export class Action {
   }
 
   static async fetch(apiUrl: string, adapter: ActionAdapter) {
-    const response = await fetch(proxify(apiUrl), {
+    const proxyUrl = proxify(apiUrl);
+    const response = await fetch(proxyUrl, {
       headers: {
         Accept: 'application/json',
       },
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch action ${apiUrl}`);
+      throw new Error(
+        `Failed to fetch action ${proxyUrl}, action url: ${apiUrl}`,
+      );
     }
 
     const data = (await response.json()) as ActionsSpecGetResponse;
@@ -130,7 +133,8 @@ export class ActionComponent {
   }
 
   public async post(account: string) {
-    const response = await fetch(proxify(this._href), {
+    const proxyUrl = proxify(this.href);
+    const response = await fetch(proxyUrl, {
       method: 'POST',
       body: JSON.stringify({ account } as ActionsSpecPostRequestBody),
       headers: {
@@ -141,7 +145,7 @@ export class ActionComponent {
     if (!response.ok) {
       const error = (await response.json()) as ActionError;
       console.error(
-        `Failed to execute action ${this.href}, reason: ${error.message}`,
+        `Failed to execute action ${proxyUrl}, href ${this.href}, reason: ${error.message}`,
       );
 
       throw {

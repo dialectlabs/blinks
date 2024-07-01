@@ -1,5 +1,4 @@
 import { createRoot } from 'react-dom/client';
-import { proxify } from '../../test/utils/proxify.ts';
 import {
   Action,
   ActionsRegistry,
@@ -11,6 +10,7 @@ import { checkSecurity, type SecurityLevel } from '../shared';
 import { ActionContainer } from '../ui';
 import { noop } from '../utils/constants';
 import { isInterstitial } from '../utils/interstitial-url.ts';
+import { proxify } from '../utils/proxify.ts';
 import { ActionsURLMapper, type ActionsJsonConfig } from '../utils/url-mapper';
 
 type ObserverSecurityLevel = SecurityLevel;
@@ -108,10 +108,7 @@ async function handleNewNode(
     return;
   }
 
-  const action = await Action.fetch(
-    proxify(actionApiUrl).toString(),
-    config,
-  ).catch(() => null);
+  const action = await Action.fetch(actionApiUrl, config).catch(() => null);
 
   if (!action) {
     return;
