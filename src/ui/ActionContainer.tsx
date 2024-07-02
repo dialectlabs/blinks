@@ -9,10 +9,14 @@ import {
   type ActionCallbacksConfig,
   type ActionContext,
   type ExtendedActionState,
+  type Parameter,
 } from '../api';
 import { checkSecurity, type SecurityLevel } from '../shared';
 import { isInterstitial } from '../utils/interstitial-url.ts';
-import { isSignTransactionError } from '../utils/type-guards.ts';
+import {
+  isPostRequestError,
+  isSignTransactionError,
+} from '../utils/type-guards.ts';
 import type { ButtonProps } from './ActionLayout';
 import { ActionLayout } from './ActionLayout';
 import { Snackbar } from './Snackbar.tsx';
@@ -31,6 +35,7 @@ enum ExecutionType {
   FINISH = 'FINISH',
   FAIL = 'FAIL',
   RESET = 'RESET',
+  SOFT_RESET = 'SOFT_RESET',
   UNBLOCK = 'UNBLOCK',
   BLOCK = 'BLOCK',
 }
@@ -57,6 +62,10 @@ type ActionValue =
     }
   | {
       type: ExecutionType.BLOCK;
+    }
+  | {
+      type: ExecutionType.SOFT_RESET;
+      errorMessage?: string;
     };
 
 const executionReducer = (
@@ -83,6 +92,13 @@ const executionReducer = (
     case ExecutionType.RESET:
       return {
         status: 'idle',
+      };
+    case ExecutionType.SOFT_RESET:
+      return {
+        ...state,
+        status: 'idle',
+        errorMessage: action.errorMessage,
+        successMessage: null,
       };
     case ExecutionType.BLOCK:
       return {
@@ -165,6 +181,8 @@ const checkSecurityFromActionState = (
 
 const SOFT_LIMIT_BUTTONS = 10;
 const SOFT_LIMIT_INPUTS = 3;
+const SOFT_LIMIT_FORM_INPUTS = 10;
+
 const DEFAULT_SECURITY_LEVEL: SecurityLevel = 'only-trusted';
 
 type Source = 'websites' | 'interstitials' | 'actions';
@@ -227,7 +245,9 @@ export const ActionContainer = ({
       websiteUrl ?? action.url,
       actionState.action,
     );
-  }, [callbacks, action, websiteUrl, actionState]);
+    // we ignore changes to `actionState.action` explicitly, since we want this to run once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [callbacks, action, websiteUrl]);
 
   const buttons = useMemo(
     () =>
@@ -244,7 +264,7 @@ export const ActionContainer = ({
   const inputs = useMemo(
     () =>
       action?.actions
-        .filter((it) => it.parameter)
+        .filter((it) => it.parameters.length === 1)
         .filter((it) =>
           executionState.executingAction
             ? executionState.executingAction === it
@@ -253,13 +273,27 @@ export const ActionContainer = ({
         .toSpliced(SOFT_LIMIT_INPUTS) ?? [],
     [action, executionState.executingAction],
   );
+  const form = useMemo(() => {
+    const [formComponent] =
+      action?.actions
+        .filter((it) => it.parameters.length > 1)
+        .filter((it) =>
+          executionState.executingAction
+            ? executionState.executingAction === it
+            : true,
+        ) ?? [];
+
+    return formComponent;
+  }, [action, executionState.executingAction]);
 
   const execute = async (
     component: ActionComponent,
     params?: Record<string, string>,
   ) => {
-    if (component.parameter && params) {
-      component.setValue(params[component.parameter.name]);
+    if (component.parameters && params) {
+      Object.entries(params).forEach(([name, value]) =>
+        component.setValue(value, name),
+      );
     }
 
     const newActionState = getOverallActionState(action, websiteUrl);
@@ -295,7 +329,18 @@ export const ActionContainer = ({
         return;
       }
 
-      const tx = await component.post(account);
+      const tx = await component
+        .post(account)
+        .catch((e: Error) => ({ error: e.message }));
+
+      if (isPostRequestError(tx)) {
+        dispatch({
+          type: ExecutionType.SOFT_RESET,
+          errorMessage: tx.error,
+        });
+        return;
+      }
+
       const signResult = await action.adapter.signTransaction(
         tx.transaction,
         context,
@@ -328,13 +373,27 @@ export const ActionContainer = ({
     onClick: (params?: Record<string, string>) => execute(it, params),
   });
 
-  const asInputProps = (it: ActionComponent) => {
+  const asInputProps = (it: ActionComponent, parameter?: Parameter) => {
+    const placeholder = !parameter ? it.parameter!.label : parameter.label;
+    const name = !parameter ? it.parameter!.name : parameter.name;
+    const required = !parameter ? it.parameter!.required : parameter.required;
+
     return {
       // since we already filter this, we can safely assume that parameter is not null
-      placeholder: it.parameter!.label,
+      placeholder,
       disabled: action.disabled || executionState.status !== 'idle',
-      name: it.parameter!.name,
+      name,
+      required,
+      button: !parameter ? asButtonProps(it) : undefined,
+    };
+  };
+
+  const asFormProps = (it: ActionComponent) => {
+    return {
       button: asButtonProps(it),
+      inputs: it.parameters
+        .toSpliced(SOFT_LIMIT_FORM_INPUTS)
+        .map((parameter) => asInputProps(it, parameter)),
     };
   };
 
@@ -409,7 +468,8 @@ export const ActionContainer = ({
       }
       success={executionState.successMessage}
       buttons={buttons.map(asButtonProps)}
-      inputs={inputs.map(asInputProps)}
+      inputs={inputs.map((input) => asInputProps(input))}
+      form={form ? asFormProps(form) : undefined}
       disclaimer={disclaimer}
     />
   );

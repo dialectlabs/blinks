@@ -38,17 +38,19 @@ export interface LinkedAction {
   // enforcing single parameter for now for simplicity and determenistic client UIs
   // can be extended to multiple inputs w/o breaking change by switching to Parameter[]
   // note: there are no use-cases for multiple parameters atm, e.g. farcaster frames also have just single input
-  parameters?: [Parameter];
+  parameters?: Parameter[];
 }
 
 export interface Parameter {
   name: string; // parameter name in url
   label?: string; // input placeholder
+  required?: boolean; // input required
 }
 
 // No changes
 export interface ActionsSpecPostRequestBody
   extends SolanaPaySpecPostRequestBody {}
 
-// No changes
-export interface ActionsSpecPostResponse extends SolanaPaySpecPostResponse {}
+// Almost no changes, omitting old `redirect`
+export interface ActionsSpecPostResponse
+  extends Omit<SolanaPaySpecPostResponse, 'redirect'> {}
