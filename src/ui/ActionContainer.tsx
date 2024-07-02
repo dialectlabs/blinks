@@ -245,7 +245,9 @@ export const ActionContainer = ({
       websiteUrl ?? action.url,
       actionState.action,
     );
-  }, [callbacks, action, websiteUrl, actionState]);
+    // we ignore changes to `actionState.action` explicitly, since we want this to run once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [callbacks, action, websiteUrl]);
 
   const buttons = useMemo(
     () =>
