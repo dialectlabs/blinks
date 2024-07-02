@@ -1,4 +1,5 @@
-import { useState, type ReactNode } from 'react';
+import clsx from 'clsx';
+import { useState, type ChangeEvent, type ReactNode } from 'react';
 import type { ExtendedActionState } from '../api';
 import { Badge } from './Badge.tsx';
 import { Button } from './Button';
@@ -49,17 +50,24 @@ export interface FormProps {
 
 const Linkable = ({
   url,
+  className,
   children,
 }: {
   url?: string | null;
+  className?: string;
   children: ReactNode | ReactNode[];
 }) =>
   url ? (
-    <a href={url} target="_blank" rel="noopener noreferrer">
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={className}
+    >
       {children}
     </a>
   ) : (
-    <>{children}</>
+    <div className={className}>{children}</div>
   );
 
 export const ActionLayout = ({
@@ -79,9 +87,17 @@ export const ActionLayout = ({
   return (
     <div className="mt-3 w-full cursor-default overflow-hidden rounded-2xl border border-twitter-accent bg-twitter-neutral-80 shadow-action">
       {image && (
-        <Linkable url={websiteUrl}>
+        <Linkable
+          url={websiteUrl}
+          className={clsx({
+            'block px-5 pt-5': form,
+          })}
+        >
           <img
-            className="aspect-square w-full object-cover object-left"
+            className={clsx('w-full object-cover object-left', {
+              'aspect-square': !form,
+              'aspect-[2/1] rounded-xl': form,
+            })}
             src={image}
             alt="action-image"
           />
@@ -162,14 +178,7 @@ const ActionContent = ({
   buttons,
 }: Pick<LayoutProps, 'form' | 'buttons' | 'inputs'>) => {
   if (form) {
-    return (
-      <div className="flex flex-col gap-3">
-        {form.inputs.map((input) => (
-          <ActionInput key={input.name} {...input} />
-        ))}
-        <ActionButton {...form.button} />
-      </div>
-    );
+    return <ActionForm form={form} />;
   }
 
   return (
@@ -188,30 +197,68 @@ const ActionContent = ({
   );
 };
 
+const ActionForm = ({ form }: Required<Pick<LayoutProps, 'form'>>) => {
+  const [values, setValues] = useState(
+    Object.fromEntries(form.inputs.map((i) => [i.name, ''])),
+  );
+
+  const onChange = (name: string, value: string) => {
+    setValues((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const disabled = form.inputs.some((i) => i.required && values[i.name] === '');
+
+  return (
+    <div className="flex flex-col gap-3">
+      {form.inputs.map((input) => (
+        <ActionInput
+          key={input.name}
+          {...input}
+          onChange={(v) => onChange(input.name, v)}
+        />
+      ))}
+      <ActionButton
+        {...form.button}
+        onClick={() => form.button.onClick(values)}
+        disabled={form.button.disabled || disabled}
+      />
+    </div>
+  );
+};
+
 const ActionInput = ({
   placeholder,
   name,
   button,
   disabled,
+  onChange: extOnChange,
   required,
-}: InputProps) => {
+}: InputProps & { onChange?: (value: string) => void }) => {
   const [value, onChange] = useState('');
+
+  const extendedChange = (e: ChangeEvent<HTMLInputElement>) => {
+    onChange(e.currentTarget.value);
+    extOnChange?.(e.currentTarget.value);
+  };
+
+  const placeholderWithRequired =
+    (placeholder || 'Type here...') + (required ? '*' : '');
 
   return (
     <div className="flex items-center gap-2 rounded-full border border-[#3D4144] transition-colors focus-within:border-twitter-accent motion-reduce:transition-none">
       <input
-        placeholder={placeholder || 'Type here...'}
+        placeholder={placeholderWithRequired}
         value={value}
         disabled={disabled}
-        onChange={(e) => onChange(e.target.value)}
-        className="ml-4 flex-1 truncate bg-transparent outline-none placeholder:text-twitter-neutral-50 disabled:text-twitter-neutral-50"
+        onChange={extendedChange}
+        className="my-3 ml-4 flex-1 truncate bg-transparent outline-none placeholder:text-twitter-neutral-50 disabled:text-twitter-neutral-50"
       />
       {button && (
         <div className="my-2 mr-2">
           <ActionButton
             {...button}
             onClick={() => button.onClick({ [name]: value })}
-            disabled={button.disabled || (required && value === '')}
+            disabled={button.disabled || value === ''}
           />
         </div>
       )}

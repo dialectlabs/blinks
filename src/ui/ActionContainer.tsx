@@ -13,7 +13,10 @@ import {
 } from '../api';
 import { checkSecurity, type SecurityLevel } from '../shared';
 import { isInterstitial } from '../utils/interstitial-url.ts';
-import { isSignTransactionError } from '../utils/type-guards.ts';
+import {
+  isPostRequestError,
+  isSignTransactionError,
+} from '../utils/type-guards.ts';
 import type { ButtonProps } from './ActionLayout';
 import { ActionLayout } from './ActionLayout';
 import { Snackbar } from './Snackbar.tsx';
@@ -32,6 +35,7 @@ enum ExecutionType {
   FINISH = 'FINISH',
   FAIL = 'FAIL',
   RESET = 'RESET',
+  SOFT_RESET = 'SOFT_RESET',
   UNBLOCK = 'UNBLOCK',
   BLOCK = 'BLOCK',
 }
@@ -58,6 +62,10 @@ type ActionValue =
     }
   | {
       type: ExecutionType.BLOCK;
+    }
+  | {
+      type: ExecutionType.SOFT_RESET;
+      errorMessage?: string;
     };
 
 const executionReducer = (
@@ -84,6 +92,13 @@ const executionReducer = (
     case ExecutionType.RESET:
       return {
         status: 'idle',
+      };
+    case ExecutionType.SOFT_RESET:
+      return {
+        ...state,
+        status: 'idle',
+        errorMessage: action.errorMessage,
+        successMessage: null,
       };
     case ExecutionType.BLOCK:
       return {
@@ -166,6 +181,8 @@ const checkSecurityFromActionState = (
 
 const SOFT_LIMIT_BUTTONS = 10;
 const SOFT_LIMIT_INPUTS = 3;
+const SOFT_LIMIT_FORM_INPUTS = 10;
+
 const DEFAULT_SECURITY_LEVEL: SecurityLevel = 'only-trusted';
 
 type Source = 'websites' | 'interstitials' | 'actions';
@@ -271,8 +288,10 @@ export const ActionContainer = ({
     component: ActionComponent,
     params?: Record<string, string>,
   ) => {
-    if (component.parameter && params) {
-      component.setValue(params[component.parameter.name]);
+    if (component.parameters && params) {
+      Object.entries(params).forEach(([name, value]) =>
+        component.setValue(value, name),
+      );
     }
 
     const newActionState = getOverallActionState(action, websiteUrl);
@@ -308,7 +327,18 @@ export const ActionContainer = ({
         return;
       }
 
-      const tx = await component.post(account);
+      const tx = await component
+        .post(account)
+        .catch((e: Error) => ({ error: e.message }));
+
+      if (isPostRequestError(tx)) {
+        dispatch({
+          type: ExecutionType.SOFT_RESET,
+          errorMessage: tx.error,
+        });
+        return;
+      }
+
       const signResult = await action.adapter.signTransaction(
         tx.transaction,
         context,
@@ -359,7 +389,9 @@ export const ActionContainer = ({
   const asFormProps = (it: ActionComponent) => {
     return {
       button: asButtonProps(it),
-      inputs: it.parameters.map((parameter) => asInputProps(it, parameter)),
+      inputs: it.parameters
+        .toSpliced(SOFT_LIMIT_FORM_INPUTS)
+        .map((parameter) => asInputProps(it, parameter)),
     };
   };
 

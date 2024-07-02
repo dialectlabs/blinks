@@ -103,14 +103,19 @@ export class ActionComponent {
     if (this.parameters.length === 1) {
       return this._href.replace(
         `{${this.parameter.name}}`,
-        this.parameterValue[this.parameter.name].trim(),
+        encodeURIComponent(
+          this.parameterValue[this.parameter.name]?.trim() ?? '',
+        ),
       );
     }
 
     // form
     if (this.parameters.length > 1) {
       return this.parameters.reduce((href, param) => {
-        return href.replace(`{${param.name}}`, this.parameterValue[param.name]);
+        return href.replace(
+          `{${param.name}}`,
+          encodeURIComponent(this.parameterValue[param.name]?.trim() ?? ''),
+        );
       }, this._href);
     }
 
