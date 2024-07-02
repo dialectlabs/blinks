@@ -374,9 +374,8 @@ export const ActionContainer = ({
       return (
         <Snackbar variant="warning">
           <p>
-            This Action or it&apos;s origin has not yet been registered. Only
-            use it if you trust the source. It will not unfurl on X until it is
-            registered.
+            This Action has not yet been registered. Only use it if you trust
+            the source. This Action will not unfurl on X until it is registered.
             {!isPassingSecurityCheck &&
               ' Your action provider blocks execution of this action.'}
           </p>
