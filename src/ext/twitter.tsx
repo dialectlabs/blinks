@@ -189,7 +189,6 @@ function createAction({
   action,
   callbacks,
   options,
-  isInterstitial,
 }: {
   originalUrl: URL;
   action: Action;
@@ -202,15 +201,11 @@ function createAction({
 
   const actionRoot = createRoot(container);
 
-  const websiteText = isInterstitial
-    ? new URL(action.url).hostname
-    : originalUrl.hostname;
-
   actionRoot.render(
     <ActionContainer
       action={action}
       websiteUrl={originalUrl.toString()}
-      websiteText={websiteText}
+      websiteText={originalUrl.hostname}
       callbacks={callbacks}
       securityLevel={options.securityLevel}
     />,
