@@ -32,6 +32,7 @@ export interface ActionAdapter {
 }
 
 export class ActionConfig implements ActionAdapter {
+  private static readonly CONFIRM_TIMEOUT_MS = 60000 * 1.2; // 20% extra time
   private connection: Connection;
 
   constructor(
@@ -57,26 +58,38 @@ export class ActionConfig implements ActionAdapter {
     return this.adapter.signTransaction(tx, context);
   }
 
-  async confirmTransaction(signature: string): Promise<void> {
-    if (!this.connection) {
-      throw new Error('Unable to confirm transaction');
-    }
+  confirmTransaction(signature: string): Promise<void> {
+    return new Promise<void>((res, rej) => {
+      const start = Date.now();
 
-    try {
-      const latestBlockhashData =
-        await this.connection.getLatestBlockhash('confirmed');
+      const confirm = async () => {
+        if (Date.now() - start >= ActionConfig.CONFIRM_TIMEOUT_MS) {
+          rej(new Error('Unable to confirm transaction'));
+          return;
+        }
 
-      const res = await this.connection.confirmTransaction({
-        signature,
-        lastValidBlockHeight: latestBlockhashData.lastValidBlockHeight,
-        blockhash: latestBlockhashData.blockhash,
-      });
+        try {
+          const status = await this.connection.getSignatureStatus(signature);
 
-      if (res.value.err) {
-        return Promise.reject(new Error('Transaction execution failed'));
-      }
-    } catch {
-      throw new Error('Unable to confirm transaction');
-    }
+          // if error present, transaction failed
+          if (status.value?.err) {
+            rej(new Error('Transaction execution failed'));
+            return;
+          }
+
+          // if has confirmations, transaction is successful
+          if (status.value && status.value.confirmations !== null) {
+            res();
+            return;
+          }
+        } catch (e) {
+          console.error('Error confirming transaction', e);
+        }
+
+        setTimeout(confirm, 3000);
+      };
+
+      confirm();
+    });
   }
 }
