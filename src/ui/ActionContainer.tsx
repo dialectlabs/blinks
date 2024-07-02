@@ -9,6 +9,7 @@ import {
   type ActionCallbacksConfig,
   type ActionContext,
   type ExtendedActionState,
+  type Parameter,
 } from '../api';
 import { checkSecurity, type SecurityLevel } from '../shared';
 import { isInterstitial } from '../utils/interstitial-url.ts';
@@ -244,7 +245,7 @@ export const ActionContainer = ({
   const inputs = useMemo(
     () =>
       action?.actions
-        .filter((it) => it.parameter)
+        .filter((it) => it.parameters.length === 1)
         .filter((it) =>
           executionState.executingAction
             ? executionState.executingAction === it
@@ -253,6 +254,18 @@ export const ActionContainer = ({
         .toSpliced(SOFT_LIMIT_INPUTS) ?? [],
     [action, executionState.executingAction],
   );
+  const form = useMemo(() => {
+    const [formComponent] =
+      action?.actions
+        .filter((it) => it.parameters.length > 1)
+        .filter((it) =>
+          executionState.executingAction
+            ? executionState.executingAction === it
+            : true,
+        ) ?? [];
+
+    return formComponent;
+  }, [action, executionState.executingAction]);
 
   const execute = async (
     component: ActionComponent,
@@ -328,13 +341,25 @@ export const ActionContainer = ({
     onClick: (params?: Record<string, string>) => execute(it, params),
   });
 
-  const asInputProps = (it: ActionComponent) => {
+  const asInputProps = (it: ActionComponent, parameter?: Parameter) => {
+    const placeholder = !parameter ? it.parameter!.label : parameter.label;
+    const name = !parameter ? it.parameter!.name : parameter.name;
+    const required = !parameter ? it.parameter!.required : parameter.required;
+
     return {
       // since we already filter this, we can safely assume that parameter is not null
-      placeholder: it.parameter!.label,
+      placeholder,
       disabled: action.disabled || executionState.status !== 'idle',
-      name: it.parameter!.name,
+      name,
+      required,
+      button: !parameter ? asButtonProps(it) : undefined,
+    };
+  };
+
+  const asFormProps = (it: ActionComponent) => {
+    return {
       button: asButtonProps(it),
+      inputs: it.parameters.map((parameter) => asInputProps(it, parameter)),
     };
   };
 
@@ -410,7 +435,8 @@ export const ActionContainer = ({
       }
       success={executionState.successMessage}
       buttons={buttons.map(asButtonProps)}
-      inputs={inputs.map(asInputProps)}
+      inputs={inputs.map((input) => asInputProps(input))}
+      form={form ? asFormProps(form) : undefined}
       disclaimer={disclaimer}
     />
   );

@@ -89,23 +89,32 @@ export class Action {
 }
 
 export class ActionComponent {
-  private parameterValue: string = '';
+  private parameterValue: Record<string, string> = {};
 
   constructor(
     private _parent: Action,
     private _label: string,
     private _href: string,
-    private _parameters?: [Parameter],
+    private _parameters?: Parameter[],
   ) {}
 
   public get href() {
-    if (this.parameter) {
+    // input with a button
+    if (this.parameters.length === 1) {
       return this._href.replace(
         `{${this.parameter.name}}`,
-        this.parameterValue.trim(),
+        this.parameterValue[this.parameter.name].trim(),
       );
     }
 
+    // form
+    if (this.parameters.length > 1) {
+      return this.parameters.reduce((href, param) => {
+        return href.replace(`{${param.name}}`, this.parameterValue[param.name]);
+      }, this._href);
+    }
+
+    // button
     return this._href;
   }
 
@@ -119,17 +128,25 @@ export class ActionComponent {
 
   // initial version uses only one parameter, so using the first one
   public get parameter() {
-    const [param] = this._parameters ?? [];
+    const [param] = this.parameters;
 
     return param;
   }
 
-  public reset() {
-    this.parameterValue = '';
+  public get parameters() {
+    return this._parameters ?? [];
   }
 
-  public setValue(value: string) {
-    this.parameterValue = value;
+  public reset() {
+    this.parameterValue = {};
+  }
+
+  public setValue(value: string, name?: string) {
+    if (!this.parameter) {
+      return;
+    }
+
+    this.parameterValue[name ?? this.parameter.name] = value;
   }
 
   public async post(account: string) {

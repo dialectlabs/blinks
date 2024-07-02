@@ -24,6 +24,7 @@ interface LayoutProps {
   description: string;
   buttons?: ButtonProps[];
   inputs?: InputProps[];
+  form?: FormProps;
 }
 export interface ButtonProps {
   text: string | null;
@@ -37,6 +38,12 @@ export interface InputProps {
   placeholder?: string;
   name: string;
   disabled: boolean;
+  required?: boolean;
+  button?: ButtonProps;
+}
+
+export interface FormProps {
+  inputs: Array<Omit<InputProps, 'button'>>;
   button: ButtonProps;
 }
 
@@ -65,6 +72,7 @@ export const ActionLayout = ({
   disclaimer,
   buttons,
   inputs,
+  form,
   error,
   success,
 }: LayoutProps) => {
@@ -132,18 +140,7 @@ export const ActionLayout = ({
           {description}
         </span>
         {disclaimer && <div className="mb-4">{disclaimer}</div>}
-        <div className="flex flex-col gap-3">
-          {buttons && buttons.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              {buttons?.map((it, index) => (
-                <div key={index} className="flex-auto">
-                  <ActionButton {...it} />
-                </div>
-              ))}
-            </div>
-          )}
-          {inputs?.map((input) => <ActionInput key={input.name} {...input} />)}
-        </div>
+        <ActionContent form={form} inputs={inputs} buttons={buttons} />
         {success && (
           <span className="mt-4 flex justify-center text-subtext text-twitter-success">
             {success}
@@ -159,7 +156,45 @@ export const ActionLayout = ({
   );
 };
 
-const ActionInput = ({ placeholder, name, button, disabled }: InputProps) => {
+const ActionContent = ({
+  form,
+  inputs,
+  buttons,
+}: Pick<LayoutProps, 'form' | 'buttons' | 'inputs'>) => {
+  if (form) {
+    return (
+      <div className="flex flex-col gap-3">
+        {form.inputs.map((input) => (
+          <ActionInput key={input.name} {...input} />
+        ))}
+        <ActionButton {...form.button} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      {buttons && buttons.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          {buttons?.map((it, index) => (
+            <div key={index} className="flex-auto">
+              <ActionButton {...it} />
+            </div>
+          ))}
+        </div>
+      )}
+      {inputs?.map((input) => <ActionInput key={input.name} {...input} />)}
+    </div>
+  );
+};
+
+const ActionInput = ({
+  placeholder,
+  name,
+  button,
+  disabled,
+  required,
+}: InputProps) => {
   const [value, onChange] = useState('');
 
   return (
@@ -171,13 +206,15 @@ const ActionInput = ({ placeholder, name, button, disabled }: InputProps) => {
         onChange={(e) => onChange(e.target.value)}
         className="ml-4 flex-1 truncate bg-transparent outline-none placeholder:text-twitter-neutral-50 disabled:text-twitter-neutral-50"
       />
-      <div className="my-2 mr-2">
-        <ActionButton
-          {...button}
-          onClick={() => button.onClick({ [name]: value })}
-          disabled={button.disabled || value === ''}
-        />
-      </div>
+      {button && (
+        <div className="my-2 mr-2">
+          <ActionButton
+            {...button}
+            onClick={() => button.onClick({ [name]: value })}
+            disabled={button.disabled || (required && value === '')}
+          />
+        </div>
+      )}
     </div>
   );
 };
