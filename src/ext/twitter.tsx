@@ -212,7 +212,7 @@ function createAction({
       websiteUrl={originalUrl.toString()}
       websiteText={websiteText}
       callbacks={callbacks}
-      securityLevel={options.securityLevel.actions}
+      securityLevel={options.securityLevel}
     />,
   );
 
