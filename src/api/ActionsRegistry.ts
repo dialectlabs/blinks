@@ -32,7 +32,7 @@ export class ActionsRegistry {
   }
 
   public static getInstance(config?: ActionsRegistryConfig): ActionsRegistry {
-    if (this.instance === null) {
+    if (this.instance === null || config) {
       this.instance = new ActionsRegistry(config);
     }
     return this.instance;
@@ -58,6 +58,7 @@ export class ActionsRegistry {
     url: string | URL,
     type: LookupType = 'action',
   ): RegisteredEntity | null {
+    console.log(`Looking up ${type} for URL: ${url}`);
     if (type === 'action') {
       return this.lookupAction(url);
     }
