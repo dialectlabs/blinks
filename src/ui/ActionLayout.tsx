@@ -85,7 +85,7 @@ export const ActionLayout = ({
   success,
 }: LayoutProps) => {
   return (
-    <div className="mt-3 w-full cursor-default overflow-hidden rounded-2xl border border-twitter-accent bg-twitter-neutral-80 shadow-action">
+    <div className="mt-3 w-full cursor-default overflow-hidden rounded-2xl border border-blink-accent bg-blink-neutral-80 shadow-action">
       {image && (
         <Linkable
           url={websiteUrl}
@@ -109,7 +109,7 @@ export const ActionLayout = ({
             <a
               href={websiteUrl}
               target="_blank"
-              className="inline-flex items-center truncate text-subtext text-twitter-neutral-50 transition-colors hover:cursor-pointer hover:text-[#949CA4] hover:underline motion-reduce:transition-none"
+              className="inline-flex items-center truncate text-subtext text-blink-neutral-50 transition-colors hover:cursor-pointer hover:text-[#949CA4] hover:underline motion-reduce:transition-none"
               rel="noopener noreferrer"
             >
               <LinkIcon className="mr-2" />
@@ -117,7 +117,7 @@ export const ActionLayout = ({
             </a>
           )}
           {websiteText && !websiteUrl && (
-            <span className="inline-flex items-center truncate text-subtext text-twitter-neutral-50">
+            <span className="inline-flex items-center truncate text-subtext text-blink-neutral-50">
               {websiteText}
             </span>
           )}
@@ -152,18 +152,18 @@ export const ActionLayout = ({
         <span className="mb-0.5 text-text font-semibold text-white">
           {title}
         </span>
-        <span className="mb-4 whitespace-pre-wrap text-subtext text-twitter-neutral-40">
+        <span className="mb-4 whitespace-pre-wrap text-subtext text-blink-neutral-40">
           {description}
         </span>
         {disclaimer && <div className="mb-4">{disclaimer}</div>}
         <ActionContent form={form} inputs={inputs} buttons={buttons} />
         {success && (
-          <span className="mt-4 flex justify-center text-subtext text-twitter-success">
+          <span className="mt-4 flex justify-center text-subtext text-blink-success">
             {success}
           </span>
         )}
         {error && !success && (
-          <span className="mt-4 flex justify-center text-subtext text-twitter-error">
+          <span className="mt-4 flex justify-center text-subtext text-blink-error">
             {error}
           </span>
         )}
@@ -245,13 +245,13 @@ const ActionInput = ({
     (placeholder || 'Type here...') + (required ? '*' : '');
 
   return (
-    <div className="flex items-center gap-2 rounded-full border border-[#3D4144] transition-colors focus-within:border-twitter-accent motion-reduce:transition-none">
+    <div className="flex items-center gap-2 rounded-full border border-[#3D4144] transition-colors focus-within:border-blink-accent motion-reduce:transition-none">
       <input
         placeholder={placeholderWithRequired}
         value={value}
         disabled={disabled}
         onChange={extendedChange}
-        className="my-3 ml-4 flex-1 truncate bg-transparent outline-none placeholder:text-twitter-neutral-50 disabled:text-twitter-neutral-50"
+        className="my-3 ml-4 flex-1 truncate bg-transparent outline-none placeholder:text-blink-neutral-50 disabled:text-blink-neutral-50"
       />
       {button && (
         <div className="my-2 mr-2">
@@ -282,7 +282,7 @@ const ActionButton = ({
       );
     if (variant === 'success')
       return (
-        <span className="flex flex-row items-center justify-center gap-2 text-twitter-success">
+        <span className="flex flex-row items-center justify-center gap-2 text-blink-success">
           {text}
           <CheckIcon />
         </span>

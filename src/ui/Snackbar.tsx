@@ -9,8 +9,8 @@ interface Props {
 }
 
 const variantClasses: Record<SnackbarVariant, string> = {
-  error: 'bg-twitter-error/10 text-twitter-error border-twitter-error',
-  warning: 'bg-twitter-warning/10 text-twitter-warning border-twitter-warning',
+  error: 'bg-blink-error/10 text-blink-error border-blink-error',
+  warning: 'bg-blink-warning/10 text-blink-warning border-blink-warning',
 };
 
 export const Snackbar = ({ variant = 'warning', children }: Props) => {

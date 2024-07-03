@@ -12,8 +12,8 @@ export const Button = ({
   variant?: 'success' | 'error' | 'default';
 } & PropsWithChildren) => {
   const buttonStyle = disabled
-    ? 'bg-twitter-neutral-70 text-twitter-neutral-50'
-    : 'bg-twitter-accent hover:bg-twitter-accent-darker text-white';
+    ? 'bg-blink-neutral-70 text-blink-neutral-50'
+    : 'bg-blink-accent hover:bg-blink-accent-darker text-white';
   return (
     <button
       className={clsx(

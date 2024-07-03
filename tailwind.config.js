@@ -4,15 +4,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        twitter: {
+        blink: {
           neutral: {
-            100: '#0f1419',
             80: '#202327',
             70: '#2f3336',
             50: '#6E767D',
             40: '#C4C4C4',
-            30: '#d9d9d9',
-            20: '#eff3f4',
           },
           accent: {
             DEFAULT: '#1d9bf0',

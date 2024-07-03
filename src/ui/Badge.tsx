@@ -12,9 +12,9 @@ interface Props {
 
 const variantClasses: Record<BadgeVariant, string> = {
   error:
-    'bg-twitter-error/10 text-twitter-error hover:text-twitter-error-lighter hover:bg-[#F62D2D1A] transition-colors motion-reduce:transition-none',
+    'bg-blink-error/10 text-blink-error hover:text-blink-error-lighter hover:bg-[#F62D2D1A] transition-colors motion-reduce:transition-none',
   warning:
-    'bg-twitter-warning/10 text-twitter-warning hover:text-twitter-warning-lighter transition-colors motion-reduce:transition-none',
+    'bg-blink-warning/10 text-blink-warning hover:text-blink-warning-lighter transition-colors motion-reduce:transition-none',
   default:
     'bg-[#B3B3B31A] text-[#888989] hover:text-[#949CA4] transition-colors motion-reduce:transition-none',
 };

@@ -194,12 +194,16 @@ export const ActionContainer = ({
   websiteText,
   callbacks,
   securityLevel = DEFAULT_SECURITY_LEVEL,
+  Experimental__ActionLayout = ActionLayout,
 }: {
   action: Action;
   websiteUrl?: string | null;
   websiteText?: string | null;
   callbacks?: Partial<ActionCallbacksConfig>;
   securityLevel?: SecurityLevel | NormalizedSecurityLevel;
+
+  // please do not use it yet, better api is coming..
+  Experimental__ActionLayout?: typeof ActionLayout;
 }) => {
   const normalizedSecurityLevel: NormalizedSecurityLevel = useMemo(() => {
     if (typeof securityLevel === 'string') {
@@ -419,7 +423,7 @@ export const ActionContainer = ({
           </p>
           {isPassingSecurityCheck && (
             <button
-              className="mt-3 font-semibold transition-colors hover:text-twitter-error-lighter motion-reduce:transition-none"
+              className="mt-3 font-semibold transition-colors hover:text-blink-error-lighter motion-reduce:transition-none"
               onClick={() => dispatch({ type: ExecutionType.UNBLOCK })}
             >
               Ignore warning & proceed
@@ -439,7 +443,7 @@ export const ActionContainer = ({
               ' Your action provider blocks execution of this action.'}
           </p>
           <a
-            className="mt-3 inline-block font-semibold transition-colors hover:text-twitter-warning-lighter motion-reduce:transition-none"
+            className="mt-3 inline-block font-semibold transition-colors hover:text-blink-warning-lighter motion-reduce:transition-none"
             href="https://discord.gg/saydialect"
             target="_blank"
             rel="noopener noreferrer"
@@ -454,7 +458,7 @@ export const ActionContainer = ({
   }, [executionState.status, isPassingSecurityCheck, overallState]);
 
   return (
-    <ActionLayout
+    <Experimental__ActionLayout
       type={overallState}
       title={action.title}
       description={action.description}
