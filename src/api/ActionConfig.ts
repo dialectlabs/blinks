@@ -10,13 +10,7 @@ export interface ActionContext {
 
 export interface IncomingActionConfig {
   rpcUrl: string;
-  adapter: {
-    connect: (context: ActionContext) => Promise<string>;
-    signTransaction: (
-      tx: string,
-      context: ActionContext,
-    ) => Promise<{ signature: string } | { error: string }>;
-  };
+  adapter: Pick<ActionAdapter, 'connect' | 'signTransaction'>;
 }
 
 export interface ActionAdapter {
