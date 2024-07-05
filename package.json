@@ -10,7 +10,8 @@
     "url": "https://github.com/dialectlabs/blinks"
   },
   "scripts": {
-    "build": "tsup-node"
+    "build": "tsup-node",
+    "prepack": "tsup-node"
   },
   "main": "dist/index.cjs",
   "module": "dist/index.js",
