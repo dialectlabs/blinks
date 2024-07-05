@@ -4,7 +4,7 @@ import type { PropsWithChildren } from 'react';
 export const Button = ({
   onClick,
   disabled,
-  variant,
+  variant, //eslint-disable-line @typescript-eslint/no-unused-vars
   children,
 }: {
   onClick: () => void;
