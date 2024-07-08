@@ -13,7 +13,16 @@ import {
 
 type ActionType = ExtendedActionState;
 
+export type StylePreset = 'default' | 'x-dark' | 'x-light' | 'custom';
+const stylePresetClassMap: Record<StylePreset, string> = {
+  default: 'dial-light',
+  'x-dark': 'x-dark',
+  'x-light': 'x-light',
+  custom: 'custom',
+};
+
 interface LayoutProps {
+  stylePreset?: StylePreset;
   image?: string;
   error?: string | null;
   success?: string | null;
@@ -71,6 +80,7 @@ const Linkable = ({
   );
 
 export const ActionLayout = ({
+  stylePreset = 'default',
   title,
   description,
   image,
@@ -85,7 +95,7 @@ export const ActionLayout = ({
   success,
 }: LayoutProps) => {
   return (
-    <div className="blink x-light">
+    <div className={clsx('blink', stylePresetClassMap[stylePreset])}>
       <div className="mt-3 w-full cursor-default overflow-hidden rounded-2xl border border-stroke-brand bg-bg-primary shadow-action">
         {image && (
           <Linkable url={websiteUrl} className="block px-5 pt-5">

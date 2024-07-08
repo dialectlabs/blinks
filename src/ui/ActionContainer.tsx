@@ -17,7 +17,7 @@ import {
   isPostRequestError,
   isSignTransactionError,
 } from '../utils/type-guards.ts';
-import type { ButtonProps } from './ActionLayout';
+import type { ButtonProps, StylePreset } from './ActionLayout';
 import { ActionLayout } from './ActionLayout';
 import { Snackbar } from './Snackbar.tsx';
 
@@ -194,6 +194,7 @@ export const ActionContainer = ({
   websiteText,
   callbacks,
   securityLevel = DEFAULT_SECURITY_LEVEL,
+  stylePreset = 'default',
   Experimental__ActionLayout = ActionLayout,
 }: {
   action: Action;
@@ -201,6 +202,7 @@ export const ActionContainer = ({
   websiteText?: string | null;
   callbacks?: Partial<ActionCallbacksConfig>;
   securityLevel?: SecurityLevel | NormalizedSecurityLevel;
+  stylePreset?: StylePreset;
 
   // please do not use it yet, better api is coming..
   Experimental__ActionLayout?: typeof ActionLayout;
@@ -459,6 +461,7 @@ export const ActionContainer = ({
 
   return (
     <Experimental__ActionLayout
+      stylePreset={stylePreset}
       type={overallState}
       title={action.title}
       description={action.description}

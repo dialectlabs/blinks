@@ -9,7 +9,7 @@ import {
   type ActionCallbacksConfig,
 } from '../api';
 import { checkSecurity, type SecurityLevel } from '../shared';
-import { ActionContainer } from '../ui';
+import { ActionContainer, type StylePreset } from '../ui';
 import { noop } from '../utils/constants';
 import { isInterstitial } from '../utils/interstitial-url.ts';
 import { proxify } from '../utils/proxify.ts';
@@ -123,6 +123,7 @@ async function handleNewNode(
   if (!linkPreview) {
     return;
   }
+
   const anchor = linkPreview.children[0] as HTMLAnchorElement;
   const shortenedUrl = anchor.href;
   const actionUrl = await resolveTwitterShortenedUrl(shortenedUrl);
@@ -203,6 +204,7 @@ function createAction({
 
   actionRoot.render(
     <ActionContainer
+      stylePreset={resolveXStylePreset()}
       action={action}
       websiteUrl={originalUrl.toString()}
       websiteText={originalUrl.hostname}
@@ -213,6 +215,17 @@ function createAction({
 
   return container;
 }
+
+const resolveXStylePreset = (): StylePreset => {
+  const colorScheme = document.querySelector('html')?.style.colorScheme;
+
+  if (colorScheme) {
+    return colorScheme === 'dark' ? 'x-dark' : 'x-light';
+  }
+
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  return prefersDark ? 'x-dark' : 'x-light';
+};
 
 async function resolveTwitterShortenedUrl(shortenedUrl: string): Promise<URL> {
   const res = await fetch(shortenedUrl);

@@ -117,7 +117,5 @@
     --blink-transparent-warning: var(--light-twitter-warning-light---10);
   }
 
-  .blink.x-blue {
-    /* todo: x dark blue/gray mode */
-  }
+  .blink.custom {}
 }
