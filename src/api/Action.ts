@@ -37,7 +37,7 @@ export class Action {
   }
 
   public get icon() {
-    return this._data.icon;
+    return proxify(this._data.icon).toString();
   }
 
   public get title() {
