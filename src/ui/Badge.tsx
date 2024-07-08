@@ -10,13 +10,28 @@ interface Props {
   className?: string;
 }
 
-const variantClasses: Record<BadgeVariant, string> = {
-  error:
-    'bg-blink-error/10 text-blink-error hover:text-blink-error-lighter hover:bg-[#F62D2D1A] transition-colors motion-reduce:transition-none',
-  warning:
-    'bg-blink-warning/10 text-blink-warning hover:text-blink-warning-lighter transition-colors motion-reduce:transition-none',
-  default:
-    'bg-[#B3B3B31A] text-[#888989] hover:text-[#949CA4] transition-colors motion-reduce:transition-none',
+interface VariantClassNames {
+  container: string;
+  text: string;
+  icon: string;
+}
+
+const variantClasses: Record<BadgeVariant, VariantClassNames> = {
+  error: {
+    container: 'group bg-transparent-error',
+    text: 'text-text-error group-hover:text-text-error-hover transition-colors motion-reduce:transition-none',
+    icon: 'text-icon-error group-hover:text-icon-error-hover transition-colors motion-reduce:transition-none',
+  },
+  warning: {
+    container: 'group bg-transparent-warning',
+    text: 'text-text-warning group-hover:text-text-warning-hover transition-colors motion-reduce:transition-none',
+    icon: 'text-icon-warning group-hover:text-icon-warning-hover transition-colors motion-reduce:transition-none',
+  },
+  default: {
+    container: 'group bg-transparent-grey',
+    text: 'text-text-primary group-hover:text-text-primary-hover transition-colors motion-reduce:transition-none',
+    icon: 'text-icon-primary group-hover:text-icon-primary-hover transition-colors motion-reduce:transition-none',
+  },
 };
 
 export const Badge = ({
@@ -25,10 +40,11 @@ export const Badge = ({
   className,
   icon,
 }: Props) => {
+  const { container, icon: iconClassNames, text } = variantClasses[variant];
   return (
     <div
       className={clsx(
-        variantClasses[variant],
+        container,
         'inline-flex items-center justify-center gap-1 rounded-full text-subtext font-semibold leading-none',
         className,
         {
@@ -37,8 +53,8 @@ export const Badge = ({
         },
       )}
     >
-      {children && <span>{children}</span>}
-      {icon && <div>{icon}</div>}
+      {children && <span className={text}>{children}</span>}
+      {icon && <div className={iconClassNames}>{icon}</div>}
     </div>
   );
 };

@@ -12,8 +12,8 @@ export const Button = ({
   variant?: 'success' | 'error' | 'default';
 } & PropsWithChildren) => {
   const buttonStyle = disabled
-    ? 'bg-blink-neutral-70 text-blink-neutral-50'
-    : 'bg-blink-accent hover:bg-blink-accent-darker text-white';
+    ? 'bg-button-disabled text-text-tertiary'
+    : 'bg-button hover:bg-button-hover text-text-button';
   return (
     <button
       className={clsx(

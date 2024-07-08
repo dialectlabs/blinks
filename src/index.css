@@ -1,3 +1,123 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  .blink.dial-light {
+    /* todo: interstitial styles */
+  }
+
+  .blink.x-dark {
+    --dark-twitter-brand: #1d9bf0;
+    --dark-twitter-brand-dark: #3087da;
+    --dark-twitter-brand-dark--10: #1d9bf01a;
+    --dark-twitter-brand-light: #35aeff;
+    --dark-twitter-dark-30: #949ca4;
+    --dark-twitter-dark-40: #768088;
+    --dark-twitter-dark-50: #6e767d;
+    --dark-twitter-dark-50---10: #6e767d1a;
+    --dark-twitter-dark-70: #3d4144;
+    --dark-twitter-dark-80: #2f3336;
+    --dark-twitter-dark-90: #202327;
+    --dark-twitter-error: #ff6565;
+    --dark-twitter-error-dark: #aa0000;
+    --dark-twitter-error-dark---10: #aa00001a;
+    --dark-twitter-error-light: #ff7a7a;
+    --dark-twitter-light-100: #ffffff;
+    --dark-twitter-success: #12dc88;
+    --dark-twitter-warning: #ffb545;
+    --dark-twitter-warning-dark: #a96600;
+    --dark-twitter-warning-dark---10: #a966001a;
+    --dark-twitter-warning-light: #ffc875;
+
+    --blink-bg-primary: var(--dark-twitter-dark-90);
+    --blink-button: var(--dark-twitter-brand);
+    --blink-button-disabled: var(--dark-twitter-dark-80);
+    --blink-button-hover: var(--dark-twitter-brand-dark);
+    --blink-icon-error: var(--dark-twitter-error);
+    --blink-icon-error-hover: var(--dark-twitter-error-light);
+    --blink-icon-primary: var(--dark-twitter-dark-50);
+    --blink-icon-primary-hover: var(--dark-twitter-dark-30);
+    --blink-icon-warning: var(--dark-twitter-warning);
+    --blink-icon-warning-hover: var(--dark-twitter-warning-light);
+    --blink-stroke-brand: var(--dark-twitter-brand);
+    --blink-stroke-error: var(--dark-twitter-error);
+    --blink-stroke-primary: var(--dark-twitter-dark-70);
+    --blink-stroke-secondary: var(--dark-twitter-dark-70);
+    --blink-stroke-warning: var(--dark-twitter-warning);
+    --blink-text-brand: var(--dark-twitter-brand-light);
+    --blink-text-button: var(--dark-twitter-light-100);
+    --blink-text-error: var(--dark-twitter-error);
+    --blink-text-error-hover: var(--dark-twitter-error-light);
+    --blink-text-hover: var(--dark-twitter-dark-30);
+    --blink-text-primary: var(--dark-twitter-light-100);
+    --blink-text-secondary: var(--dark-twitter-dark-30);
+    --blink-text-success: var(--dark-twitter-success);
+    --blink-text-tertiary: var(--dark-twitter-dark-50);
+    --blink-text-warning: var(--dark-twitter-warning);
+    --blink-text-warning-hover: var(--dark-twitter-warning-light);
+    --blink-transparent-error: var(--dark-twitter-error-dark---10);
+    --blink-transparent-grey: var(--dark-twitter-dark-50---10);
+    --blink-transparent-warning: var(--dark-twitter-warning-dark---10);
+  }
+
+  .blink.x-light {
+    --light-twitter-brand: #499bea;
+    --light-twitter-brand-dark: #428cd2;
+    --light-twitter-brand-light: #5facf7;
+    --light-twitter-brand-light---10: #5facf71a;
+    --light-twitter-dark-100: #101418;
+    --light-twitter-dark-20: #9da3ae;
+    --light-twitter-dark-30: #949ca4;
+    --light-twitter-dark-60: #566470;
+    --light-twitter-dark-90: #202327;
+    --light-twitter-error: #ff402e;
+    --light-twitter-error-dark: #f71a05;
+    --light-twitter-error-light: #ff9696;
+    --light-twitter-error-light---10: #ff96961a;
+    --light-twitter-light-100: #ffffff;
+    --light-twitter-light-30: #d1d9de;
+    --light-twitter-light-70: #f0f3f4;
+    --light-twitter-light-80: #f3f5f6;
+    --light-twitter-light-90: #f7f7f7;
+    --light-twitter-success: #029923;
+    --light-twitter-warning: #ef6f08;
+    --light-twitter-warning-dark: #d55f00;
+    --light-twitter-warning-light: #ffbc6e;
+    --light-twitter-warning-light---10: #ffbc6e1a;
+
+    --blink-bg-primary: var(--light-twitter-light-100);
+    --blink-button: var(--light-twitter-brand);
+    --blink-button-disabled: var(--light-twitter-light-80);
+    --blink-button-hover: var(--light-twitter-brand-dark);
+    --blink-icon-error: var(--light-twitter-error-dark);
+    --blink-icon-error-hover: var(--light-twitter-error);
+    --blink-icon-primary: var(--light-twitter-dark-30);
+    --blink-icon-primary-hover: var(--light-twitter-dark-20);
+    --blink-icon-warning: var(--light-twitter-warning);
+    --blink-icon-warning-hover: var(--light-twitter-warning-light);
+    --blink-stroke-brand: var(--light-twitter-brand);
+    --blink-stroke-error: var(--light-twitter-error-light);
+    --blink-stroke-primary: var(--light-twitter-light-70);
+    --blink-stroke-secondary: var(--light-twitter-light-30);
+    --blink-stroke-warning: var(--light-twitter-warning-light);
+    --blink-text-brand: var(--light-twitter-brand-dark);
+    --blink-text-button: var(--light-twitter-light-100);
+    --blink-text-error: var(--light-twitter-error-dark);
+    --blink-text-error-hover: var(--light-twitter-error);
+    --blink-text-hover: var(--light-twitter-dark-20);
+    --blink-text-primary: var(--light-twitter-dark-100);
+    --blink-text-secondary: var(--light-twitter-dark-60);
+    --blink-text-success: var(--light-twitter-success);
+    --blink-text-tertiary: var(--light-twitter-dark-30);
+    --blink-text-warning: var(--light-twitter-warning-dark);
+    --blink-text-warning-hover: var(--light-twitter-warning);
+    --blink-transparent-error: var(--light-twitter-error-light---10);
+    --blink-transparent-grey: var(--dark-twitter-dark-50---10);
+    --blink-transparent-warning: var(--light-twitter-warning-light---10);
+  }
+
+  .blink.x-blue {
+    /* todo: x dark blue/gray mode */
+  }
+}

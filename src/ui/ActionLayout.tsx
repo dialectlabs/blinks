@@ -85,88 +85,85 @@ export const ActionLayout = ({
   success,
 }: LayoutProps) => {
   return (
-    <div className="mt-3 w-full cursor-default overflow-hidden rounded-2xl border border-blink-accent bg-blink-neutral-80 shadow-action">
-      {image && (
-        <Linkable
-          url={websiteUrl}
-          className={clsx({
-            'block px-5 pt-5': form,
-          })}
-        >
-          <img
-            className={clsx('w-full object-cover object-left', {
-              'aspect-square': !form,
-              'aspect-[2/1] rounded-xl': form,
-            })}
-            src={image}
-            alt="action-image"
-          />
-        </Linkable>
-      )}
-      <div className="flex flex-col p-5">
-        <div className="mb-2 flex items-center gap-2">
-          {websiteUrl && (
+    <div className="blink x-light">
+      <div className="mt-3 w-full cursor-default overflow-hidden rounded-2xl border border-stroke-brand bg-bg-primary shadow-action">
+        {image && (
+          <Linkable url={websiteUrl} className="block px-5 pt-5">
+            <img
+              className={clsx('w-full rounded-xl object-cover object-left', {
+                'aspect-square': !form,
+                'aspect-[2/1]': form,
+              })}
+              src={image}
+              alt="action-image"
+            />
+          </Linkable>
+        )}
+        <div className="flex flex-col p-5">
+          <div className="mb-2 flex items-center gap-2">
+            {websiteUrl && (
+              <a
+                href={websiteUrl}
+                target="_blank"
+                className="inline-flex items-center truncate text-subtext text-text-tertiary transition-colors hover:cursor-pointer hover:text-text-hover hover:underline motion-reduce:transition-none"
+                rel="noopener noreferrer"
+              >
+                <LinkIcon className="mr-2" />
+                {websiteText ?? websiteUrl}
+              </a>
+            )}
+            {websiteText && !websiteUrl && (
+              <span className="inline-flex items-center truncate text-subtext text-text-tertiary">
+                {websiteText}
+              </span>
+            )}
             <a
-              href={websiteUrl}
+              href="https://docs.dialect.to/documentation/actions/security"
               target="_blank"
-              className="inline-flex items-center truncate text-subtext text-blink-neutral-50 transition-colors hover:cursor-pointer hover:text-[#949CA4] hover:underline motion-reduce:transition-none"
               rel="noopener noreferrer"
+              className="flex items-center"
             >
-              <LinkIcon className="mr-2" />
-              {websiteText ?? websiteUrl}
+              {type === 'malicious' && (
+                <Badge
+                  variant="error"
+                  icon={<ExclamationShieldIcon width={13} height={13} />}
+                >
+                  Blocked
+                </Badge>
+              )}
+              {type === 'trusted' && (
+                <Badge
+                  variant="default"
+                  icon={<InfoShieldIcon width={13} height={13} />}
+                />
+              )}
+              {type === 'unknown' && (
+                <Badge
+                  variant="warning"
+                  icon={<InfoShieldIcon width={13} height={13} />}
+                />
+              )}
             </a>
-          )}
-          {websiteText && !websiteUrl && (
-            <span className="inline-flex items-center truncate text-subtext text-blink-neutral-50">
-              {websiteText}
+          </div>
+          <span className="mb-0.5 text-text font-semibold text-text-primary">
+            {title}
+          </span>
+          <span className="mb-4 whitespace-pre-wrap text-subtext text-text-secondary">
+            {description}
+          </span>
+          {disclaimer && <div className="mb-4">{disclaimer}</div>}
+          <ActionContent form={form} inputs={inputs} buttons={buttons} />
+          {success && (
+            <span className="mt-4 flex justify-center text-subtext text-text-success">
+              {success}
             </span>
           )}
-          <a
-            href="https://docs.dialect.to/documentation/actions/security"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center"
-          >
-            {type === 'malicious' && (
-              <Badge
-                variant="error"
-                icon={<ExclamationShieldIcon width={13} height={13} />}
-              >
-                Blocked
-              </Badge>
-            )}
-            {type === 'trusted' && (
-              <Badge
-                variant="default"
-                icon={<InfoShieldIcon width={13} height={13} />}
-              />
-            )}
-            {type === 'unknown' && (
-              <Badge
-                variant="warning"
-                icon={<InfoShieldIcon width={13} height={13} />}
-              />
-            )}
-          </a>
+          {error && !success && (
+            <span className="mt-4 flex justify-center text-subtext text-text-error">
+              {error}
+            </span>
+          )}
         </div>
-        <span className="mb-0.5 text-text font-semibold text-white">
-          {title}
-        </span>
-        <span className="mb-4 whitespace-pre-wrap text-subtext text-blink-neutral-40">
-          {description}
-        </span>
-        {disclaimer && <div className="mb-4">{disclaimer}</div>}
-        <ActionContent form={form} inputs={inputs} buttons={buttons} />
-        {success && (
-          <span className="mt-4 flex justify-center text-subtext text-blink-success">
-            {success}
-          </span>
-        )}
-        {error && !success && (
-          <span className="mt-4 flex justify-center text-subtext text-blink-error">
-            {error}
-          </span>
-        )}
       </div>
     </div>
   );
@@ -245,13 +242,13 @@ const ActionInput = ({
     (placeholder || 'Type here...') + (required ? '*' : '');
 
   return (
-    <div className="flex items-center gap-2 rounded-full border border-[#3D4144] transition-colors focus-within:border-blink-accent motion-reduce:transition-none">
+    <div className="flex items-center gap-2 rounded-full border border-stroke-secondary transition-colors focus-within:border-stroke-brand motion-reduce:transition-none">
       <input
         placeholder={placeholderWithRequired}
         value={value}
         disabled={disabled}
         onChange={extendedChange}
-        className="my-3 ml-4 flex-1 truncate bg-transparent outline-none placeholder:text-blink-neutral-50 disabled:text-blink-neutral-50"
+        className="bg-transparent my-3 ml-4 flex-1 truncate outline-none placeholder:text-text-tertiary disabled:text-text-tertiary"
       />
       {button && (
         <div className="my-2 mr-2">
@@ -282,7 +279,7 @@ const ActionButton = ({
       );
     if (variant === 'success')
       return (
-        <span className="flex flex-row items-center justify-center gap-2 text-blink-success">
+        <span className="flex flex-row items-center justify-center gap-2 text-text-success">
           {text}
           <CheckIcon />
         </span>

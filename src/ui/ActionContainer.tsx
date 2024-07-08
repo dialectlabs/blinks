@@ -423,7 +423,7 @@ export const ActionContainer = ({
           </p>
           {isPassingSecurityCheck && (
             <button
-              className="mt-3 font-semibold transition-colors hover:text-blink-error-lighter motion-reduce:transition-none"
+              className="mt-3 font-semibold transition-colors hover:text-text-error-hover motion-reduce:transition-none"
               onClick={() => dispatch({ type: ExecutionType.UNBLOCK })}
             >
               Ignore warning & proceed
@@ -443,7 +443,7 @@ export const ActionContainer = ({
               ' Your action provider blocks execution of this action.'}
           </p>
           <a
-            className="mt-3 inline-block font-semibold transition-colors hover:text-blink-warning-lighter motion-reduce:transition-none"
+            className="mt-3 inline-block font-semibold transition-colors hover:text-text-warning-hover motion-reduce:transition-none"
             href="https://discord.gg/saydialect"
             target="_blank"
             rel="noopener noreferrer"
