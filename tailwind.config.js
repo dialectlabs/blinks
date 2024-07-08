@@ -34,6 +34,15 @@ export default {
       'transparent-warning': 'var(--blink-transparent-warning)',
       transparent: 'transparent',
     },
+    borderRadius: {
+      lg: 'var(--blink-border-radius-rounded-lg)',
+      xl: 'var(--blink-border-radius-rounded-xl)',
+      '2xl': 'var(--blink-border-radius-rounded-2xl)',
+      button: 'var(--blink-border-radius-rounded-button)',
+      input: 'var(--blink-border-radius-rounded-input)',
+      full: '9999px',
+      none: '0px',
+    },
     extend: {
       fontSize: {
         // assuming twitter font size base - 15px
@@ -42,8 +51,7 @@ export default {
         caption: ['0.73333rem', '0.93333rem'],
       },
       boxShadow: {
-        action:
-          '0px 2px 8px 0px rgba(59, 176, 255, 0.22), 0px 1px 48px 0px rgba(29, 155, 240, 0.32)',
+        action: 'var(--blink-shadow-container)',
       },
     },
   },

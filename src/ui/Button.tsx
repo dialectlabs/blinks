@@ -17,7 +17,7 @@ export const Button = ({
   return (
     <button
       className={clsx(
-        'flex w-full items-center justify-center rounded-full px-6 py-3 text-text font-semibold transition-colors motion-reduce:transition-none',
+        'rounded-button flex w-full items-center justify-center text-nowrap px-6 py-3 text-text font-semibold transition-colors motion-reduce:transition-none',
         buttonStyle,
       )}
       disabled={disabled}

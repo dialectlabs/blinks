@@ -193,7 +193,10 @@ const ActionContent = ({
       {buttons && buttons.length > 0 && (
         <div className="flex flex-wrap items-center gap-2">
           {buttons?.map((it, index) => (
-            <div key={index} className="flex-auto">
+            <div
+              key={index}
+              className="flex flex-grow basis-[calc(33.333%-2*4px)]"
+            >
               <ActionButton {...it} />
             </div>
           ))}
@@ -252,13 +255,13 @@ const ActionInput = ({
     (placeholder || 'Type here...') + (required ? '*' : '');
 
   return (
-    <div className="flex items-center gap-2 rounded-full border border-stroke-secondary transition-colors focus-within:border-stroke-brand motion-reduce:transition-none">
+    <div className="rounded-input flex items-center gap-2 border border-stroke-secondary transition-colors focus-within:border-stroke-brand motion-reduce:transition-none">
       <input
         placeholder={placeholderWithRequired}
         value={value}
         disabled={disabled}
         onChange={extendedChange}
-        className="bg-transparent my-3 ml-4 flex-1 truncate outline-none placeholder:text-text-tertiary disabled:text-text-tertiary"
+        className="bg-transparent my-3 ml-4 flex-1 truncate text-text-primary outline-none placeholder:text-text-tertiary disabled:text-text-tertiary"
       />
       {button && (
         <div className="my-2 mr-2">
@@ -283,13 +286,13 @@ const ActionButton = ({
   const ButtonContent = () => {
     if (loading)
       return (
-        <span className="flex flex-row items-center justify-center gap-2">
+        <span className="flex flex-row items-center justify-center gap-2 text-nowrap">
           {text} <SpinnerDots />
         </span>
       );
     if (variant === 'success')
       return (
-        <span className="flex flex-row items-center justify-center gap-2 text-text-success">
+        <span className="flex flex-row items-center justify-center gap-2 text-nowrap text-text-success">
           {text}
           <CheckIcon />
         </span>
