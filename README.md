@@ -4,7 +4,7 @@
 ### Style Presets & Overriding Theme
 
 #### Style Presets
-`ActionContainer` contains a `stylePreset` prop that accepts the following values:
+`Blink` component contains a `stylePreset` prop that accepts the following values:
 * `default` - [dial.to](https://dial.to)-styled blink (light)
 * `x-dark` - [X](https://x.com/)-styled blink (dark)
 * `x-light` - [X](https://x.com/)-styled blink (light)
