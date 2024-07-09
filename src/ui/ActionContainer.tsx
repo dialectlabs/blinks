@@ -17,7 +17,7 @@ import {
   isPostRequestError,
   isSignTransactionError,
 } from '../utils/type-guards.ts';
-import type { ButtonProps } from './ActionLayout';
+import type { ButtonProps, StylePreset } from './ActionLayout';
 import { ActionLayout } from './ActionLayout';
 import { Snackbar } from './Snackbar.tsx';
 
@@ -194,6 +194,7 @@ export const ActionContainer = ({
   websiteText,
   callbacks,
   securityLevel = DEFAULT_SECURITY_LEVEL,
+  stylePreset = 'default',
   Experimental__ActionLayout = ActionLayout,
 }: {
   action: Action;
@@ -201,6 +202,7 @@ export const ActionContainer = ({
   websiteText?: string | null;
   callbacks?: Partial<ActionCallbacksConfig>;
   securityLevel?: SecurityLevel | NormalizedSecurityLevel;
+  stylePreset?: StylePreset;
 
   // please do not use it yet, better api is coming..
   Experimental__ActionLayout?: typeof ActionLayout;
@@ -423,7 +425,7 @@ export const ActionContainer = ({
           </p>
           {isPassingSecurityCheck && (
             <button
-              className="mt-3 font-semibold transition-colors hover:text-blink-error-lighter motion-reduce:transition-none"
+              className="mt-3 font-semibold transition-colors hover:text-text-error-hover motion-reduce:transition-none"
               onClick={() => dispatch({ type: ExecutionType.UNBLOCK })}
             >
               Ignore warning & proceed
@@ -443,7 +445,7 @@ export const ActionContainer = ({
               ' Your action provider blocks execution of this action.'}
           </p>
           <a
-            className="mt-3 inline-block font-semibold transition-colors hover:text-blink-warning-lighter motion-reduce:transition-none"
+            className="mt-3 inline-block font-semibold transition-colors hover:text-text-warning-hover motion-reduce:transition-none"
             href="https://discord.gg/saydialect"
             target="_blank"
             rel="noopener noreferrer"
@@ -459,6 +461,7 @@ export const ActionContainer = ({
 
   return (
     <Experimental__ActionLayout
+      stylePreset={stylePreset}
       type={overallState}
       title={action.title}
       description={action.description}

@@ -9,8 +9,8 @@ interface Props {
 }
 
 const variantClasses: Record<SnackbarVariant, string> = {
-  error: 'bg-blink-error/10 text-blink-error border-blink-error',
-  warning: 'bg-blink-warning/10 text-blink-warning border-blink-warning',
+  error: 'bg-transparent-error text-text-error border-stroke-error',
+  warning: 'bg-transparent-warning text-text-warning border-stroke-warning',
 };
 
 export const Snackbar = ({ variant = 'warning', children }: Props) => {

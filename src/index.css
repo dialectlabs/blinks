@@ -1,3 +1,156 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  .dial-light {
+    --blink-bg-primary: #ffffff;
+    --blink-button: #2a2a2b;
+    --blink-button-disabled: #737373;
+    --blink-button-hover: #323335;
+    --blink-button-success: #09cbbf1a;
+    --blink-icon-error: #f71a05;
+    --blink-icon-error-hover: #ff402e;
+    --blink-icon-primary: #737373;
+    --blink-icon-primary-hover: #888989;
+    --blink-icon-warning: #d55f00;
+    --blink-icon-warning-hover: #ef6f08;
+    --blink-input-bg: #ffffff;
+    --blink-input-stroke: #c4c6c8;
+    --blink-input-stroke-disabled: #dee1e7;
+    --blink-input-stroke-error: #ff402e;
+    --blink-input-stroke-hover: #b3b3b3;
+    --blink-input-stroke-selected: #08c0b4;
+    --blink-stroke-error: #ff9696;
+    --blink-stroke-primary: #d7d7d7;
+    --blink-stroke-secondary: #ebebeb;
+    --blink-stroke-warning: #ffbc6e;
+    --blink-text-brand: #08c0b4;
+    --blink-text-button: #ffffff;
+    --blink-text-button-disabled: #f2f3f5;
+    --blink-text-button-success: #00a095;
+    --blink-text-error: #f71a05;
+    --blink-text-error-hover: #ff402e;
+    --blink-text-input: #737373;
+    --blink-text-input-disabled: #b3b3b3;
+    --blink-text-input-placeholder: #737373;
+    --blink-text-link: #737373;
+    --blink-text-link-hover: #888989;
+    --blink-text-primary: #232324;
+    --blink-text-secondary: #434445;
+    --blink-text-success: #00a095;
+    --blink-text-warning: #d55f00;
+    --blink-text-warning-hover: #ef6f08;
+    --blink-transparent-error: #ff96961a;
+    --blink-transparent-grey: #b3b3b31a;
+    --blink-transparent-warning: #ffbc6e1a;
+
+    --blink-border-radius-rounded-lg: 0.25rem;
+    --blink-border-radius-rounded-xl: 0.5rem;
+    --blink-border-radius-rounded-2xl: 1rem;
+    --blink-border-radius-rounded-button: 0.5rem;
+    --blink-border-radius-rounded-input: 0.5rem;
+
+    --blink-shadow-container: 0px 129.333px 103.467px 0px rgba(0, 0, 0, 0.07), 0px 54.032px 43.226px 0px rgba(0, 0, 0, 0.05), 0px 16.195px 12.956px 0px rgba(0, 0, 0, 0.04), 0px 8.601px 6.881px 0px rgba(0, 0, 0, 0.03), 0px 3.579px 2.863px 0px rgba(0, 0, 0, 0.02);
+  }
+
+  .x-dark, .x-light {
+    --blink-border-radius-rounded-lg: 0.25rem;
+    --blink-border-radius-rounded-xl: 0.5rem;
+    --blink-border-radius-rounded-2xl: 1.125rem;
+    --blink-border-radius-rounded-button: 624.9375rem;
+    --blink-border-radius-rounded-input: 624.9375rem;
+  }
+
+  .x-dark {
+    --blink-bg-primary: #202327;
+    --blink-button: #1d9bf0;
+    --blink-button-disabled: #2f3336;
+    --blink-button-hover: #3087da;
+    --blink-button-success: #00ae661a;
+    --blink-icon-error: #ff6565;
+    --blink-icon-error-hover: #ff7a7a;
+    --blink-icon-primary: #6e767d;
+    --blink-icon-primary-hover: #949ca4;
+    --blink-icon-warning: #ffb545;
+    --blink-icon-warning-hover: #ffc875;
+    --blink-input-bg: #202327;
+    --blink-input-stroke: #3d4144;
+    --blink-input-stroke-disabled: #2f3336;
+    --blink-input-stroke-error: #ff6565;
+    --blink-input-stroke-hover: #6e767d;
+    --blink-input-stroke-selected: #1d9bf0;
+    --blink-stroke-error: #ff6565;
+    --blink-stroke-primary: #1d9bf0;
+    --blink-stroke-secondary: #3d4144;
+    --blink-stroke-warning: #ffb545;
+    --blink-text-brand: #35aeff;
+    --blink-text-button: #ffffff;
+    --blink-text-button-disabled: #768088;
+    --blink-text-button-success: #12dc88;
+    --blink-text-error: #ff6565;
+    --blink-text-error-hover: #ff7a7a;
+    --blink-text-input: #ffffff;
+    --blink-text-input-disabled: #566470;
+    --blink-text-input-placeholder: #6e767d;
+    --blink-text-link: #6e767d;
+    --blink-text-link-hover: #949ca4;
+    --blink-text-primary: #ffffff;
+    --blink-text-secondary: #949ca4;
+    --blink-text-success: #12dc88;
+    --blink-text-warning: #ffb545;
+    --blink-text-warning-hover: #ffc875;
+    --blink-transparent-error: #aa00001a;
+    --blink-transparent-grey: #6e767d1a;
+    --blink-transparent-warning: #a966001a;
+
+    --blink-shadow-container: 0px 2px 8px 0px rgba(59, 176, 255, 0.22), 0px 1px 48px 0px rgba(29, 155, 240, 0.24);
+  }
+
+  .x-light {
+    --blink-bg-primary: #ffffff;
+    --blink-button: #499bea;
+    --blink-button-disabled: #F0F3F4;
+    --blink-button-hover: #428cd2;
+    --blink-button-success: #00B1271a;
+    --blink-icon-error: #f71a05;
+    --blink-icon-error-hover: #ff402e;
+    --blink-icon-primary: #949ca4;
+    --blink-icon-primary-hover: #9da3ae;
+    --blink-icon-warning: #ef6f08;
+    --blink-icon-warning-hover: #ffbc6e;
+    --blink-input-bg: #ffffff;
+    --blink-input-stroke: #d1d9de;
+    --blink-input-stroke-disabled: #f0f3f4;
+    --blink-input-stroke-error: #ff402e;
+    --blink-input-stroke-hover: #9da3ae;
+    --blink-input-stroke-selected: #499bea;
+    --blink-stroke-error: #ff9696;
+    --blink-stroke-primary: #499bea;
+    --blink-stroke-secondary: #d1d9de;
+    --blink-stroke-warning: #ffbc6e;
+    --blink-text-brand: #428cd2;
+    --blink-text-button: #ffffff;
+    --blink-text-button-disabled: #949ca4;
+    --blink-text-button-success: #029923;
+    --blink-text-error: #f71a05;
+    --blink-text-error-hover: #ff402e;
+    --blink-text-input: #101418;
+    --blink-text-input-disabled: #9da3ae;
+    --blink-text-input-placeholder: #949ca4;
+    --blink-text-link: #949ca4;
+    --blink-text-link-hover: #9da3ae;
+    --blink-text-primary: #101418;
+    --blink-text-secondary: #566470;
+    --blink-text-success: #029923;
+    --blink-text-warning: #d55f00;
+    --blink-text-warning-hover: #ef6f08;
+    --blink-transparent-error: #ff96961a;
+    --blink-transparent-grey: #6e767d1a;
+    --blink-transparent-warning: #ffbc6e1a;
+
+    --blink-shadow-container: 0px 2px 8px 0px rgba(62, 177, 255, 0.22), 0px 1px 48px 0px rgba(62, 177, 255, 0.24);
+  }
+
+  .custom {}
+}
