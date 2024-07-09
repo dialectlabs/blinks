@@ -11,6 +11,7 @@
 * `custom` - clean slate, no colors, radii at all, use CSS Variables to style. See [Overriding Theme](#overriding-theme). 
 
 ```tsx
+import '@dialectlabs/blinks/index.css';
 import { ActionContainer } from "@dialectlabs/blinks";
 
 <ActionContainer stylePreset="x-dark" ... />
@@ -27,26 +28,37 @@ In your CSS, you can override the following CSS Variables to customize the look 
   --blink-button: #1d9bf0;
   --blink-button-disabled: #2f3336;
   --blink-button-hover: #3087da;
+  --blink-button-success: #00ae661a;
   --blink-icon-error: #ff6565;
   --blink-icon-error-hover: #ff7a7a;
   --blink-icon-primary: #6e767d;
   --blink-icon-primary-hover: #949ca4;
   --blink-icon-warning: #ffb545;
   --blink-icon-warning-hover: #ffc875;
-  --blink-stroke-brand: #1d9bf0;
+  --blink-input-bg: #202327;
+  --blink-input-stroke: #3d4144;
+  --blink-input-stroke-disabled: #2f3336;
+  --blink-input-stroke-error: #ff6565;
+  --blink-input-stroke-hover: #6e767d;
+  --blink-input-stroke-selected: #1d9bf0;
   --blink-stroke-error: #ff6565;
-  --blink-stroke-primary: #3d4144;
+  --blink-stroke-primary: #1d9bf0;
   --blink-stroke-secondary: #3d4144;
   --blink-stroke-warning: #ffb545;
   --blink-text-brand: #35aeff;
   --blink-text-button: #ffffff;
+  --blink-text-button-disabled: #768088;
+  --blink-text-button-success: #12dc88;
   --blink-text-error: #ff6565;
   --blink-text-error-hover: #ff7a7a;
-  --blink-text-hover: #949ca4;
+  --blink-text-input: #ffffff;
+  --blink-text-input-disabled: #566470;
+  --blink-text-input-placeholder: #6e767d;
+  --blink-text-link: #6e767d;
+  --blink-text-link-hover: #949ca4;
   --blink-text-primary: #ffffff;
   --blink-text-secondary: #949ca4;
   --blink-text-success: #12dc88;
-  --blink-text-tertiary: #6e767d;
   --blink-text-warning: #ffb545;
   --blink-text-warning-hover: #ffc875;
   --blink-transparent-error: #aa00001a;
@@ -60,7 +72,7 @@ In your CSS, you can override the following CSS Variables to customize the look 
   --blink-border-radius-rounded-input: 624.9375rem;
 
   /* box-shadow */
-  --blink-shadow-container: 0px 2px 8px 0px rgba(59, 176, 255, 0.22), 0px 1px 48px 0px rgba(29, 155, 240, 0.32);
+  --blink-shadow-container: 0px 2px 8px 0px rgba(59, 176, 255, 0.22), 0px 1px 48px 0px rgba(29, 155, 240, 0.24);
 }
 ```
 
