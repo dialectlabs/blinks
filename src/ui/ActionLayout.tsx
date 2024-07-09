@@ -96,7 +96,7 @@ export const ActionLayout = ({
 }: LayoutProps) => {
   return (
     <div className={clsx('blink', stylePresetClassMap[stylePreset])}>
-      <div className="mt-3 w-full cursor-default overflow-hidden rounded-2xl border border-stroke-brand bg-bg-primary shadow-action">
+      <div className="mt-3 w-full cursor-default overflow-hidden rounded-2xl border border-stroke-primary bg-bg-primary shadow-action">
         {image && (
           <Linkable url={websiteUrl} className="block px-5 pt-5">
             <img
@@ -115,15 +115,17 @@ export const ActionLayout = ({
               <a
                 href={websiteUrl}
                 target="_blank"
-                className="inline-flex items-center truncate text-subtext text-text-tertiary transition-colors hover:cursor-pointer hover:text-text-hover hover:underline motion-reduce:transition-none"
+                className="group -mt-1 inline-flex items-center truncate text-subtext hover:cursor-pointer"
                 rel="noopener noreferrer"
               >
-                <LinkIcon className="mr-2" />
-                {websiteText ?? websiteUrl}
+                <LinkIcon className="mr-2 text-icon-primary transition-colors group-hover:text-icon-primary-hover motion-reduce:transition-none" />
+                <span className="text-text-link group-hover:text-text-link-hover transition-colors group-hover:underline motion-reduce:transition-none">
+                  {websiteText ?? websiteUrl}
+                </span>
               </a>
             )}
             {websiteText && !websiteUrl && (
-              <span className="inline-flex items-center truncate text-subtext text-text-tertiary">
+              <span className="text-text-link -mt-1 inline-flex items-center truncate text-subtext">
                 {websiteText}
               </span>
             )}
@@ -255,13 +257,21 @@ const ActionInput = ({
     (placeholder || 'Type here...') + (required ? '*' : '');
 
   return (
-    <div className="rounded-input flex items-center gap-2 border border-stroke-secondary transition-colors focus-within:border-stroke-brand motion-reduce:transition-none">
+    <div
+      className={clsx(
+        'border-input-stroke focus-within:border-input-stroke-selected flex items-center gap-2 rounded-input border transition-colors motion-reduce:transition-none',
+        {
+          'hover:focus-within:border-input-stroke-selected hover:border-input-stroke-hover':
+            !disabled,
+        },
+      )}
+    >
       <input
         placeholder={placeholderWithRequired}
         value={value}
         disabled={disabled}
         onChange={extendedChange}
-        className="bg-transparent my-3 ml-4 flex-1 truncate text-text-primary outline-none placeholder:text-text-tertiary disabled:text-text-tertiary"
+        className="bg-input-bg text-text-input placeholder:text-text-input-placeholder disabled:text-text-input-disabled my-3 ml-4 flex-1 truncate outline-none"
       />
       {button && (
         <div className="my-2 mr-2">
@@ -292,7 +302,7 @@ const ActionButton = ({
       );
     if (variant === 'success')
       return (
-        <span className="flex flex-row items-center justify-center gap-2 text-nowrap text-text-success">
+        <span className="flex flex-row items-center justify-center gap-2 text-nowrap">
           {text}
           <CheckIcon />
         </span>
