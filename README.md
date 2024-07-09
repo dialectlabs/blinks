@@ -12,9 +12,9 @@
 
 ```tsx
 import '@dialectlabs/blinks/index.css';
-import { ActionContainer } from "@dialectlabs/blinks";
+import { Blink } from "@dialectlabs/blinks";
 
-<ActionContainer stylePreset="x-dark" ... />
+<Blink stylePreset="x-dark" ... />
 ```
 
 #### Overriding Theme
