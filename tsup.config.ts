@@ -1,13 +1,24 @@
-import { defineConfig } from 'tsup';
+import { defineConfig, type Options } from 'tsup';
 
-export default defineConfig({
-  entry: ['src/index.ts', 'src/index.css', 'src/ext/twitter.tsx'],
+const commonCfg: Partial<Options> = {
   splitting: true,
   sourcemap: false,
   clean: true,
-  dts: {
-    entry: ['src/index.ts', 'src/ext/twitter.tsx'],
-  },
   format: ['cjs', 'esm'],
   target: ['esnext'],
-});
+};
+
+export default defineConfig([
+  {
+    ...commonCfg,
+    entry: [
+      'src/index.ts',
+      'src/index.css',
+      'src/ext/twitter.tsx',
+      'src/react/index.ts',
+    ],
+    dts: {
+      entry: ['src/index.ts', 'src/ext/twitter.tsx', 'src/react/index.ts'],
+    },
+  },
+]);

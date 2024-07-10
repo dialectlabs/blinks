@@ -14,7 +14,7 @@ export class Action {
   private constructor(
     private readonly _url: string,
     private readonly _data: ActionsSpecGetResponse,
-    private readonly _adapter: ActionAdapter,
+    private _adapter?: ActionAdapter,
   ) {
     // if no links present, fallback to original solana pay spec
     if (!_data.links?.actions) {
@@ -61,14 +61,22 @@ export class Action {
   }
 
   public get adapter() {
+    if (!this._adapter) {
+      throw new Error('No adapter provided');
+    }
+
     return this._adapter;
+  }
+
+  public setAdapter(adapter: ActionAdapter) {
+    this._adapter = adapter;
   }
 
   public resetActions() {
     this._actions.forEach((action) => action.reset());
   }
 
-  static async fetch(apiUrl: string, adapter: ActionAdapter) {
+  static async fetch(apiUrl: string, adapter?: ActionAdapter) {
     const proxyUrl = proxify(apiUrl);
     const response = await fetch(proxyUrl, {
       headers: {
