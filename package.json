@@ -22,9 +22,9 @@
       "types": "./dist/ext/twitter.d.ts"
     },
     "./react": {
-        "import": "./dist/react/index.js",
-        "require": "./dist/react/index.cjs",
-        "types": "./dist/react/index.d.ts"
+      "import": "./dist/react/index.js",
+      "require": "./dist/react/index.cjs",
+      "types": "./dist/react/index.d.ts"
     },
     ".": {
       "import": "./dist/index.js",
