@@ -1,4 +1,4 @@
-import { proxify } from '../utils/proxify.ts';
+import { proxify, proxifyImage } from '../utils/proxify.ts';
 import type { ActionAdapter } from './ActionConfig.ts';
 import type {
   ActionError,
@@ -37,7 +37,7 @@ export class Action {
   }
 
   public get icon() {
-    return proxify(this._data.icon).toString();
+    return proxifyImage(this._data.icon).toString();
   }
 
   public get title() {
