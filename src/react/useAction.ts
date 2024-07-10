@@ -1,3 +1,4 @@
+'use client';
 import type { Connection } from '@solana/web3.js';
 import { useEffect, useState } from 'react';
 import { Action } from '../api';

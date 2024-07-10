@@ -1,7 +1,7 @@
 import { defineConfig, type Options } from 'tsup';
 
 const commonCfg: Partial<Options> = {
-  splitting: false,
+  splitting: true,
   sourcemap: false,
   clean: true,
   format: ['cjs', 'esm'],
@@ -11,29 +11,14 @@ const commonCfg: Partial<Options> = {
 export default defineConfig([
   {
     ...commonCfg,
-    entry: ['src/react/index.ts'],
-    outDir: 'dist/react',
+    entry: [
+      'src/index.ts',
+      'src/index.css',
+      'src/ext/twitter.tsx',
+      'src/react/index.ts',
+    ],
     dts: {
-      entry: ['src/react/index.ts'],
-    },
-    banner: {
-      js: "'use client';",
-    },
-  },
-  {
-    ...commonCfg,
-    entry: ['src/ext/twitter.tsx'],
-    outDir: 'dist/ext',
-    dts: {
-      entry: ['src/ext/twitter.tsx'],
-    },
-  },
-  {
-    ...commonCfg,
-    entry: ['src/index.ts', 'src/index.css'],
-    outDir: 'dist',
-    dts: {
-      entry: ['src/index.ts'],
+      entry: ['src/index.ts', 'src/ext/twitter.tsx', 'src/react/index.ts'],
     },
   },
 ]);
