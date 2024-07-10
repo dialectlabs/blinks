@@ -30,14 +30,17 @@ export class ActionConfig implements ActionAdapter {
   private connection: Connection;
 
   constructor(
-    rpcUrl: string,
+    rpcUrlOrConnection: string | Connection,
     private adapter: IncomingActionConfig['adapter'],
   ) {
-    if (!rpcUrl) {
-      throw new Error('rpcUrl is required');
+    if (!rpcUrlOrConnection) {
+      throw new Error('rpcUrl or connection is required');
     }
 
-    this.connection = new Connection(rpcUrl, 'confirmed');
+    this.connection =
+      typeof rpcUrlOrConnection === 'string'
+        ? new Connection(rpcUrlOrConnection, 'confirmed')
+        : rpcUrlOrConnection;
   }
 
   async connect(context: ActionContext) {
