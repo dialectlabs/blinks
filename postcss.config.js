@@ -1,4 +1,11 @@
 let prefixOverrideList = ['html', 'body'];
+const selectorIgnoreList = [
+  '.blink',
+  '.x-dark',
+  '.x-light',
+  '.dial-light',
+  '.custom',
+];
 
 export default {
   plugins: {
@@ -8,7 +15,10 @@ export default {
       prefix: '.blink',
       includeFiles: ['index.css'],
       transform: function (prefix, selector, prefixedSelector) {
-        if (selector.startsWith('.blink')) {
+        const shouldIgnore =
+          selectorIgnoreList.filter((ignore) => selector.startsWith(ignore))
+            .length > 0;
+        if (shouldIgnore) {
           return selector;
         }
         if (prefixOverrideList.includes(selector)) {
