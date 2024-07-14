@@ -37,6 +37,9 @@ export class Action {
   }
 
   public get icon() {
+    if (this._data.icon.startsWith('data:')) {
+      return this._data.icon;
+    }
     return proxifyImage(this._data.icon).toString();
   }
 
