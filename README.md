@@ -106,6 +106,17 @@ class MyActionAdapter implements ActionAdapter {
 setupTwitterObserver(new MyActionAdapter());
 ```
 
+#### Manifest
+
+```json
+  "content_scripts": [
+    {
+      "matches": ["https://twitter.com/*", "https://x.com/*", "https://pro.x.com/*"],
+      "js": ["src/contentScript.ts"],
+    }
+  ]
+```
+
 ## Learn More:
 
 - [Join our Discord](https://discord.gg/saydialect) - join the community and ask us a question
