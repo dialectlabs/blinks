@@ -101,7 +101,7 @@ export const ActionLayout = ({
           <Linkable url={websiteUrl} className="block px-5 pt-5">
             <img
               className={clsx('w-full rounded-xl object-cover object-left', {
-                'aspect-square': !form,
+                'aspect-auto': !form,
                 'aspect-[2/1]': form,
               })}
               src={image}
