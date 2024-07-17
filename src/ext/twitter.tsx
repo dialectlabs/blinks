@@ -102,7 +102,6 @@ export function setupTwitterObserver(
     observer.observe(twitterReactRoot, { childList: true, subtree: true });
   });
 }
-
 async function handleNewNode(
   node: Element,
   config: ActionAdapter,
@@ -114,17 +113,25 @@ async function handleNewNode(
   if (!element || element.localName !== 'div') {
     return;
   }
-  const rootElement = findElementByTestId(element, 'card.wrapper');
-  if (!rootElement) {
-    return;
-  }
-  // handle link preview only, assuming that link preview is a must for actions
-  const linkPreview = rootElement.children[0] as HTMLDivElement;
-  if (!linkPreview) {
-    return;
+
+  let anchor;
+  let card;
+  let tweetText;
+
+  const linkPreview = tryLinkPreview(element);
+  if (linkPreview) {
+    anchor = linkPreview.anchor;
+    card = linkPreview.card;
+  } else {
+    const link = tryLinkInText(element);
+    if (link) {
+      anchor = link.anchor;
+      tweetText = link.tweetText;
+    }
   }
 
-  const anchor = linkPreview.children[0] as HTMLAnchorElement;
+  if (!anchor) return;
+
   const shortenedUrl = anchor.href;
   const actionUrl = await resolveTwitterShortenedUrl(shortenedUrl);
   const interstitialData = isInterstitial(actionUrl);
@@ -168,13 +175,22 @@ async function handleNewNode(
     return;
   }
 
+  //double check if link preview appeared after we assumed it is not there
+  const isCardPresent = findCardInTweet(element);
+  if (!card && isCardPresent) {
+    console.log('found card in tweet');
+    return;
+  }
+
   const action = await Action.fetch(actionApiUrl, config).catch(() => null);
 
   if (!action) {
     return;
   }
 
-  rootElement.parentElement?.replaceChildren(
+  const container = card ? card.parentElement : getContainerForLink(tweetText!);
+
+  container?.replaceChildren(
     createAction({
       originalUrl: actionUrl,
       action,
@@ -241,4 +257,51 @@ function findElementByTestId(element: Element, testId: string) {
     return element;
   }
   return element.querySelector(`[data-testid="${testId}"]`);
+}
+
+function getContainerForLink(tweetText: Element) {
+  const root = document.createElement('div');
+  root.style.paddingTop = '12px';
+  const dm = tweetText.closest(`[data-testid="messageEntry"]`);
+  if (dm) {
+    tweetText.parentElement?.parentElement?.prepend(root);
+    root.style.paddingBottom = '8px';
+  } else {
+    tweetText.parentElement?.append(root);
+  }
+  return root;
+}
+
+function findCardInTweet(element: Element) {
+  const message =
+    findElementByTestId(element, 'tweet') ??
+    findElementByTestId(element, 'messageEntry');
+  if (message) {
+    return findElementByTestId(message, 'card.wrapper');
+  }
+}
+
+function tryLinkPreview(element: Element) {
+  const card = findElementByTestId(element, 'card.wrapper');
+  if (card) {
+    const linkPreview = card.children[0];
+    if (linkPreview) {
+      const anchor = linkPreview.children[0] as HTMLAnchorElement;
+      return { anchor, card };
+    }
+  }
+}
+function tryLinkInText(element: Element) {
+  const tweetText = findElementByTestId(element, 'tweetText');
+  if (!tweetText || tweetText.classList.contains('dialect-link-tweet')) {
+    return;
+  }
+
+  const links = tweetText.getElementsByTagName('a');
+  if (links.length > 0) {
+    //marking tweet as visited
+    tweetText.classList.add('dialect-link-tweet');
+    const anchor = links[links.length - 1] as HTMLAnchorElement;
+    return { anchor, tweetText };
+  }
 }

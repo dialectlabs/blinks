@@ -96,7 +96,7 @@ export const ActionLayout = ({
 }: LayoutProps) => {
   return (
     <div className={clsx('blink', stylePresetClassMap[stylePreset])}>
-      <div className="mt-3 w-full cursor-default overflow-hidden rounded-2xl border border-stroke-primary bg-bg-primary shadow-action">
+      <div className="w-full cursor-default overflow-hidden rounded-2xl border border-stroke-primary bg-bg-primary shadow-action">
         {image && (
           <Linkable url={websiteUrl} className="block px-5 pt-5">
             <img
@@ -119,13 +119,13 @@ export const ActionLayout = ({
                 rel="noopener noreferrer"
               >
                 <LinkIcon className="mr-2 text-icon-primary transition-colors group-hover:text-icon-primary-hover motion-reduce:transition-none" />
-                <span className="text-text-link group-hover:text-text-link-hover transition-colors group-hover:underline motion-reduce:transition-none">
+                <span className="text-text-link transition-colors group-hover:text-text-link-hover group-hover:underline motion-reduce:transition-none">
                   {websiteText ?? websiteUrl}
                 </span>
               </a>
             )}
             {websiteText && !websiteUrl && (
-              <span className="text-text-link -mt-1 inline-flex items-center truncate text-subtext">
+              <span className="-mt-1 inline-flex items-center truncate text-subtext text-text-link">
                 {websiteText}
               </span>
             )}
@@ -259,9 +259,9 @@ const ActionInput = ({
   return (
     <div
       className={clsx(
-        'border-input-stroke focus-within:border-input-stroke-selected flex items-center gap-2 rounded-input border transition-colors motion-reduce:transition-none',
+        'flex items-center gap-2 rounded-input border border-input-stroke transition-colors focus-within:border-input-stroke-selected motion-reduce:transition-none',
         {
-          'hover:focus-within:border-input-stroke-selected hover:border-input-stroke-hover':
+          'hover:border-input-stroke-hover hover:focus-within:border-input-stroke-selected':
             !disabled,
         },
       )}
@@ -271,7 +271,7 @@ const ActionInput = ({
         value={value}
         disabled={disabled}
         onChange={extendedChange}
-        className="bg-input-bg text-text-input placeholder:text-text-input-placeholder disabled:text-text-input-disabled my-3 ml-4 flex-1 truncate outline-none"
+        className="my-3 ml-4 flex-1 truncate bg-input-bg text-text-input outline-none placeholder:text-text-input-placeholder disabled:text-text-input-disabled"
       />
       {button && (
         <div className="my-2 mr-2">
