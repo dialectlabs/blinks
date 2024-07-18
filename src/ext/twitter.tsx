@@ -115,18 +115,25 @@ async function handleNewNode(
   }
 
   let anchor;
-  let card;
-  let tweetText;
 
-  const linkPreview = tryLinkPreview(element);
+  const linkPreview = findLinkPreview(element);
+
+  let container = findContainerInTweet(
+    linkPreview?.card ?? element,
+    Boolean(linkPreview),
+  );
   if (linkPreview) {
     anchor = linkPreview.anchor;
-    card = linkPreview.card;
+    container?.remove();
+    container = linkPreview.card.parentElement as HTMLElement;
   } else {
-    const link = tryLinkInText(element);
+    if (container) {
+      return;
+    }
+    const link = findLastLinkInText(element);
     if (link) {
       anchor = link.anchor;
-      tweetText = link.tweetText;
+      container = getContainerForLink(link.tweetText);
     }
   }
 
@@ -175,22 +182,13 @@ async function handleNewNode(
     return;
   }
 
-  //double check if link preview appeared after we assumed it is not there
-  const isCardPresent = findCardInTweet(element);
-  if (!card && isCardPresent) {
-    console.log('found card in tweet');
-    return;
-  }
-
   const action = await Action.fetch(actionApiUrl, config).catch(() => null);
 
   if (!action) {
     return;
   }
 
-  const container = card ? card.parentElement : getContainerForLink(tweetText!);
-
-  container?.replaceChildren(
+  addMargin(container)?.replaceChildren(
     createAction({
       originalUrl: actionUrl,
       action,
@@ -259,29 +257,19 @@ function findElementByTestId(element: Element, testId: string) {
   return element.querySelector(`[data-testid="${testId}"]`);
 }
 
-function getContainerForLink(tweetText: Element) {
-  const root = document.createElement('div');
-  root.style.paddingTop = '12px';
-  const dm = tweetText.closest(`[data-testid="messageEntry"]`);
-  if (dm) {
-    tweetText.parentElement?.parentElement?.prepend(root);
-    root.style.paddingBottom = '8px';
-  } else {
-    tweetText.parentElement?.append(root);
-  }
-  return root;
-}
+function findContainerInTweet(element: Element, searchUp?: boolean) {
+  const message = searchUp
+    ? element.closest(`[data-testid="tweet"]`) ??
+      element.closest(`[data-testid="messageEntry"]`)
+    : findElementByTestId(element, 'tweet') ??
+      findElementByTestId(element, 'messageEntry');
 
-function findCardInTweet(element: Element) {
-  const message =
-    findElementByTestId(element, 'tweet') ??
-    findElementByTestId(element, 'messageEntry');
   if (message) {
-    return findElementByTestId(message, 'card.wrapper');
+    return message.querySelector('.dialect-wrapper') as HTMLElement;
   }
 }
 
-function tryLinkPreview(element: Element) {
+function findLinkPreview(element: Element) {
   const card = findElementByTestId(element, 'card.wrapper');
   if (card) {
     const linkPreview = card.children[0];
@@ -291,17 +279,38 @@ function tryLinkPreview(element: Element) {
     }
   }
 }
-function tryLinkInText(element: Element) {
+function findLastLinkInText(element: Element) {
   const tweetText = findElementByTestId(element, 'tweetText');
-  if (!tweetText || tweetText.classList.contains('dialect-link-tweet')) {
+  if (!tweetText) {
     return;
   }
 
   const links = tweetText.getElementsByTagName('a');
   if (links.length > 0) {
-    //marking tweet as visited
-    tweetText.classList.add('dialect-link-tweet');
     const anchor = links[links.length - 1] as HTMLAnchorElement;
     return { anchor, tweetText };
   }
+}
+
+function getContainerForLink(tweetText: Element) {
+  const root = document.createElement('div');
+  root.className = 'dialect-wrapper';
+  const dm = tweetText.closest(`[data-testid="messageEntry"]`);
+  if (dm) {
+    root.classList.add('dialect-dm');
+    tweetText.parentElement?.parentElement?.prepend(root);
+  } else {
+    tweetText.parentElement?.append(root);
+  }
+  return root;
+}
+
+function addMargin(element?: HTMLElement) {
+  if (element && element.classList.contains('dialect-wrapper')) {
+    element.style.marginTop = '12px';
+    if (element.classList.contains('dialect-dm')) {
+      element.style.marginBottom = '8px';
+    }
+  }
+  return element;
 }
