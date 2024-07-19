@@ -98,10 +98,13 @@ export const ActionLayout = ({
     <div className={clsx('blink', stylePresetClassMap[stylePreset])}>
       <div className="w-full cursor-default overflow-hidden rounded-2xl border border-stroke-primary bg-bg-primary shadow-action">
         {image && (
-          <Linkable url={websiteUrl} className="block px-5 pt-5">
+          <Linkable
+            url={websiteUrl}
+            className="block max-h-[500px] overflow-y-hidden px-5 pt-5"
+          >
             <img
               className={clsx('w-full rounded-xl object-cover object-left', {
-                'aspect-square': !form,
+                'aspect-auto': !form,
                 'aspect-[2/1]': form,
               })}
               src={image}
