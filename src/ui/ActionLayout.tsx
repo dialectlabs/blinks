@@ -115,7 +115,7 @@ export const ActionLayout = ({
               <a
                 href={websiteUrl}
                 target="_blank"
-                className="group -mt-1 inline-flex items-center truncate text-subtext hover:cursor-pointer"
+                className="group inline-flex items-center truncate text-subtext hover:cursor-pointer"
                 rel="noopener noreferrer"
               >
                 <LinkIcon className="mr-2 text-icon-primary transition-colors group-hover:text-icon-primary-hover motion-reduce:transition-none" />
@@ -125,7 +125,7 @@ export const ActionLayout = ({
               </a>
             )}
             {websiteText && !websiteUrl && (
-              <span className="-mt-1 inline-flex items-center truncate text-subtext text-text-link">
+              <span className="inline-flex items-center truncate text-subtext text-text-link">
                 {websiteText}
               </span>
             )}

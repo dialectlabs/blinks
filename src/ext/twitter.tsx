@@ -124,7 +124,7 @@ async function handleNewNode(
   );
   if (linkPreview) {
     anchor = linkPreview.anchor;
-    container?.remove();
+    container && container.remove();
     container = linkPreview.card.parentElement as HTMLElement;
   } else {
     if (container) {
@@ -137,7 +137,7 @@ async function handleNewNode(
     }
   }
 
-  if (!anchor) return;
+  if (!anchor || !container) return;
 
   const shortenedUrl = anchor.href;
   const actionUrl = await resolveTwitterShortenedUrl(shortenedUrl);
@@ -188,7 +188,7 @@ async function handleNewNode(
     return;
   }
 
-  addMargin(container)?.replaceChildren(
+  addMargin(container).replaceChildren(
     createAction({
       originalUrl: actionUrl,
       action,
@@ -259,30 +259,31 @@ function findElementByTestId(element: Element, testId: string) {
 
 function findContainerInTweet(element: Element, searchUp?: boolean) {
   const message = searchUp
-    ? element.closest(`[data-testid="tweet"]`) ??
-      element.closest(`[data-testid="messageEntry"]`)
-    : findElementByTestId(element, 'tweet') ??
-      findElementByTestId(element, 'messageEntry');
+    ? (element.closest(`[data-testid="tweet"]`) ??
+      element.closest(`[data-testid="messageEntry"]`))
+    : (findElementByTestId(element, 'tweet') ??
+      findElementByTestId(element, 'messageEntry'));
 
   if (message) {
     return message.querySelector('.dialect-wrapper') as HTMLElement;
   }
+  return null;
 }
 
 function findLinkPreview(element: Element) {
   const card = findElementByTestId(element, 'card.wrapper');
-  if (card) {
-    const linkPreview = card.children[0];
-    if (linkPreview) {
-      const anchor = linkPreview.children[0] as HTMLAnchorElement;
-      return { anchor, card };
-    }
+  if (!card) {
+    return null;
   }
+
+  const anchor = card.children[0]?.children[0] as HTMLAnchorElement;
+
+  return anchor ? { anchor, card } : null;
 }
 function findLastLinkInText(element: Element) {
   const tweetText = findElementByTestId(element, 'tweetText');
   if (!tweetText) {
-    return;
+    return null;
   }
 
   const links = tweetText.getElementsByTagName('a');
@@ -290,6 +291,7 @@ function findLastLinkInText(element: Element) {
     const anchor = links[links.length - 1] as HTMLAnchorElement;
     return { anchor, tweetText };
   }
+  return null;
 }
 
 function getContainerForLink(tweetText: Element) {
@@ -305,7 +307,7 @@ function getContainerForLink(tweetText: Element) {
   return root;
 }
 
-function addMargin(element?: HTMLElement) {
+function addMargin(element: HTMLElement) {
   if (element && element.classList.contains('dialect-wrapper')) {
     element.style.marginTop = '12px';
     if (element.classList.contains('dialect-dm')) {
