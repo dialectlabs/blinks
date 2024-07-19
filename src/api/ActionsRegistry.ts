@@ -58,7 +58,6 @@ export class ActionsRegistry {
     url: string | URL,
     type: LookupType = 'action',
   ): RegisteredEntity | null {
-    console.log(`Looking up ${type} for URL: ${url}`);
     if (type === 'action') {
       return this.lookupAction(url);
     }
@@ -80,7 +79,10 @@ export class ActionsRegistry {
       const host = urlObj.host;
       return this.actionsByHost[host] ?? null;
     } catch (e) {
-      console.error(`Failed to lookup action for URL: ${url}`, e);
+      console.error(
+        `[@dialectlabs/blinks] Failed to lookup action for URL: ${url}`,
+        e,
+      );
       return null;
     }
   }
@@ -91,7 +93,10 @@ export class ActionsRegistry {
       const host = urlObj.host;
       return this.websitesByHost[host] ?? null;
     } catch (e) {
-      console.error(`Failed to lookup website for URL: ${url}`, e);
+      console.error(
+        `[@dialectlabs/blinks] Failed to lookup website for URL: ${url}`,
+        e,
+      );
       return null;
     }
   }
@@ -102,7 +107,10 @@ export class ActionsRegistry {
       const host = urlObj.host;
       return this.interstitialsByHost[host] ?? null;
     } catch (e) {
-      console.error(`Failed to lookup interstitial for URL: ${url}`, e);
+      console.error(
+        `[@dialectlabs/blinks] Failed to lookup interstitial for URL: ${url}`,
+        e,
+      );
       return null;
     }
   }
@@ -167,7 +175,7 @@ async function fetchActionsRegistryConfig(): Promise<ActionsRegistryConfig> {
 
     if (!response.ok) {
       console.error(
-        'Failed to fetch actions registry config',
+        '[@dialectlabs/blinks] Failed to fetch actions registry config',
         await response.json(),
       );
       return { actions: [], interstitials: [], websites: [] };
@@ -175,7 +183,10 @@ async function fetchActionsRegistryConfig(): Promise<ActionsRegistryConfig> {
 
     return await response.json();
   } catch (e) {
-    console.error('Failed to fetch actions registry config', e);
+    console.error(
+      '[@dialectlabs/blinks] Failed to fetch actions registry config',
+      e,
+    );
     return { actions: [], interstitials: [], websites: [] };
   }
 }

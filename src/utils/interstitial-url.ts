@@ -36,7 +36,10 @@ export function isInterstitial(url: string | URL): IsInterstitialResult {
       decodedActionUrl: decodedActionUrlObj.toString(),
     };
   } catch (e) {
-    console.error(`Failed to check if URL is interstitial: ${url}`, e);
+    console.error(
+      `[@dialectlabs/blinks] Failed to check if URL is interstitial: ${url}`,
+      e,
+    );
     return { isInterstitial: false };
   }
 }

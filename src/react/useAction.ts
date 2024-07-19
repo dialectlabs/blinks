@@ -26,7 +26,7 @@ export function useAction(
     Action.fetch(actionUrl)
       .then(setAction)
       .catch((e) => {
-        console.error('Failed to fetch action', e);
+        console.error('[@dialectlabs/blinks] Failed to fetch action', e);
         setAction(null);
       });
   }, [actionUrl, isRegistryLoaded]);

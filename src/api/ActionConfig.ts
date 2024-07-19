@@ -80,7 +80,10 @@ export class ActionConfig implements ActionAdapter {
             return;
           }
         } catch (e) {
-          console.error('Error confirming transaction', e);
+          console.error(
+            '[@dialectlabs/blinks] Error confirming transaction',
+            e,
+          );
         }
 
         setTimeout(confirm, 3000);

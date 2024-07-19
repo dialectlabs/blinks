@@ -28,7 +28,7 @@ export function useActionsRegistryInterval({
     return () => {
       clearInterval(interval);
     };
-  }, [isRegistryLoaded, refreshInterval]);
+  }, [isLoading, isRegistryLoaded, refreshInterval]);
 
   return { isRegistryLoaded };
 }

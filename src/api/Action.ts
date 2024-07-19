@@ -178,7 +178,7 @@ export class ActionComponent {
     if (!response.ok) {
       const error = (await response.json()) as ActionError;
       console.error(
-        `Failed to execute action ${proxyUrl}, href ${this.href}, reason: ${error.message}`,
+        `[@dialectlabs/blinks] Failed to execute action ${proxyUrl}, href ${this.href}, reason: ${error.message}`,
       );
 
       throw {
