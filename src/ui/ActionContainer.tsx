@@ -96,6 +96,7 @@ const executionReducer = (
     case ExecutionType.SOFT_RESET:
       return {
         ...state,
+        executingAction: null,
         status: 'idle',
         errorMessage: action.errorMessage,
         successMessage: null,
