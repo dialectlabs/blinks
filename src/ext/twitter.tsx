@@ -102,7 +102,6 @@ export function setupTwitterObserver(
     observer.observe(twitterReactRoot, { childList: true, subtree: true });
   });
 }
-
 async function handleNewNode(
   node: Element,
   config: ActionAdapter,
@@ -114,17 +113,32 @@ async function handleNewNode(
   if (!element || element.localName !== 'div') {
     return;
   }
-  const rootElement = findElementByTestId(element, 'card.wrapper');
-  if (!rootElement) {
-    return;
-  }
-  // handle link preview only, assuming that link preview is a must for actions
-  const linkPreview = rootElement.children[0] as HTMLDivElement;
-  if (!linkPreview) {
-    return;
+
+  let anchor;
+
+  const linkPreview = findLinkPreview(element);
+
+  let container = findContainerInTweet(
+    linkPreview?.card ?? element,
+    Boolean(linkPreview),
+  );
+  if (linkPreview) {
+    anchor = linkPreview.anchor;
+    container && container.remove();
+    container = linkPreview.card.parentElement as HTMLElement;
+  } else {
+    if (container) {
+      return;
+    }
+    const link = findLastLinkInText(element);
+    if (link) {
+      anchor = link.anchor;
+      container = getContainerForLink(link.tweetText);
+    }
   }
 
-  const anchor = linkPreview.children[0] as HTMLAnchorElement;
+  if (!anchor || !container) return;
+
   const shortenedUrl = anchor.href;
   const actionUrl = await resolveTwitterShortenedUrl(shortenedUrl);
   const interstitialData = isInterstitial(actionUrl);
@@ -174,7 +188,7 @@ async function handleNewNode(
     return;
   }
 
-  rootElement.parentElement?.replaceChildren(
+  addMargin(container).replaceChildren(
     createAction({
       originalUrl: actionUrl,
       action,
@@ -241,4 +255,64 @@ function findElementByTestId(element: Element, testId: string) {
     return element;
   }
   return element.querySelector(`[data-testid="${testId}"]`);
+}
+
+function findContainerInTweet(element: Element, searchUp?: boolean) {
+  const message = searchUp
+    ? (element.closest(`[data-testid="tweet"]`) ??
+      element.closest(`[data-testid="messageEntry"]`))
+    : (findElementByTestId(element, 'tweet') ??
+      findElementByTestId(element, 'messageEntry'));
+
+  if (message) {
+    return message.querySelector('.dialect-wrapper') as HTMLElement;
+  }
+  return null;
+}
+
+function findLinkPreview(element: Element) {
+  const card = findElementByTestId(element, 'card.wrapper');
+  if (!card) {
+    return null;
+  }
+
+  const anchor = card.children[0]?.children[0] as HTMLAnchorElement;
+
+  return anchor ? { anchor, card } : null;
+}
+function findLastLinkInText(element: Element) {
+  const tweetText = findElementByTestId(element, 'tweetText');
+  if (!tweetText) {
+    return null;
+  }
+
+  const links = tweetText.getElementsByTagName('a');
+  if (links.length > 0) {
+    const anchor = links[links.length - 1] as HTMLAnchorElement;
+    return { anchor, tweetText };
+  }
+  return null;
+}
+
+function getContainerForLink(tweetText: Element) {
+  const root = document.createElement('div');
+  root.className = 'dialect-wrapper';
+  const dm = tweetText.closest(`[data-testid="messageEntry"]`);
+  if (dm) {
+    root.classList.add('dialect-dm');
+    tweetText.parentElement?.parentElement?.prepend(root);
+  } else {
+    tweetText.parentElement?.append(root);
+  }
+  return root;
+}
+
+function addMargin(element: HTMLElement) {
+  if (element && element.classList.contains('dialect-wrapper')) {
+    element.style.marginTop = '12px';
+    if (element.classList.contains('dialect-dm')) {
+      element.style.marginBottom = '8px';
+    }
+  }
+  return element;
 }
