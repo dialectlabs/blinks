@@ -3,6 +3,7 @@ import { useState, type ChangeEvent, type ReactNode } from 'react';
 import type { ExtendedActionState } from '../api';
 import { Badge } from './Badge.tsx';
 import { Button } from './Button';
+import { Snackbar } from './Snackbar.tsx';
 import {
   CheckIcon,
   ExclamationShieldIcon,
@@ -14,6 +15,23 @@ import {
 type ActionType = ExtendedActionState;
 
 export type StylePreset = 'default' | 'x-dark' | 'x-light' | 'custom';
+export enum DisclaimerType {
+  BLOCKED = 'blocked',
+  UNKNOWN = 'unknown',
+}
+
+export type Disclaimer =
+  | {
+      type: DisclaimerType.BLOCKED;
+      ignorable: boolean;
+      hidden: boolean;
+      onSkip: () => void;
+    }
+  | {
+      type: DisclaimerType.UNKNOWN;
+      ignorable: boolean;
+    };
+
 const stylePresetClassMap: Record<StylePreset, string> = {
   default: 'dial-light',
   'x-dark': 'x-dark',
@@ -28,7 +46,7 @@ interface LayoutProps {
   success?: string | null;
   websiteUrl?: string | null;
   websiteText?: string | null;
-  disclaimer?: ReactNode;
+  disclaimer?: Disclaimer | null;
   type: ActionType;
   title: string;
   description: string;
@@ -79,6 +97,72 @@ const Linkable = ({
     <div className={className}>{children}</div>
   );
 
+const DisclaimerBlock = ({
+  type,
+  hidden,
+  ignorable,
+  onSkip,
+}: {
+  type: DisclaimerType;
+  ignorable: boolean;
+  onSkip?: () => void;
+  hidden: boolean;
+}) => {
+  if (type === DisclaimerType.BLOCKED && !hidden) {
+    return (
+      <Snackbar variant="error">
+        <p>
+          This Action or it&apos;s origin has been flagged as an unsafe action,
+          & has been blocked. If you believe this action has been blocked in
+          error, please{' '}
+          <a
+            href="https://discord.gg/saydialect"
+            className="cursor-pointer underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            submit an issue
+          </a>
+          .
+          {!ignorable &&
+            ' Your action provider blocks execution of this action.'}
+        </p>
+        {ignorable && onSkip && (
+          <button
+            className="mt-3 font-semibold transition-colors hover:text-text-error-hover motion-reduce:transition-none"
+            onClick={onSkip}
+          >
+            Ignore warning & proceed
+          </button>
+        )}
+      </Snackbar>
+    );
+  }
+
+  if (type === DisclaimerType.UNKNOWN) {
+    return (
+      <Snackbar variant="warning">
+        <p>
+          This Action has not yet been registered. Only use it if you trust the
+          source. This Action will not unfurl on X until it is registered.
+          {!ignorable &&
+            ' Your action provider blocks execution of this action.'}
+        </p>
+        <a
+          className="mt-3 inline-block font-semibold transition-colors hover:text-text-warning-hover motion-reduce:transition-none"
+          href="https://discord.gg/saydialect"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Report
+        </a>
+      </Snackbar>
+    );
+  }
+
+  return null;
+};
+
 export const ActionLayout = ({
   stylePreset = 'default',
   title,
@@ -119,13 +203,13 @@ export const ActionLayout = ({
                 rel="noopener noreferrer"
               >
                 <LinkIcon className="mr-2 text-icon-primary transition-colors group-hover:text-icon-primary-hover motion-reduce:transition-none" />
-                <span className="text-text-link transition-colors group-hover:text-text-link-hover group-hover:underline motion-reduce:transition-none">
+                <span className="text-text-link group-hover:text-text-link-hover transition-colors group-hover:underline motion-reduce:transition-none">
                   {websiteText ?? websiteUrl}
                 </span>
               </a>
             )}
             {websiteText && !websiteUrl && (
-              <span className="inline-flex items-center truncate text-subtext text-text-link">
+              <span className="text-text-link inline-flex items-center truncate text-subtext">
                 {websiteText}
               </span>
             )}
@@ -163,7 +247,24 @@ export const ActionLayout = ({
           <span className="mb-4 whitespace-pre-wrap text-subtext text-text-secondary">
             {description}
           </span>
-          {disclaimer && <div className="mb-4">{disclaimer}</div>}
+          {disclaimer && (
+            <div className="mb-4">
+              <DisclaimerBlock
+                type={disclaimer.type}
+                ignorable={disclaimer.ignorable}
+                hidden={
+                  disclaimer.type === DisclaimerType.BLOCKED
+                    ? disclaimer.hidden
+                    : false
+                }
+                onSkip={
+                  disclaimer.type === DisclaimerType.BLOCKED
+                    ? disclaimer.onSkip
+                    : undefined
+                }
+              />
+            </div>
+          )}
           <ActionContent form={form} inputs={inputs} buttons={buttons} />
           {success && (
             <span className="mt-4 flex justify-center text-subtext text-text-success">
@@ -259,7 +360,7 @@ const ActionInput = ({
   return (
     <div
       className={clsx(
-        'flex items-center gap-2 rounded-input border border-input-stroke transition-colors focus-within:border-input-stroke-selected motion-reduce:transition-none',
+        'border-input-stroke focus-within:border-input-stroke-selected flex items-center gap-2 rounded-input border transition-colors motion-reduce:transition-none',
         {
           'hover:border-input-stroke-hover hover:focus-within:border-input-stroke-selected':
             !disabled,
@@ -271,7 +372,7 @@ const ActionInput = ({
         value={value}
         disabled={disabled}
         onChange={extendedChange}
-        className="my-3 ml-4 flex-1 truncate bg-input-bg text-text-input outline-none placeholder:text-text-input-placeholder disabled:text-text-input-disabled"
+        className="bg-input-bg text-text-input placeholder:text-text-input-placeholder disabled:text-text-input-disabled my-3 ml-4 flex-1 truncate outline-none"
       />
       {button && (
         <div className="my-2 mr-2">
