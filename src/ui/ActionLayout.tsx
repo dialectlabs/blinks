@@ -103,10 +103,9 @@ export const ActionLayout = ({
             className="block max-h-[100cqw] overflow-y-hidden px-5 pt-5"
           >
             <img
-              className={clsx('w-full rounded-xl object-cover object-left', {
-                'aspect-auto': !form,
-                'aspect-[2/1]': form,
-              })}
+              className={clsx(
+                'aspect-auto w-full rounded-xl object-cover object-center',
+              )}
               src={image}
               alt="action-image"
             />
