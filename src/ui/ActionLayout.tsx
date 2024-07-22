@@ -100,7 +100,7 @@ export const ActionLayout = ({
         {image && (
           <Linkable
             url={websiteUrl}
-            className="block max-h-[500px] overflow-y-hidden px-5 pt-5"
+            className="block max-h-[100cqw] overflow-y-hidden px-5 pt-5"
           >
             <img
               className={clsx('w-full rounded-xl object-cover object-left', {
