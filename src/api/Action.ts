@@ -5,7 +5,7 @@ import type {
   ActionsSpecGetResponse,
   ActionsSpecPostRequestBody,
   ActionsSpecPostResponse,
-  Parameter,
+  TypedParameter,
 } from './actions-spec';
 
 export class Action {
@@ -106,7 +106,7 @@ export class ActionComponent {
     private _parent: Action,
     private _label: string,
     private _href: string,
-    private _parameters?: Parameter[],
+    private _parameters?: TypedParameter[],
   ) {}
 
   public get href() {

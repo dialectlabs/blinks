@@ -38,14 +38,51 @@ export interface LinkedAction {
   // enforcing single parameter for now for simplicity and determenistic client UIs
   // can be extended to multiple inputs w/o breaking change by switching to Parameter[]
   // note: there are no use-cases for multiple parameters atm, e.g. farcaster frames also have just single input
-  parameters?: Parameter[];
+  parameters?: TypedParameter[];
 }
 
-export interface Parameter {
-  name: string; // parameter name in url
-  label?: string; // input placeholder
-  required?: boolean; // input required
+export type GeneralParameterType =
+  | 'text'
+  | 'email'
+  | 'url'
+  | 'number'
+  | 'date'
+  | 'datetime-local'
+  | 'textarea';
+
+export type SelectableParameterType = 'select' | 'radio' | 'checkbox';
+
+export type ParameterType = GeneralParameterType | SelectableParameterType;
+
+export interface Parameter<T extends ParameterType> {
+  /** input field type */
+  type?: T;
+  /** regular expression pattern to validate user input client side */
+  pattern?: string;
+  /** human-readable description of the `pattern` */
+  patternDescription?: string;
+  /** parameter name in url */
+  name: string;
+  /** input placeholder */
+  label?: string;
+  /** input required */
+  required?: boolean;
 }
+
+export interface ParameterSelectable<T extends ParameterType>
+  extends Omit<Parameter<T>, 'pattern' | 'patternDescription'> {
+  options: Array<{
+    /** displayed UI label of this selectable option */
+    label: string;
+    /** value of this selectable option */
+    value: string;
+    /** whether this option should be selected by default */
+    selected?: boolean;
+  }>;
+}
+
+export type TypedParameter<T extends ParameterType = ParameterType> =
+  T extends SelectableParameterType ? ParameterSelectable<T> : Parameter<T>;
 
 // No changes
 export interface ActionsSpecPostRequestBody
