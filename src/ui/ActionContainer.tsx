@@ -17,9 +17,13 @@ import {
   isPostRequestError,
   isSignTransactionError,
 } from '../utils/type-guards.ts';
-import type { ButtonProps, StylePreset } from './ActionLayout';
-import { ActionLayout } from './ActionLayout';
-import { Snackbar } from './Snackbar.tsx';
+import {
+  ActionLayout,
+  DisclaimerType,
+  type ButtonProps,
+  type Disclaimer,
+  type StylePreset,
+} from './ActionLayout';
 
 type ExecutionStatus = 'blocked' | 'idle' | 'executing' | 'success' | 'error';
 
@@ -404,57 +408,21 @@ export const ActionContainer = ({
     };
   };
 
-  const disclaimer = useMemo(() => {
-    if (overallState === 'malicious' && executionState.status === 'blocked') {
-      return (
-        <Snackbar variant="error">
-          <p>
-            This Action or it&apos;s origin has been flagged as an unsafe
-            action, & has been blocked. If you believe this action has been
-            blocked in error, please{' '}
-            <a
-              href="https://discord.gg/saydialect"
-              className="cursor-pointer underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              submit an issue
-            </a>
-            .
-            {!isPassingSecurityCheck &&
-              ' Your action provider blocks execution of this action.'}
-          </p>
-          {isPassingSecurityCheck && (
-            <button
-              className="mt-3 font-semibold transition-colors hover:text-text-error-hover motion-reduce:transition-none"
-              onClick={() => dispatch({ type: ExecutionType.UNBLOCK })}
-            >
-              Ignore warning & proceed
-            </button>
-          )}
-        </Snackbar>
-      );
+  const disclaimer: Disclaimer | null = useMemo(() => {
+    if (overallState === 'malicious') {
+      return {
+        type: DisclaimerType.BLOCKED,
+        ignorable: isPassingSecurityCheck,
+        hidden: executionState.status !== 'blocked',
+        onSkip: () => dispatch({ type: ExecutionType.UNBLOCK }),
+      };
     }
 
     if (overallState === 'unknown') {
-      return (
-        <Snackbar variant="warning">
-          <p>
-            This Action has not yet been registered. Only use it if you trust
-            the source. This Action will not unfurl on X until it is registered.
-            {!isPassingSecurityCheck &&
-              ' Your action provider blocks execution of this action.'}
-          </p>
-          <a
-            className="mt-3 inline-block font-semibold transition-colors hover:text-text-warning-hover motion-reduce:transition-none"
-            href="https://discord.gg/saydialect"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Report
-          </a>
-        </Snackbar>
-      );
+      return {
+        type: DisclaimerType.UNKNOWN,
+        ignorable: isPassingSecurityCheck,
+      };
     }
 
     return null;
