@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+  .blink {
+    container-type: inline-size;
+  }  
+
   .dial-light {
     --blink-bg-primary: #ffffff;
     --blink-button: #2a2a2b;
