@@ -71,10 +71,6 @@ export function setupTwitterObserver(
   const mergedOptions = normalizeOptions(options);
   const twitterReactRoot = document.getElementById('react-root')!;
 
-  if (!twitterReactRoot) {
-    return;
-  }
-
   const refreshRegistry = async () => {
     await ActionsRegistry.getInstance().init();
 
@@ -186,7 +182,7 @@ async function handleNewNode(
     return;
   }
 
-  const action = await Action.fetch(actionApiUrl, config).catch(noop);
+  const action = await Action.fetch(actionApiUrl, config).catch(() => null);
 
   if (!action) {
     return;
