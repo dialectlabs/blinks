@@ -16,6 +16,7 @@ export default defineConfig([
       'src/index.css',
       'src/ext/twitter.tsx',
       'src/react/index.ts',
+      'src/solana/index.ts',
     ],
     dts: {
       entry: ['src/index.ts', 'src/ext/twitter.tsx', 'src/react/index.ts'],

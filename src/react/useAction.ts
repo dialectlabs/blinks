@@ -1,21 +1,16 @@
 'use client';
-import type { Connection } from '@solana/web3.js';
 import { useEffect, useState } from 'react';
-import { Action } from '../api';
-import { useActionAdapter } from './useActionAdapter.ts';
+import { Action, type ActionAdapter } from '../api';
 import { useActionsRegistryInterval } from './useActionRegistryInterval.ts';
 
 interface UseActionOptions {
-  rpcUrlOrConnection: string | Connection;
+  url: string;
+  adapter: ActionAdapter;
   refreshInterval?: number;
 }
 
-export function useAction(
-  actionUrl: string,
-  { rpcUrlOrConnection, refreshInterval }: UseActionOptions,
-) {
+export function useAction({ url, adapter, refreshInterval }: UseActionOptions) {
   const { isRegistryLoaded } = useActionsRegistryInterval({ refreshInterval });
-  const { adapter } = useActionAdapter(rpcUrlOrConnection);
   const [action, setAction] = useState<Action | null>(null);
 
   useEffect(() => {
@@ -23,13 +18,13 @@ export function useAction(
     if (!isRegistryLoaded) {
       return;
     }
-    Action.fetch(actionUrl)
+    Action.fetch(url)
       .then(setAction)
       .catch((e) => {
         console.error('[@dialectlabs/blinks] Failed to fetch action', e);
         setAction(null);
       });
-  }, [actionUrl, isRegistryLoaded]);
+  }, [url, isRegistryLoaded]);
 
   useEffect(() => {
     action?.setAdapter(adapter);

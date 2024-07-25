@@ -26,6 +26,11 @@
       "require": "./dist/react/index.cjs",
       "types": "./dist/react/index.d.ts"
     },
+    "./solana": {
+      "import": "./dist/solana/index.js",
+      "require": "./dist/solana/index.cjs",
+      "types": "./dist/solana/index.d.ts"
+    },
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
