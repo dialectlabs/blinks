@@ -54,7 +54,13 @@ export type SelectableParameterType = 'select' | 'radio' | 'checkbox';
 
 export type ParameterType = GeneralParameterType | SelectableParameterType;
 
-export interface Parameter<T extends ParameterType> {
+type MinMax<T extends ParameterType> = T extends 'date' | 'datetime-local'
+  ? string
+  : T extends 'radio' | 'select'
+    ? never
+    : number;
+
+export interface Parameter<T extends ParameterType, M = MinMax<T>> {
   /** input field type */
   type?: T;
   /** regular expression pattern to validate user input client side */
@@ -67,6 +73,8 @@ export interface Parameter<T extends ParameterType> {
   label?: string;
   /** input required */
   required?: boolean;
+  min?: M;
+  max?: M;
 }
 
 export interface ParameterSelectable<T extends ParameterType>
@@ -84,9 +92,10 @@ export interface ParameterSelectable<T extends ParameterType>
 export type TypedParameter<T extends ParameterType = ParameterType> =
   T extends SelectableParameterType ? ParameterSelectable<T> : Parameter<T>;
 
-// No changes
-export interface ActionsSpecPostRequestBody
-  extends SolanaPaySpecPostRequestBody {}
+export interface ActionsSpecPostRequestBody<V extends string = string>
+  extends SolanaPaySpecPostRequestBody {
+  data?: Record<V, string | string[]>;
+}
 
 // Almost no changes, omitting old `redirect`
 export interface ActionsSpecPostResponse

@@ -1,4 +1,4 @@
-import { Action } from './Action.ts';
+import { Action } from './Action';
 
 export interface ActionCallbacksConfig {
   onActionMount: (
