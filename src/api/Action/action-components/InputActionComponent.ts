@@ -1,4 +1,9 @@
+import type {
+  GeneralParameterType,
+  TypedParameter,
+} from '../../actions-spec.ts';
 import { AbstractActionComponent } from './AbstractActionComponent.ts';
+import { ButtonActionComponent } from './ButtonActionComponent.ts';
 
 export class InputActionComponent extends AbstractActionComponent {
   private parameterValue: string | null = '';
@@ -16,10 +21,10 @@ export class InputActionComponent extends AbstractActionComponent {
     };
   }
 
-  public get parameter() {
+  public get parameter(): TypedParameter<GeneralParameterType> {
     const [param] = this.parameters;
 
-    return param;
+    return param as TypedParameter<GeneralParameterType>;
   }
 
   public setValue(value: string) {
@@ -31,5 +36,9 @@ export class InputActionComponent extends AbstractActionComponent {
       `{${this.parameter.name}}`,
       encodeURIComponent(this.parameterValue?.toString().trim() ?? ''),
     );
+  }
+
+  toButtonActionComponent(): ButtonActionComponent {
+    return new ButtonActionComponent(this._parent, this._label, this.href);
   }
 }

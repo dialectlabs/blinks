@@ -1,5 +1,10 @@
-import type { ActionsSpecPostRequestBody } from '../../actions-spec.ts';
+import type {
+  ActionsSpecPostRequestBody,
+  SelectableParameterType,
+  TypedParameter,
+} from '../../actions-spec.ts';
 import { AbstractActionComponent } from './AbstractActionComponent.ts';
+import { ButtonActionComponent } from './ButtonActionComponent.ts';
 
 export class SelectableInputActionComponent extends AbstractActionComponent {
   private parameterValue: Array<string> = [];
@@ -23,10 +28,10 @@ export class SelectableInputActionComponent extends AbstractActionComponent {
     return this.parameter.type === 'checkbox';
   }
 
-  public get parameter() {
+  public get parameter(): TypedParameter<SelectableParameterType> {
     const [param] = this.parameters;
 
-    return param;
+    return param as TypedParameter<SelectableParameterType>;
   }
 
   public setValue(value: string | Array<string>) {
@@ -38,5 +43,9 @@ export class SelectableInputActionComponent extends AbstractActionComponent {
       `{${this.parameter.name}}`,
       encodeURIComponent(this.parameterValue.join(',')),
     );
+  }
+
+  toButtonActionComponent(): ButtonActionComponent {
+    return new ButtonActionComponent(this._parent, this._label, this.href);
   }
 }

@@ -1,5 +1,7 @@
 import type { ActionsSpecPostRequestBody } from '../../actions-spec.ts';
 import { AbstractActionComponent } from './AbstractActionComponent.ts';
+import { ButtonActionComponent } from './ButtonActionComponent.ts';
+import { InputActionComponent } from './InputActionComponent.ts';
 
 export class FormActionComponent extends AbstractActionComponent {
   private parameterValues: Record<string, string | string[]> = {};
@@ -44,5 +46,22 @@ export class FormActionComponent extends AbstractActionComponent {
 
   public setValue(value: string | Array<string>, name: string) {
     this.parameterValues[name] = value;
+  }
+
+  toButtonActionComponent(): ButtonActionComponent {
+    return new ButtonActionComponent(this._parent, this._label, this.href);
+  }
+
+  toInputActionComponent(paramName: string): InputActionComponent {
+    const parameter = this.parameters.find((param) => param.name === paramName);
+
+    if (!parameter) {
+      // very unlikely to happen
+      throw new Error(`Input Parameter ${paramName} not found`);
+    }
+
+    return new InputActionComponent(this._parent, this._label, this.href, [
+      parameter,
+    ]);
   }
 }

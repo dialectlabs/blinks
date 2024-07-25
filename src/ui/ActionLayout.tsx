@@ -1,16 +1,10 @@
 import clsx from 'clsx';
-import { useState, type ChangeEvent, type ReactNode } from 'react';
-import type { ExtendedActionState } from '../api';
+import { useState, type ReactNode } from 'react';
+import type { ExtendedActionState, ParameterType } from '../api';
 import { Badge } from './Badge.tsx';
-import { Button } from './Button';
 import { Snackbar } from './Snackbar.tsx';
-import {
-  CheckIcon,
-  ExclamationShieldIcon,
-  InfoShieldIcon,
-  LinkIcon,
-  SpinnerDots,
-} from './icons';
+import { ExclamationShieldIcon, InfoShieldIcon, LinkIcon } from './icons';
+import { ActionButton, ActionTextInput } from './inputs';
 
 type ActionType = ExtendedActionState;
 
@@ -63,10 +57,15 @@ export interface ButtonProps {
 }
 
 export interface InputProps {
+  type: ParameterType;
   placeholder?: string;
   name: string;
   disabled: boolean;
   required?: boolean;
+  min?: number | string;
+  max?: number | string;
+  pattern?: string;
+  description?: string;
   button?: ButtonProps;
 }
 
@@ -203,13 +202,13 @@ export const ActionLayout = ({
                 rel="noopener noreferrer"
               >
                 <LinkIcon className="mr-2 text-icon-primary transition-colors group-hover:text-icon-primary-hover motion-reduce:transition-none" />
-                <span className="text-text-link group-hover:text-text-link-hover transition-colors group-hover:underline motion-reduce:transition-none">
+                <span className="text-text-link transition-colors group-hover:text-text-link-hover group-hover:underline motion-reduce:transition-none">
                   {websiteText ?? websiteUrl}
                 </span>
               </a>
             )}
             {websiteText && !websiteUrl && (
-              <span className="text-text-link inline-flex items-center truncate text-subtext">
+              <span className="inline-flex items-center truncate text-subtext text-text-link">
                 {websiteText}
               </span>
             )}
@@ -305,7 +304,7 @@ const ActionContent = ({
           ))}
         </div>
       )}
-      {inputs?.map((input) => <ActionInput key={input.name} {...input} />)}
+      {inputs?.map((input) => <ActionTextInput key={input.name} {...input} />)}
     </div>
   );
 };
@@ -324,7 +323,7 @@ const ActionForm = ({ form }: Required<Pick<LayoutProps, 'form'>>) => {
   return (
     <div className="flex flex-col gap-3">
       {form.inputs.map((input) => (
-        <ActionInput
+        <ActionTextInput
           key={input.name}
           {...input}
           onChange={(v) => onChange(input.name, v)}
@@ -336,84 +335,5 @@ const ActionForm = ({ form }: Required<Pick<LayoutProps, 'form'>>) => {
         disabled={form.button.disabled || disabled}
       />
     </div>
-  );
-};
-
-const ActionInput = ({
-  placeholder,
-  name,
-  button,
-  disabled,
-  onChange: extOnChange,
-  required,
-}: InputProps & { onChange?: (value: string) => void }) => {
-  const [value, onChange] = useState('');
-
-  const extendedChange = (e: ChangeEvent<HTMLInputElement>) => {
-    onChange(e.currentTarget.value);
-    extOnChange?.(e.currentTarget.value);
-  };
-
-  const placeholderWithRequired =
-    (placeholder || 'Type here...') + (required ? '*' : '');
-
-  return (
-    <div
-      className={clsx(
-        'border-input-stroke focus-within:border-input-stroke-selected flex items-center gap-2 rounded-input border transition-colors motion-reduce:transition-none',
-        {
-          'hover:border-input-stroke-hover hover:focus-within:border-input-stroke-selected':
-            !disabled,
-        },
-      )}
-    >
-      <input
-        placeholder={placeholderWithRequired}
-        value={value}
-        disabled={disabled}
-        onChange={extendedChange}
-        className="bg-input-bg text-text-input placeholder:text-text-input-placeholder disabled:text-text-input-disabled my-3 ml-4 flex-1 truncate outline-none"
-      />
-      {button && (
-        <div className="my-2 mr-2">
-          <ActionButton
-            {...button}
-            onClick={() => button.onClick({ [name]: value })}
-            disabled={button.disabled || value === ''}
-          />
-        </div>
-      )}
-    </div>
-  );
-};
-
-const ActionButton = ({
-  text,
-  loading,
-  disabled,
-  variant,
-  onClick,
-}: ButtonProps) => {
-  const ButtonContent = () => {
-    if (loading)
-      return (
-        <span className="flex flex-row items-center justify-center gap-2 text-nowrap">
-          {text} <SpinnerDots />
-        </span>
-      );
-    if (variant === 'success')
-      return (
-        <span className="flex flex-row items-center justify-center gap-2 text-nowrap">
-          {text}
-          <CheckIcon />
-        </span>
-      );
-    return text;
-  };
-
-  return (
-    <Button onClick={() => onClick()} disabled={disabled} variant={variant}>
-      <ButtonContent />
-    </Button>
   );
 };

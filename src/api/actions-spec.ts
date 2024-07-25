@@ -66,7 +66,7 @@ export interface Parameter<T extends ParameterType, M = MinMax<T>> {
   /** regular expression pattern to validate user input client side */
   pattern?: string;
   /** human-readable description of the `pattern` */
-  patternDescription?: string;
+  description?: string;
   /** parameter name in url */
   name: string;
   /** input placeholder */
@@ -78,7 +78,7 @@ export interface Parameter<T extends ParameterType, M = MinMax<T>> {
 }
 
 export interface ParameterSelectable<T extends ParameterType>
-  extends Omit<Parameter<T>, 'pattern' | 'patternDescription'> {
+  extends Omit<Parameter<T>, 'pattern'> {
   options: Array<{
     /** displayed UI label of this selectable option */
     label: string;
