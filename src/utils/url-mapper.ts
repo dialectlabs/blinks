@@ -1,3 +1,7 @@
+import { SOLANA_ACTION_PREFIX } from './constants';
+import { isInterstitial } from './interstitial-url';
+import { proxify } from './proxify';
+
 type Action = {
   pathPattern: string;
   apiPath: string;
@@ -79,4 +83,29 @@ export class ActionsURLMapper {
 
     return `${origin}${mappedPath}${queryParams}`;
   }
+}
+
+export async function unfurlUrlToActionApiUrl(url: URL): Promise<string | null> {
+  const strUrl = url.toString();
+  // case 1: if the URL is a solana action URL
+  if (strUrl.startsWith(SOLANA_ACTION_PREFIX)) {
+    return strUrl.replace(SOLANA_ACTION_PREFIX, '');
+  }
+
+  // case 2: if the URL is an interstitial URL
+  const interstitialData = isInterstitial(url);
+  if (interstitialData.isInterstitial) {
+    return interstitialData.decodedActionUrl;
+  }
+
+  // case 3: if the URL is a website URL which has action.json
+
+  const actionsJsonUrl = url.origin + '/actions.json';
+  const actionsJson = await fetch(proxify(actionsJsonUrl)).then(
+    (res) => res.json() as Promise<ActionsJsonConfig>,
+  );
+
+  const actionsUrlMapper = new ActionsURLMapper(actionsJson);
+
+  return actionsUrlMapper.mapUrl(url);
 }

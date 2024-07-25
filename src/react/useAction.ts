@@ -1,34 +1,85 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Action, type ActionAdapter } from '../api';
+import { unfurlUrlToActionApiUrl } from '../utils/url-mapper.ts';
 import { useActionsRegistryInterval } from './useActionRegistryInterval.ts';
 
 interface UseActionOptions {
   url: string;
   adapter: ActionAdapter;
-  refreshInterval?: number;
+  securityRegistryRefreshInterval?: number;
 }
 
-export function useAction({ url, adapter, refreshInterval }: UseActionOptions) {
-  const { isRegistryLoaded } = useActionsRegistryInterval({ refreshInterval });
-  const [action, setAction] = useState<Action | null>(null);
+function useActionApiUrl(url: string) {
+  const [apiUrl, setApiUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    setAction(null);
-    if (!isRegistryLoaded) {
+    let ignore = false;
+
+    unfurlUrlToActionApiUrl(new URL(url))
+      .then((apiUrl) => {
+        if (ignore) {
+          return;
+        }
+        setApiUrl(apiUrl);
+      })
+      .catch((e) => {
+        console.error('[@dialectlabs/blinks] Failed to unfurl action URL', e);
+        setApiUrl(null);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [url]);
+
+  return { actionApiUrl: apiUrl };
+}
+
+export function useAction({
+  url,
+  adapter,
+  securityRegistryRefreshInterval,
+}: UseActionOptions) {
+  const { isRegistryLoaded } = useActionsRegistryInterval({
+    refreshInterval: securityRegistryRefreshInterval,
+  });
+  const { actionApiUrl } = useActionApiUrl(url);
+  const [action, setAction] = useState<Action | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(true);
+    if (!isRegistryLoaded || !actionApiUrl) {
       return;
     }
-    Action.fetch(url)
-      .then(setAction)
+
+    let ignore = false;
+    Action.fetch(actionApiUrl)
+      .then((action) => {
+        if (ignore) {
+          return;
+        }
+        setAction(action);
+      })
       .catch((e) => {
         console.error('[@dialectlabs/blinks] Failed to fetch action', e);
         setAction(null);
+      })
+      .finally(() => {
+        if (!ignore) {
+          setIsLoading(false);
+        }
       });
-  }, [url, isRegistryLoaded]);
+
+    return () => {
+      ignore = true;
+    };
+  }, [actionApiUrl, isRegistryLoaded]);
 
   useEffect(() => {
     action?.setAdapter(adapter);
   }, [action, adapter]);
 
-  return { action };
+  return { action, isLoading };
 }
