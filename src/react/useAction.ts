@@ -5,12 +5,12 @@ import { unfurlUrlToActionApiUrl } from '../utils/url-mapper.ts';
 import { useActionsRegistryInterval } from './useActionRegistryInterval.ts';
 
 interface UseActionOptions {
-  url: string;
+  url: string | URL;
   adapter: ActionAdapter;
   securityRegistryRefreshInterval?: number;
 }
 
-function useActionApiUrl(url: string) {
+function useActionApiUrl(url: string | URL) {
   const [apiUrl, setApiUrl] = useState<string | null>(null);
 
   useEffect(() => {

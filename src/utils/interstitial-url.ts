@@ -19,7 +19,7 @@ export function isInterstitial(url: string | URL): IsInterstitialResult {
     }
     const urlDecodedActionUrl = decodeURIComponent(actionUrl);
 
-    if (!urlDecodedActionUrl.startsWith(SOLANA_ACTION_PREFIX)) {
+    if (!SOLANA_ACTION_PREFIX.test(urlDecodedActionUrl)) {
       return { isInterstitial: false };
     }
 

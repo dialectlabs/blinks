@@ -85,10 +85,13 @@ export class ActionsURLMapper {
   }
 }
 
-export async function unfurlUrlToActionApiUrl(url: URL): Promise<string | null> {
-  const strUrl = url.toString();
+export async function unfurlUrlToActionApiUrl(
+  actionUrl: URL | string,
+): Promise<string | null> {
+  const url = new URL(actionUrl);
+  const strUrl = actionUrl.toString();
   // case 1: if the URL is a solana action URL
-  if (strUrl.startsWith(SOLANA_ACTION_PREFIX)) {
+  if (SOLANA_ACTION_PREFIX.test(strUrl)) {
     return strUrl.replace(SOLANA_ACTION_PREFIX, '');
   }
 
