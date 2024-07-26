@@ -36,14 +36,8 @@ function useActionApiUrl(url: string | URL) {
   return { actionApiUrl: apiUrl };
 }
 
-export function useAction({
-  url,
-  adapter,
-  securityRegistryRefreshInterval,
-}: UseActionOptions) {
-  const { isRegistryLoaded } = useActionsRegistryInterval({
-    refreshInterval: securityRegistryRefreshInterval,
-  });
+export function useAction({ url, adapter }: UseActionOptions) {
+  const { isRegistryLoaded } = useActionsRegistryInterval();
   const { actionApiUrl } = useActionApiUrl(url);
   const [action, setAction] = useState<Action | null>(null);
   const [isLoading, setIsLoading] = useState(false);
