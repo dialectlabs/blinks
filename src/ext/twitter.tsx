@@ -7,6 +7,7 @@ import {
   getExtendedWebsiteState,
   type ActionAdapter,
   type ActionCallbacksConfig,
+  type ActionCompatibility,
 } from '../api';
 import { checkSecurity, type SecurityLevel } from '../shared';
 import { ActionContainer, type StylePreset } from '../ui';
@@ -182,16 +183,26 @@ async function handleNewNode(
     return;
   }
 
-  const action = await Action.fetch(actionApiUrl, config).catch(() => null);
+  const fetchResult = await Action.fetch(actionApiUrl, config).catch(noop);
 
-  if (!action) {
+  if (!fetchResult) {
     return;
+  }
+
+  const { action, actionCompatibility } = fetchResult;
+
+  if (config.isCompatible) {
+    const compatible = await config.isCompatible(actionCompatibility);
+    if (!compatible) {
+      return;
+    }
   }
 
   addMargin(container).replaceChildren(
     createAction({
       originalUrl: actionUrl,
       action,
+      actionCompatibility,
       callbacks,
       options,
       isInterstitial: interstitialData.isInterstitial,
@@ -202,11 +213,13 @@ async function handleNewNode(
 function createAction({
   originalUrl,
   action,
+  actionCompatibility,
   callbacks,
   options,
 }: {
   originalUrl: URL;
   action: Action;
+  actionCompatibility: ActionCompatibility;
   callbacks: Partial<ActionCallbacksConfig>;
   options: NormalizedObserverOptions;
   isInterstitial: boolean;
@@ -220,6 +233,7 @@ function createAction({
     <ActionContainer
       stylePreset={resolveXStylePreset()}
       action={action}
+      actionCompatibility={actionCompatibility}
       websiteUrl={originalUrl.toString()}
       websiteText={originalUrl.hostname}
       callbacks={callbacks}
