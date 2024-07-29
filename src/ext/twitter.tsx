@@ -190,7 +190,12 @@ async function handleNewNode(
   const { action, actionCompatibility } = fetchResult;
 
   if (config.isCompatible) {
-    const compatible = await config.isCompatible(actionCompatibility);
+    const compatible = await config.isCompatible({
+      originalUrl: actionUrl.toString(),
+      action,
+      actionType: state,
+      actionCompatibility,
+    });
     if (!compatible) {
       return;
     }
