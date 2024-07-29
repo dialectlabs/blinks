@@ -73,9 +73,7 @@ export function setupTwitterObserver(
   const twitterReactRoot = document.getElementById('react-root')!;
 
   const refreshRegistry = async () => {
-    await ActionsRegistry.getInstance().init();
-
-    setTimeout(refreshRegistry, 1000 * 60 * 10); // every 10 minutes
+    return ActionsRegistry.getInstance().init();
   };
 
   // if we don't have the registry, then we don't show anything
