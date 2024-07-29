@@ -1,7 +1,7 @@
-import clsx from 'clsx';
-import { type ChangeEvent, useState } from 'react';
-import type { InputProps } from '../ActionLayout.tsx';
+import { type ChangeEvent, useMemo, useState } from 'react';
 import { ActionButton } from './ActionButton.tsx';
+import { BaseInputContainer } from './BaseInputContainer.tsx';
+import type { BaseInputProps } from './types.ts';
 
 export const ActionTextInput = ({
   placeholder,
@@ -9,44 +9,57 @@ export const ActionTextInput = ({
   button,
   disabled,
   onChange: extOnChange,
+  pattern,
+  min,
+  max,
+  description,
   required,
-}: InputProps & { onChange?: (value: string) => void }) => {
+}: Omit<BaseInputProps, 'type'> & { onChange?: (value: string) => void }) => {
   const [value, onChange] = useState('');
+  const [isValid, setValid] = useState(true);
 
   const extendedChange = (e: ChangeEvent<HTMLInputElement>) => {
     onChange(e.currentTarget.value);
     extOnChange?.(e.currentTarget.value);
+    setValid(e.currentTarget.checkValidity());
   };
 
   const placeholderWithRequired =
     (placeholder || 'Type here...') + (required ? '*' : '');
 
+  const validationProps = useMemo(
+    () => ({
+      minLength: min as number,
+      maxLength: max as number,
+      pattern,
+      title: description,
+      required,
+    }),
+    [min, max, pattern, description, required],
+  );
+
   return (
-    <div
-      className={clsx(
-        'flex items-center gap-2 rounded-input border border-input-stroke transition-colors focus-within:border-input-stroke-selected motion-reduce:transition-none',
-        {
-          'hover:border-input-stroke-hover hover:focus-within:border-input-stroke-selected':
-            !disabled,
-        },
-      )}
-    >
-      <input
-        placeholder={placeholderWithRequired}
-        value={value}
-        disabled={disabled}
-        onChange={extendedChange}
-        className="my-3 ml-4 flex-1 truncate bg-input-bg text-text-input outline-none placeholder:text-text-input-placeholder disabled:text-text-input-disabled"
-      />
-      {button && (
-        <div className="my-2 mr-2">
+    <BaseInputContainer
+      disabled={disabled}
+      rightAdornment={
+        button ? (
           <ActionButton
             {...button}
             onClick={() => button.onClick({ [name]: value })}
-            disabled={button.disabled || value === ''}
+            disabled={button.disabled || value === '' || !isValid}
           />
-        </div>
-      )}
-    </div>
+        ) : null
+      }
+    >
+      <input
+        type="text"
+        placeholder={placeholderWithRequired}
+        value={value}
+        onChange={extendedChange}
+        {...validationProps}
+        required={required ?? !!button}
+        minLength={5}
+      />
+    </BaseInputContainer>
   );
 };

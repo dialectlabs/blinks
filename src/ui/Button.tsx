@@ -14,7 +14,7 @@ export const Button = ({
   return (
     <button
       className={clsx(
-        'flex w-full items-center justify-center text-nowrap rounded-button px-6 py-3 text-text font-semibold transition-colors motion-reduce:transition-none',
+        'flex w-full items-center justify-center text-nowrap rounded-button px-4 py-3 text-text font-semibold transition-colors motion-reduce:transition-none',
         {
           'bg-button-disabled text-text-button-disabled':
             disabled && variant !== 'success',

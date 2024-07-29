@@ -25,7 +25,6 @@ import {
 import {
   ActionLayout,
   DisclaimerType,
-  type ButtonProps,
   type Disclaimer,
   type StylePreset,
 } from './ActionLayout';
@@ -389,7 +388,7 @@ export const ActionContainer = ({
     }
   };
 
-  const asButtonProps = (it: ButtonActionComponent): ButtonProps => ({
+  const asButtonProps = (it: ButtonActionComponent) => ({
     text: buttonLabelMap[executionState.status] ?? it.label,
     loading:
       executionState.status === 'executing' &&

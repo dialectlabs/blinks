@@ -1,6 +1,6 @@
-import type { ButtonProps } from '../ActionLayout.tsx';
 import { Button } from '../Button.tsx';
 import { CheckIcon, SpinnerDots } from '../icons';
+import type { BaseButtonProps } from './types.ts';
 
 export const ActionButton = ({
   text,
@@ -8,7 +8,7 @@ export const ActionButton = ({
   disabled,
   variant,
   onClick,
-}: ButtonProps) => {
+}: BaseButtonProps) => {
   const ButtonContent = () => {
     if (loading)
       return (

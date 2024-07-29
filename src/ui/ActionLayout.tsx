@@ -1,12 +1,15 @@
 import clsx from 'clsx';
 import { useState, type ReactNode } from 'react';
-import type { ExtendedActionState, ParameterType } from '../api';
+import type { ExtendedActionState } from '../api';
 import { Badge } from './Badge.tsx';
 import { Snackbar } from './Snackbar.tsx';
 import { ExclamationShieldIcon, InfoShieldIcon, LinkIcon } from './icons';
 import { ActionButton, ActionTextInput } from './inputs';
+import type { BaseButtonProps, BaseInputProps } from './inputs/types.ts';
 
 type ActionType = ExtendedActionState;
+type ButtonProps = BaseButtonProps;
+type InputProps = BaseInputProps;
 
 export type StylePreset = 'default' | 'x-dark' | 'x-light' | 'custom';
 export enum DisclaimerType {
@@ -47,26 +50,6 @@ interface LayoutProps {
   buttons?: ButtonProps[];
   inputs?: InputProps[];
   form?: FormProps;
-}
-export interface ButtonProps {
-  text: string | null;
-  loading?: boolean;
-  variant?: 'default' | 'success' | 'error';
-  disabled?: boolean;
-  onClick: (params?: Record<string, string>) => void;
-}
-
-export interface InputProps {
-  type: ParameterType;
-  placeholder?: string;
-  name: string;
-  disabled: boolean;
-  required?: boolean;
-  min?: number | string;
-  max?: number | string;
-  pattern?: string;
-  description?: string;
-  button?: ButtonProps;
 }
 
 export interface FormProps {
