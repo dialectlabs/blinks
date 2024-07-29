@@ -8,7 +8,6 @@ import {
 } from 'react';
 
 interface Props {
-  disabled?: boolean;
   children: ReactElement<
     | InputHTMLAttributes<HTMLInputElement>
     | TextareaHTMLAttributes<HTMLTextAreaElement>
@@ -16,31 +15,27 @@ interface Props {
   leftAdornment?: ReactNode;
   rightAdornment?: ReactNode;
   description?: string;
-  valid?: boolean;
 }
 
 export const BaseInputContainer = ({
-  disabled,
   children,
   leftAdornment,
   rightAdornment,
   description,
-  valid,
 }: Props) => {
   return (
     <div>
       <div
         className={clsx(
-          'flex items-center gap-2 rounded-input border border-input-stroke py-1.5 pl-4 pr-1.5 transition-colors focus-within:border-input-stroke-selected focus-within:has-[:invalid]:border-input-stroke-error motion-reduce:transition-none',
-          {
-            'hover:border-input-stroke-hover hover:focus-within:border-input-stroke-selected':
-              !disabled,
-          },
+          'flex items-center gap-2 rounded-input border border-input-stroke py-1.5 pl-4 pr-1.5 transition-colors motion-reduce:transition-none',
+          // focus, invalid, required
+          'focus-within:has-[:invalid]:border-input-stroke-error focus-within:has-[:valid]:border-input-stroke-selected focus-within:hover:has-[:invalid]:border-input-stroke-error focus-within:hover:has-[:valid]:border-input-stroke-selected',
+          // enabled,
+          'hover:has-[:enabled]:border-input-stroke-hover',
         )}
       >
         {leftAdornment && <span className="mr-2">{leftAdornment}</span>}
         {cloneElement(children, {
-          disabled,
           className:
             'flex-1 truncate bg-input-bg text-text-input outline-none placeholder:text-text-input-placeholder disabled:text-text-input-disabled',
         })}

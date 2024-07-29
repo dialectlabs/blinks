@@ -40,7 +40,6 @@ export const ActionTextInput = ({
 
   return (
     <BaseInputContainer
-      disabled={disabled}
       rightAdornment={
         button ? (
           <ActionButton
@@ -58,7 +57,7 @@ export const ActionTextInput = ({
         onChange={extendedChange}
         {...validationProps}
         required={required ?? !!button}
-        minLength={5}
+        disabled={disabled}
       />
     </BaseInputContainer>
   );
