@@ -1,5 +1,5 @@
 import { proxify, proxifyImage } from '../utils/proxify.ts';
-import type { ActionAdapter, ActionCompatibility } from './ActionConfig.ts';
+import type { ActionAdapter } from './ActionConfig.ts';
 import type {
   ActionError,
   ActionsSpecGetResponse,
@@ -8,12 +8,17 @@ import type {
   Parameter,
 } from './actions-spec';
 
+interface ActionMetadata {
+  blockchainIds: string[];
+}
+
 export class Action {
   private readonly _actions: ActionComponent[];
 
   private constructor(
     private readonly _url: string,
     private readonly _data: ActionsSpecGetResponse,
+    private readonly _metadata: ActionMetadata,
     private _adapter?: ActionAdapter,
   ) {
     // if no links present, fallback to original solana pay spec
@@ -63,6 +68,10 @@ export class Action {
     return this._data.error?.message ?? null;
   }
 
+  public get metadata() {
+    return this._metadata;
+  }
+
   public get adapter() {
     if (!this._adapter) {
       throw new Error('No adapter provided');
@@ -87,15 +96,6 @@ export class Action {
       },
     });
 
-    // for multi-chain x-blockchain-ids
-    const blockchainIds = (
-      response?.headers?.get('x-blockchain-ids') || ''
-    ).split(',');
-
-    const actionCompatibility: ActionCompatibility = {
-      blockchainIds,
-    };
-
     if (!response.ok) {
       throw new Error(
         `Failed to fetch action ${proxyUrl}, action url: ${apiUrl}`,
@@ -104,7 +104,16 @@ export class Action {
 
     const data = (await response.json()) as ActionsSpecGetResponse;
 
-    return { action: new Action(apiUrl, data, adapter), actionCompatibility };
+    // for multi-chain x-blockchain-ids
+    const blockchainIds = (
+      response?.headers?.get('x-blockchain-ids') || ''
+    ).split(',');
+
+    const metadata: ActionMetadata = {
+      blockchainIds,
+    };
+
+    return new Action(apiUrl, data, metadata, adapter);
   }
 }
 

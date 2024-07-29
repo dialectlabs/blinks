@@ -54,8 +54,3 @@ export interface ActionsSpecPostRequestBody
 // Almost no changes, omitting old `redirect`
 export interface ActionsSpecPostResponse
   extends Omit<SolanaPaySpecPostResponse, 'redirect'> {}
-
-export interface Options {
-  // For multi-chain, see https://github.com/ChainAgnostic/CAIPs
-  blockchainIds?: string;
-}

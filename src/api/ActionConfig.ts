@@ -6,11 +6,6 @@ export interface ActionContext {
   action: Action;
   actionType: 'trusted' | 'malicious' | 'unknown';
   triggeredLinkedAction: ActionComponent;
-  actionCompatibility: ActionCompatibility;
-}
-
-export interface ActionCompatibility {
-  blockchainIds?: string[];
 }
 
 export interface IncomingActionConfig {
@@ -28,7 +23,7 @@ export interface ActionAdapter {
     signature: string,
     context: ActionContext,
   ) => Promise<void>;
-   isCompatible?: (
+  isSupported?: (
     context: Omit<ActionContext, 'triggeredLinkedAction'>,
   ) => Promise<boolean>;
 }

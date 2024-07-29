@@ -50,7 +50,7 @@ export function useAction({ url, adapter }: UseActionOptions) {
 
     let ignore = false;
     Action.fetch(actionApiUrl)
-      .then(({ action }) => {
+      .then((action) => {
         if (ignore) {
           return;
         }

@@ -7,7 +7,6 @@ import {
   getExtendedWebsiteState,
   mergeActionStates,
   type ActionCallbacksConfig,
-  type ActionCompatibility,
   type ActionContext,
   type ExtendedActionState,
   type Parameter,
@@ -196,7 +195,6 @@ type NormalizedSecurityLevel = Record<Source, SecurityLevel>;
 
 export const ActionContainer = ({
   action,
-  actionCompatibility,
   websiteUrl,
   websiteText,
   callbacks,
@@ -205,7 +203,6 @@ export const ActionContainer = ({
   Experimental__ActionLayout = ActionLayout,
 }: {
   action: Action;
-  actionCompatibility: ActionCompatibility;
   websiteUrl?: string | null;
   websiteText?: string | null;
   callbacks?: Partial<ActionCallbacksConfig>;
@@ -334,7 +331,6 @@ export const ActionContainer = ({
       actionType: actionState.action,
       originalUrl: websiteUrl ?? component.parent.url,
       triggeredLinkedAction: component,
-      actionCompatibility,
     };
 
     try {
@@ -443,7 +439,7 @@ export const ActionContainer = ({
       image={action.icon}
       error={
         executionState.status !== 'success'
-          ? executionState.errorMessage ?? action.error
+          ? (executionState.errorMessage ?? action.error)
           : null
       }
       success={executionState.successMessage}
