@@ -28,7 +28,9 @@ export interface ActionAdapter {
     signature: string,
     context: ActionContext,
   ) => Promise<void>;
-  isCompatible?: (actionCompatibility: ActionCompatibility) => Promise<boolean>;
+   isCompatible?: (
+    context: Omit<ActionContext, 'triggeredLinkedAction'>,
+  ) => Promise<boolean>;
 }
 
 export class ActionConfig implements ActionAdapter {
