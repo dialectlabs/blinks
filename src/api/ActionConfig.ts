@@ -23,6 +23,9 @@ export interface ActionAdapter {
     signature: string,
     context: ActionContext,
   ) => Promise<void>;
+  isSupported?: (
+    context: Omit<ActionContext, 'triggeredLinkedAction'>,
+  ) => Promise<boolean>;
 }
 
 export class ActionConfig implements ActionAdapter {

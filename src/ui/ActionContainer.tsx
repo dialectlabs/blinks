@@ -439,7 +439,7 @@ export const ActionContainer = ({
       image={action.icon}
       error={
         executionState.status !== 'success'
-          ? executionState.errorMessage ?? action.error
+          ? (executionState.errorMessage ?? action.error)
           : null
       }
       success={executionState.successMessage}

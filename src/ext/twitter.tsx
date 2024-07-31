@@ -180,10 +180,21 @@ async function handleNewNode(
     return;
   }
 
-  const action = await Action.fetch(actionApiUrl, config).catch(() => null);
+  const action = await Action.fetch(actionApiUrl, config).catch(noop);
 
   if (!action) {
     return;
+  }
+
+  if (config.isSupported) {
+    const supported = await config.isSupported({
+      originalUrl: actionUrl.toString(),
+      action,
+      actionType: state,
+    });
+    if (!supported) {
+      return;
+    }
   }
 
   addMargin(container).replaceChildren(
