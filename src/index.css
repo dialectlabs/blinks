@@ -3,6 +3,16 @@
 @tailwind utilities;
 
 @layer base {
+  .blink input[type="date"]::-webkit-inner-spin-button, input[type="date"]::-webkit-calendar-picker-indicator, input[type="datetime-local"]::-webkit-inner-spin-button, input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    /*
+      this is very dirty hack to make picker openable, since in chrome ext environment, programmatic `showPicker` doesn't work and/or crashes the browser
+      https://issues.chromium.org/issues/356419161
+    */
+    position: absolute;
+    left: 1rem;
+    opacity: 0;
+  }
+
   .dial-light {
     --blink-bg-primary: #ffffff;
     --blink-button: #2a2a2b;

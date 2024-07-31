@@ -1,10 +1,11 @@
 import { type ChangeEvent, useMemo, useState } from 'react';
+import { LinkIcon } from '../icons';
 import { ActionButton } from './ActionButton.tsx';
 import { BaseInputContainer } from './BaseInputContainer.tsx';
 import type { BaseInputProps } from './types.ts';
 import { buildDefaultTextDescription } from './utils.ts';
 
-export const ActionTextInput = ({
+export const ActionUrlInput = ({
   placeholder,
   name,
   button,
@@ -37,7 +38,7 @@ export const ActionTextInput = ({
   };
 
   const placeholderWithRequired =
-    (placeholder || 'Type here...') + (required ? '*' : '');
+    (placeholder || 'https://') + (required ? '*' : '');
 
   const validationProps = useMemo(
     () => ({
@@ -47,7 +48,7 @@ export const ActionTextInput = ({
       title: description,
       required,
     }),
-    [min, max, pattern, description, required],
+    [minLength, maxLength, pattern, description, required],
   );
 
   return (
@@ -56,6 +57,7 @@ export const ActionTextInput = ({
         description ??
         buildDefaultTextDescription({ min: minLength, max: maxLength })
       }
+      leftAdornment={<LinkIcon className="text-icon-primary" />}
       rightAdornment={
         button ? (
           <ActionButton
@@ -67,7 +69,7 @@ export const ActionTextInput = ({
       }
     >
       <input
-        type="text"
+        type={pattern ? 'text' : 'url'}
         placeholder={placeholderWithRequired}
         value={value}
         onChange={extendedChange}

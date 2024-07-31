@@ -414,6 +414,10 @@ export const ActionContainer = ({
       max: it.parameter.max,
       pattern:
         it instanceof InputActionComponent ? it.parameter.pattern : undefined,
+      options:
+        it instanceof SelectableInputActionComponent
+          ? it.parameter.options
+          : undefined,
       description: it.parameter.description,
       button:
         placement === 'standalone'

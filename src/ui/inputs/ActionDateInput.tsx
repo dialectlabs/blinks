@@ -1,10 +1,18 @@
-import { type ChangeEvent, useMemo, useState } from 'react';
+import {
+  type ChangeEvent,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import CalendarIcon from '../icons/CalendarIcon.tsx';
 import { ActionButton } from './ActionButton.tsx';
 import { BaseInputContainer } from './BaseInputContainer.tsx';
 import type { BaseInputProps } from './types.ts';
-import { buildDefaultTextDescription } from './utils.ts';
+import { buildDefaultDateDescription } from './utils.ts';
 
-export const ActionTextInput = ({
+export const ActionDateInput = ({
+  type = 'date',
   placeholder,
   name,
   button,
@@ -17,15 +25,17 @@ export const ActionTextInput = ({
   description,
   required,
 }: Omit<BaseInputProps, 'type'> & {
+  type?: 'date' | 'datetime-local';
   onChange?: (value: string) => void;
   onValidityChange?: (state: boolean) => void;
 }) => {
+  const ref = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState('');
   const [isValid, setValid] = useState(button ? false : !required);
-  const minLength = min as number;
-  const maxLength = max as number;
+  const minDate = min as string | undefined;
+  const maxDate = max as string | undefined;
 
-  const extendedChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const extendedChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
     const validity = e.currentTarget.checkValidity();
 
@@ -34,27 +44,35 @@ export const ActionTextInput = ({
 
     onChange?.(value);
     onValidityChange?.(validity);
-  };
+  }, []);
 
   const placeholderWithRequired =
-    (placeholder || 'Type here...') + (required ? '*' : '');
+    (placeholder || 'hello@example.com') + (required ? '*' : '');
 
   const validationProps = useMemo(
     () => ({
-      minLength,
-      maxLength,
+      min: minDate,
+      max: maxDate,
       pattern,
       title: description,
       required,
     }),
-    [min, max, pattern, description, required],
+    [minDate, maxDate, pattern, description, required],
   );
 
   return (
     <BaseInputContainer
       description={
         description ??
-        buildDefaultTextDescription({ min: minLength, max: maxLength })
+        buildDefaultDateDescription({ min: minDate, max: maxDate })
+      }
+      leftAdornment={
+        <button
+          className="flex items-center"
+          onClick={() => ref.current?.focus()}
+        >
+          <CalendarIcon className="text-icon-primary" />
+        </button>
       }
       rightAdornment={
         button ? (
@@ -67,7 +85,8 @@ export const ActionTextInput = ({
       }
     >
       <input
-        type="text"
+        ref={ref}
+        type={pattern ? 'text' : type}
         placeholder={placeholderWithRequired}
         value={value}
         onChange={extendedChange}

@@ -4,7 +4,7 @@ import { BaseInputContainer } from './BaseInputContainer.tsx';
 import type { BaseInputProps } from './types.ts';
 import { buildDefaultTextDescription } from './utils.ts';
 
-export const ActionTextInput = ({
+export const ActionTextArea = ({
   placeholder,
   name,
   button,
@@ -25,7 +25,7 @@ export const ActionTextInput = ({
   const minLength = min as number;
   const maxLength = max as number;
 
-  const extendedChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const extendedChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.currentTarget.value;
     const validity = e.currentTarget.checkValidity();
 
@@ -56,7 +56,7 @@ export const ActionTextInput = ({
         description ??
         buildDefaultTextDescription({ min: minLength, max: maxLength })
       }
-      rightAdornment={
+      footer={
         button ? (
           <ActionButton
             {...button}
@@ -66,12 +66,12 @@ export const ActionTextInput = ({
         ) : null
       }
     >
-      <input
-        type="text"
+      <textarea
         placeholder={placeholderWithRequired}
         value={value}
         onChange={extendedChange}
         {...validationProps}
+        rows={3}
         required={button ? true : required}
         disabled={disabled}
       />

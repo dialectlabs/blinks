@@ -1,10 +1,11 @@
 import { type ChangeEvent, useMemo, useState } from 'react';
+import EmailIcon from '../icons/EmailIcon.tsx';
 import { ActionButton } from './ActionButton.tsx';
 import { BaseInputContainer } from './BaseInputContainer.tsx';
 import type { BaseInputProps } from './types.ts';
 import { buildDefaultTextDescription } from './utils.ts';
 
-export const ActionTextInput = ({
+export const ActionEmailInput = ({
   placeholder,
   name,
   button,
@@ -22,8 +23,8 @@ export const ActionTextInput = ({
 }) => {
   const [value, setValue] = useState('');
   const [isValid, setValid] = useState(button ? false : !required);
-  const minLength = min as number;
-  const maxLength = max as number;
+  const minLength = min as number | undefined;
+  const maxLength = max as number | undefined;
 
   const extendedChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
@@ -37,7 +38,7 @@ export const ActionTextInput = ({
   };
 
   const placeholderWithRequired =
-    (placeholder || 'Type here...') + (required ? '*' : '');
+    (placeholder || 'hello@example.com') + (required ? '*' : '');
 
   const validationProps = useMemo(
     () => ({
@@ -47,7 +48,7 @@ export const ActionTextInput = ({
       title: description,
       required,
     }),
-    [min, max, pattern, description, required],
+    [minLength, maxLength, pattern, description, required],
   );
 
   return (
@@ -56,6 +57,7 @@ export const ActionTextInput = ({
         description ??
         buildDefaultTextDescription({ min: minLength, max: maxLength })
       }
+      leftAdornment={<EmailIcon className="text-icon-primary" />}
       rightAdornment={
         button ? (
           <ActionButton
@@ -67,7 +69,7 @@ export const ActionTextInput = ({
       }
     >
       <input
-        type="text"
+        type={pattern ? 'text' : 'email'}
         placeholder={placeholderWithRequired}
         value={value}
         onChange={extendedChange}

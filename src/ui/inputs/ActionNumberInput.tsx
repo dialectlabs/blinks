@@ -2,9 +2,9 @@ import { type ChangeEvent, useMemo, useState } from 'react';
 import { ActionButton } from './ActionButton.tsx';
 import { BaseInputContainer } from './BaseInputContainer.tsx';
 import type { BaseInputProps } from './types.ts';
-import { buildDefaultTextDescription } from './utils.ts';
+import { buildDefaultNumberDescription } from './utils.ts';
 
-export const ActionTextInput = ({
+export const ActionNumberInput = ({
   placeholder,
   name,
   button,
@@ -22,8 +22,6 @@ export const ActionTextInput = ({
 }) => {
   const [value, setValue] = useState('');
   const [isValid, setValid] = useState(button ? false : !required);
-  const minLength = min as number;
-  const maxLength = max as number;
 
   const extendedChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
@@ -41,8 +39,8 @@ export const ActionTextInput = ({
 
   const validationProps = useMemo(
     () => ({
-      minLength,
-      maxLength,
+      min: !pattern ? (min as number | undefined) : undefined,
+      max: !pattern ? (max as number | undefined) : undefined,
       pattern,
       title: description,
       required,
@@ -54,7 +52,10 @@ export const ActionTextInput = ({
     <BaseInputContainer
       description={
         description ??
-        buildDefaultTextDescription({ min: minLength, max: maxLength })
+        buildDefaultNumberDescription({
+          min: min as number | undefined,
+          max: max as number | undefined,
+        })
       }
       rightAdornment={
         button ? (
@@ -67,7 +68,7 @@ export const ActionTextInput = ({
       }
     >
       <input
-        type="text"
+        type={pattern ? 'text' : 'number'}
         placeholder={placeholderWithRequired}
         value={value}
         onChange={extendedChange}

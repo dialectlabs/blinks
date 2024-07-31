@@ -28,7 +28,9 @@ export const ActionButton = ({
 
   return (
     <Button onClick={() => onClick()} disabled={disabled} variant={variant}>
-      <ButtonContent />
+      <span className="min-w-0 truncate">
+        <ButtonContent />
+      </span>
     </Button>
   );
 };
