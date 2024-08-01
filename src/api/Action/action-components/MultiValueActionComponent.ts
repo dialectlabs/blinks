@@ -6,7 +6,7 @@ import type {
 import { AbstractActionComponent } from './AbstractActionComponent.ts';
 import { ButtonActionComponent } from './ButtonActionComponent.ts';
 
-export class SelectableInputActionComponent extends AbstractActionComponent {
+export class MultiValueActionComponent extends AbstractActionComponent {
   private parameterValue: Array<string> = [];
 
   protected buildBody(account: string): ActionsSpecPostRequestBody {

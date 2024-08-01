@@ -1,7 +1,7 @@
 import type { ActionsSpecPostRequestBody } from '../../actions-spec.ts';
 import { AbstractActionComponent } from './AbstractActionComponent.ts';
 import { ButtonActionComponent } from './ButtonActionComponent.ts';
-import { InputActionComponent } from './InputActionComponent.ts';
+import { SingleValueActionComponent } from './SingleValueActionComponent.ts';
 
 export class FormActionComponent extends AbstractActionComponent {
   private parameterValues: Record<string, string | string[]> = {};
@@ -52,7 +52,7 @@ export class FormActionComponent extends AbstractActionComponent {
     return new ButtonActionComponent(this._parent, this._label, this.href);
   }
 
-  toInputActionComponent(paramName: string): InputActionComponent {
+  toInputActionComponent(paramName: string): SingleValueActionComponent {
     const parameter = this.parameters.find((param) => param.name === paramName);
 
     if (!parameter) {
@@ -60,8 +60,11 @@ export class FormActionComponent extends AbstractActionComponent {
       throw new Error(`Input Parameter ${paramName} not found`);
     }
 
-    return new InputActionComponent(this._parent, this._label, this.href, [
-      parameter,
-    ]);
+    return new SingleValueActionComponent(
+      this._parent,
+      this._label,
+      this.href,
+      [parameter],
+    );
   }
 }

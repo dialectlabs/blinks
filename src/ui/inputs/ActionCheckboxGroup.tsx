@@ -114,6 +114,7 @@ export const ActionCheckboxGroup = ({
               <Checkbox
                 label={option.label}
                 value={value[option.value]}
+                inputValue={option.value}
                 onChange={(value) => extendedChange(option.value, value)}
                 name={name}
                 disabled={disabled}
@@ -131,14 +132,16 @@ export const ActionCheckboxGroup = ({
           />
         </div>
       )}
-      <span
-        className={clsx(
-          'mt-1.5 text-caption font-medium',
-          touched && !isValid ? 'text-text-error' : 'text-text-secondary',
-        )}
-      >
-        {finalDescription}
-      </span>
+      {finalDescription && (
+        <span
+          className={clsx(
+            'mt-1.5 text-caption font-medium',
+            touched && !isValid ? 'text-text-error' : 'text-text-secondary',
+          )}
+        >
+          {finalDescription}
+        </span>
+      )}
     </div>
   );
 };

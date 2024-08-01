@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { useId } from 'react';
-import CheckboxCheckIcon from './icons/CheckboxCheckIcon.tsx';
 
 interface Props {
   label: string;
@@ -11,7 +10,7 @@ interface Props {
   inputValue: string;
 }
 
-export const Checkbox = ({
+export const Radio = ({
   label,
   value,
   onChange,
@@ -24,7 +23,7 @@ export const Checkbox = ({
 
   return (
     <button
-      className={clsx('flex h-full items-center gap-2.5', {
+      className={clsx('flex h-full gap-2.5', {
         'cursor-pointer': !disabled,
         'cursor-not-allowed': disabled,
       })}
@@ -32,17 +31,17 @@ export const Checkbox = ({
     >
       <div className="flex h-full items-center">
         <input
-          type="checkbox"
+          type="radio"
           name={name}
           className="hidden"
           defaultValue={inputValue}
         />
-        <span
-          role="checkbox"
+        <div
+          role="radio"
           id={id}
           aria-labelledby={labelId}
           className={clsx(
-            'mt-0.5 flex aspect-square h-[16px] items-center justify-center rounded-lg border transition-colors motion-reduce:transition-none',
+            'mt-0.5 flex aspect-square h-[16px] items-center justify-center rounded-full border transition-colors motion-reduce:transition-none',
             {
               'border-input-stroke bg-input-bg': !value && !disabled,
               'bg-input-bg-selected border-input-stroke-selected':
@@ -53,13 +52,12 @@ export const Checkbox = ({
             },
           )}
         >
-          <CheckboxCheckIcon
-            className={clsx('h-full w-full text-input-bg', {
-              block: value,
-              hidden: !value,
+          <div
+            className={clsx('aspect-square h-[8px] rounded-full bg-input-bg', {
+              invisible: !value,
             })}
           />
-        </span>
+        </div>
       </div>
       <label className="text-text text-text-input" id={labelId}>
         {label}

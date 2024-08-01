@@ -13,8 +13,9 @@ import {
   AbstractActionComponent,
   ButtonActionComponent,
   FormActionComponent,
-  InputActionComponent,
-  SelectableInputActionComponent,
+  isPatternAllowed,
+  MultiValueActionComponent,
+  SingleValueActionComponent,
 } from '../api/Action/action-components';
 import { checkSecurity, type SecurityLevel } from '../shared';
 import { isInterstitial } from '../utils/interstitial-url.ts';
@@ -281,8 +282,8 @@ export const ActionContainer = ({
       action?.actions
         .filter(
           (it) =>
-            it instanceof InputActionComponent ||
-            it instanceof SelectableInputActionComponent,
+            it instanceof SingleValueActionComponent ||
+            it instanceof MultiValueActionComponent,
         )
         .filter((it) =>
           executionState.executingAction
@@ -307,7 +308,7 @@ export const ActionContainer = ({
 
   const execute = async (
     component: AbstractActionComponent,
-    params?: Record<string, string>,
+    params?: Record<string, string | string[]>,
   ) => {
     if (params) {
       if (component instanceof FormActionComponent) {
@@ -316,8 +317,17 @@ export const ActionContainer = ({
         );
       }
 
-      if (component instanceof InputActionComponent) {
+      if (component instanceof MultiValueActionComponent) {
         component.setValue(params[component.parameter.name]);
+      }
+
+      if (component instanceof SingleValueActionComponent) {
+        const incomingValues = params[component.parameter.name];
+        const value =
+          typeof incomingValues === 'string'
+            ? incomingValues
+            : incomingValues[0];
+        component.setValue(value);
       }
     }
 
@@ -395,11 +405,12 @@ export const ActionContainer = ({
       it === executionState.executingAction,
     disabled: action.disabled || executionState.status !== 'idle',
     variant: buttonVariantMap[executionState.status],
-    onClick: (params?: Record<string, string>) => execute(it, params),
+    onClick: (params?: Record<string, string | string[]>) =>
+      execute(it, params),
   });
 
   const asInputProps = (
-    it: InputActionComponent | SelectableInputActionComponent,
+    it: SingleValueActionComponent | MultiValueActionComponent,
     { placement }: { placement: 'form' | 'standalone' } = {
       placement: 'standalone',
     },
@@ -413,9 +424,12 @@ export const ActionContainer = ({
       min: it.parameter.min,
       max: it.parameter.max,
       pattern:
-        it instanceof InputActionComponent ? it.parameter.pattern : undefined,
+        it instanceof SingleValueActionComponent &&
+        isPatternAllowed(it.parameter)
+          ? it.parameter.pattern
+          : undefined,
       options:
-        it instanceof SelectableInputActionComponent
+        it instanceof MultiValueActionComponent
           ? it.parameter.options
           : undefined,
       description: it.parameter.description,

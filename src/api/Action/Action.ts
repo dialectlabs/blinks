@@ -8,8 +8,8 @@ import {
   type AbstractActionComponent,
   ButtonActionComponent,
   FormActionComponent,
-  InputActionComponent,
-  SelectableInputActionComponent,
+  MultiValueActionComponent,
+  SingleValueActionComponent,
 } from './action-components';
 
 export class Action {
@@ -125,12 +125,12 @@ const componentFactory = (
   const [parameter] = parameters;
 
   if (!parameter.type) {
-    return new InputActionComponent(parent, label, href, parameters);
+    return new SingleValueActionComponent(parent, label, href, parameters);
   }
 
-  if (['select', 'checkbox', 'radio'].includes(parameter.type)) {
-    return new SelectableInputActionComponent(parent, label, href, parameters);
+  if (['checkbox'].includes(parameter.type)) {
+    return new MultiValueActionComponent(parent, label, href, parameters);
   }
 
-  return new InputActionComponent(parent, label, href, parameters);
+  return new SingleValueActionComponent(parent, label, href, parameters);
 };

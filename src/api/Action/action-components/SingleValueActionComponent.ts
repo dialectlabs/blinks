@@ -5,8 +5,8 @@ import type {
 import { AbstractActionComponent } from './AbstractActionComponent.ts';
 import { ButtonActionComponent } from './ButtonActionComponent.ts';
 
-export class InputActionComponent extends AbstractActionComponent {
-  private parameterValue: string | null = '';
+export class SingleValueActionComponent extends AbstractActionComponent {
+  private parameterValue: string | null = null;
 
   protected buildBody(account: string) {
     if (this._href.indexOf(`{${this.parameter.name}}`) > -1) {
