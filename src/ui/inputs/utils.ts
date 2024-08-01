@@ -49,3 +49,16 @@ export const buildDefaultDateDescription = ({
   if (maxDate) return `Pick a date before ${formatter.format(maxDate)}`;
   return null;
 };
+
+export const buildDefaultCheckboxGroupDescription = ({
+  min,
+  max,
+}: {
+  min?: number;
+  max?: number;
+}) => {
+  if (min && max) return `Select between ${min} and ${max} options`;
+  if (min) return `Select minimum ${min} options`;
+  if (max) return `Select maximum ${max} options`;
+  return null;
+};

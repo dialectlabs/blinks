@@ -2,7 +2,6 @@ import { type ChangeEvent, useId, useMemo, useState } from 'react';
 import { ActionButton } from './ActionButton.tsx';
 import { BaseInputContainer } from './BaseInputContainer.tsx';
 import type { BaseInputProps } from './types.ts';
-import { buildDefaultTextDescription } from './utils.ts';
 
 export const ActionSelect = ({
   placeholder,
@@ -11,8 +10,6 @@ export const ActionSelect = ({
   disabled,
   onChange,
   onValidityChange,
-  min,
-  max,
   description,
   required,
   options = [],
@@ -37,8 +34,6 @@ export const ActionSelect = ({
       ? !!initiallySelectedOption
       : !(required && !initiallySelectedOption),
   );
-  const minLength = min as number;
-  const maxLength = max as number;
 
   const extendedChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const value = e.currentTarget.value;
@@ -54,10 +49,7 @@ export const ActionSelect = ({
 
   return (
     <BaseInputContainer
-      description={
-        description ??
-        buildDefaultTextDescription({ min: minLength, max: maxLength })
-      }
+      description={description}
       rightAdornment={
         button ? (
           <div className="ml-1.5">

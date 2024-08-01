@@ -31,7 +31,7 @@ export const BaseInputContainer = ({
     <div>
       <div
         className={clsx(
-          'relative flex items-center gap-1.5 rounded-input border border-input-stroke py-1.5 pl-4 pr-1.5 transition-colors motion-reduce:transition-none',
+          'peer relative flex items-center gap-1.5 rounded-input border border-input-stroke py-1.5 pl-4 pr-1.5 transition-colors motion-reduce:transition-none',
           // focus, invalid, required
           'focus-within:has-[:invalid]:border-input-stroke-error focus-within:has-[:valid]:border-input-stroke-selected focus-within:hover:has-[:invalid]:border-input-stroke-error focus-within:hover:has-[:valid]:border-input-stroke-selected',
           // enabled,
@@ -46,7 +46,11 @@ export const BaseInputContainer = ({
         {rightAdornment && <div className="min-w-0">{rightAdornment}</div>}
       </div>
       {footer && <div className="mt-2">{footer}</div>}
-      {description && <span className="mt-2">{description}</span>}
+      {description && (
+        <span className="mt-2 text-caption font-medium text-text-secondary peer-[:focus-within:has(:invalid)]:text-text-error">
+          {description}
+        </span>
+      )}
     </div>
   );
 };

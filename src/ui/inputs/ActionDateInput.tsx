@@ -32,22 +32,26 @@ export const ActionDateInput = ({
   const ref = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState('');
   const [isValid, setValid] = useState(button ? false : !required);
+  const [touched, setTouched] = useState(false);
   const minDate = min as string | undefined;
   const maxDate = max as string | undefined;
 
-  const extendedChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.currentTarget.value;
-    const validity = e.currentTarget.checkValidity();
+  const extendedChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const value = e.currentTarget.value;
+      const validity = e.currentTarget.checkValidity();
 
-    setValue(value);
-    setValid(validity);
+      setValue(value);
+      setValid(validity);
 
-    onChange?.(value);
-    onValidityChange?.(validity);
-  }, []);
+      onChange?.(value);
+      onValidityChange?.(validity);
+    },
+    [onChange, onValidityChange],
+  );
 
   const placeholderWithRequired =
-    (placeholder || 'hello@example.com') + (required ? '*' : '');
+    (placeholder || 'Enter a date') + (required ? '*' : '');
 
   const validationProps = useMemo(
     () => ({
@@ -86,10 +90,11 @@ export const ActionDateInput = ({
     >
       <input
         ref={ref}
-        type={pattern ? 'text' : type}
+        type={pattern || !touched ? 'text' : type}
         placeholder={placeholderWithRequired}
         value={value}
         onChange={extendedChange}
+        onFocus={() => setTouched(true)}
         {...validationProps}
         required={button ? true : required}
         disabled={disabled}

@@ -4,11 +4,14 @@ export default {
   theme: {
     colors: {
       'bg-primary': 'var(--blink-bg-primary)',
+      'bg-secondary': 'var(--blink-bg-secondary)',
       button: 'var(--blink-button)',
       'button-success': 'var(--blink-button-success)',
       'button-disabled': 'var(--blink-button-disabled)',
       'button-hover': 'var(--blink-button-hover)',
       'input-bg': 'var(--blink-input-bg)',
+      'input-bg-selected': 'var(--blink-input-bg-selected)',
+      'input-bg-disabled': 'var(--blink-input-bg-disabled)',
       'input-stroke': 'var(--blink-input-stroke)',
       'input-stroke-selected': 'var(--blink-input-stroke-selected)',
       'input-stroke-hover': 'var(--blink-input-stroke-hover)',

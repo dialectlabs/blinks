@@ -15,6 +15,7 @@
 
   .dial-light {
     --blink-bg-primary: #ffffff;
+    --blink-bg-secondary: #f2f3f5;
     --blink-button: #2a2a2b;
     --blink-button-disabled: #737373;
     --blink-button-hover: #323335;
@@ -26,6 +27,8 @@
     --blink-icon-warning: #d55f00;
     --blink-icon-warning-hover: #ef6f08;
     --blink-input-bg: #ffffff;
+    --blink-input-bg-selected: #08c0b4;
+    --blink-input-bg-disabled: #dee1e7;
     --blink-input-stroke: #c4c6c8;
     --blink-input-stroke-disabled: #dee1e7;
     --blink-input-stroke-error: #ff402e;
@@ -74,6 +77,7 @@
 
   .x-dark {
     --blink-bg-primary: #202327;
+    --blink-bg-secondary: #768088;
     --blink-button: #1d9bf0;
     --blink-button-disabled: #2f3336;
     --blink-button-hover: #3087da;
@@ -85,6 +89,8 @@
     --blink-icon-warning: #ffb545;
     --blink-icon-warning-hover: #ffc875;
     --blink-input-bg: #202327;
+    --blink-input-bg-selected: #1d9bf0;
+    --blink-input-bg-disabled: #2f3336;
     --blink-input-stroke: #3d4144;
     --blink-input-stroke-disabled: #2f3336;
     --blink-input-stroke-error: #ff6565;
@@ -119,6 +125,7 @@
 
   .x-light {
     --blink-bg-primary: #ffffff;
+    --blink-bg-secondary: #949ca4;
     --blink-button: #499bea;
     --blink-button-disabled: #F0F3F4;
     --blink-button-hover: #428cd2;
@@ -130,6 +137,8 @@
     --blink-icon-warning: #ef6f08;
     --blink-icon-warning-hover: #ffbc6e;
     --blink-input-bg: #ffffff;
+    --blink-input-bg-selected: #499bea;
+    --blink-input-bg-disabled: #f0f3f4;
     --blink-input-stroke: #d1d9de;
     --blink-input-stroke-disabled: #f0f3f4;
     --blink-input-stroke-error: #ff402e;
