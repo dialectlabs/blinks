@@ -4,7 +4,18 @@ import type { ExtendedActionState } from '../api';
 import { Badge } from './Badge.tsx';
 import { Snackbar } from './Snackbar.tsx';
 import { ExclamationShieldIcon, InfoShieldIcon, LinkIcon } from './icons';
-import { ActionButton, ActionTextInput } from './inputs';
+import {
+  ActionButton,
+  ActionDateInput,
+  ActionEmailInput,
+  ActionNumberInput,
+  ActionRadioGroup,
+  ActionSelect,
+  ActionTextInput,
+  ActionUrlInput,
+} from './inputs';
+import { ActionCheckboxGroup } from './inputs/ActionCheckboxGroup.tsx';
+import { ActionTextArea } from './inputs/ActionTextArea.tsx';
 import type { BaseButtonProps, BaseInputProps } from './inputs/types.ts';
 
 type ActionType = ExtendedActionState;
@@ -287,17 +298,19 @@ const ActionContent = ({
           ))}
         </div>
       )}
-      {inputs?.map((input) => <ActionTextInput key={input.name} {...input} />)}
+      {inputs?.map((input) => (
+        <ActionInputFactory key={input.name} {...input} />
+      ))}
     </div>
   );
 };
 
 const ActionForm = ({ form }: Required<Pick<LayoutProps, 'form'>>) => {
-  const [values, setValues] = useState(
+  const [values, setValues] = useState<Record<string, string | string[]>>(
     Object.fromEntries(form.inputs.map((i) => [i.name, ''])),
   );
 
-  const onChange = (name: string, value: string) => {
+  const onChange = (name: string, value: string | string[]) => {
     setValues((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -306,7 +319,7 @@ const ActionForm = ({ form }: Required<Pick<LayoutProps, 'form'>>) => {
   return (
     <div className="flex flex-col gap-3">
       {form.inputs.map((input) => (
-        <ActionTextInput
+        <ActionInputFactory
           key={input.name}
           {...input}
           onChange={(v) => onChange(input.name, v)}
@@ -319,4 +332,30 @@ const ActionForm = ({ form }: Required<Pick<LayoutProps, 'form'>>) => {
       />
     </div>
   );
+};
+
+const ActionInputFactory = (
+  input: InputProps & { onChange?: (value: string | string[]) => void },
+) => {
+  switch (input.type) {
+    case 'checkbox':
+      return <ActionCheckboxGroup {...input} />;
+    case 'radio':
+      return <ActionRadioGroup {...input} />;
+    case 'date':
+    case 'datetime-local':
+      return <ActionDateInput {...input} type={input.type} />;
+    case 'select':
+      return <ActionSelect {...input} />;
+    case 'email':
+      return <ActionEmailInput {...input} />;
+    case 'number':
+      return <ActionNumberInput {...input} />;
+    case 'url':
+      return <ActionUrlInput {...input} />;
+    case 'textarea':
+      return <ActionTextArea {...input} />;
+    default:
+      return <ActionTextInput {...input} />;
+  }
 };

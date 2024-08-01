@@ -88,8 +88,9 @@ export const ActionRadioGroup = ({
       {description && (
         <span
           className={clsx(
-            'mt-1.5 text-caption font-medium',
+            'text-caption font-medium',
             touched && !isValid ? 'text-text-error' : 'text-text-secondary',
+            isStandalone ? 'mb-2 mt-2.5' : 'mt-3',
           )}
         >
           {description}

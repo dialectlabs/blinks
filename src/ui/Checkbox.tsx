@@ -24,7 +24,7 @@ export const Checkbox = ({
 
   return (
     <button
-      className={clsx('flex h-full items-center gap-2.5', {
+      className={clsx('flex h-full gap-2.5', {
         'cursor-pointer': !disabled,
         'cursor-not-allowed': disabled,
       })}
