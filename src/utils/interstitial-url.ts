@@ -1,4 +1,4 @@
-const solanaActionPrefix = /^(solana-action:|solana:)/;
+import { SOLANA_ACTION_PREFIX } from './constants';
 
 export type IsInterstitialResult =
   | {
@@ -19,12 +19,12 @@ export function isInterstitial(url: string | URL): IsInterstitialResult {
     }
     const urlDecodedActionUrl = decodeURIComponent(actionUrl);
 
-    if (!solanaActionPrefix.test(urlDecodedActionUrl)) {
+    if (!SOLANA_ACTION_PREFIX.test(urlDecodedActionUrl)) {
       return { isInterstitial: false };
     }
 
     const decodedActionUrl = urlDecodedActionUrl.replace(
-      solanaActionPrefix,
+      SOLANA_ACTION_PREFIX,
       '',
     );
 

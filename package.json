@@ -1,6 +1,6 @@
 {
   "name": "@dialectlabs/blinks",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "license": "Apache-2.0",
   "private": false,
   "sideEffects": true,
@@ -22,10 +22,15 @@
       "require": "./dist/ext/twitter.cjs",
       "types": "./dist/ext/twitter.d.ts"
     },
-    "./react": {
-      "import": "./dist/react/index.js",
-      "require": "./dist/react/index.cjs",
-      "types": "./dist/react/index.d.ts"
+    "./hooks": {
+      "import": "./dist/hooks/index.js",
+      "require": "./dist/hooks/index.cjs",
+      "types": "./dist/hooks/index.d.ts"
+    },
+    "./hooks/solana": {
+      "import": "./dist/hooks/solana/index.js",
+      "require": "./dist/hooks/solana/index.cjs",
+      "types": "./dist/hooks/solana/index.d.ts"
     },
     ".": {
       "import": "./dist/index.js",

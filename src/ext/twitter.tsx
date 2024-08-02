@@ -72,9 +72,7 @@ export function setupTwitterObserver(
   const twitterReactRoot = document.getElementById('react-root')!;
 
   const refreshRegistry = async () => {
-    await ActionsRegistry.getInstance().init();
-
-    setTimeout(refreshRegistry, 1000 * 60 * 10); // every 10 minutes
+    return ActionsRegistry.getInstance().init();
   };
 
   // if we don't have the registry, then we don't show anything
@@ -182,10 +180,21 @@ async function handleNewNode(
     return;
   }
 
-  const action = await Action.fetch(actionApiUrl, config).catch(() => null);
+  const action = await Action.fetch(actionApiUrl, config).catch(noop);
 
   if (!action) {
     return;
+  }
+
+  if (config.isSupported) {
+    const supported = await config.isSupported({
+      originalUrl: actionUrl.toString(),
+      action,
+      actionType: state,
+    });
+    if (!supported) {
+      return;
+    }
   }
 
   addMargin(container).replaceChildren(

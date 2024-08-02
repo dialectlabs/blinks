@@ -12,12 +12,17 @@ import {
   SingleValueActionComponent,
 } from './action-components';
 
+interface ActionMetadata {
+  blockchainIds: string[];
+}
+
 export class Action {
   private readonly _actions: AbstractActionComponent[];
 
   private constructor(
     private readonly _url: string,
     private readonly _data: ActionsSpecGetResponse,
+    private readonly _metadata: ActionMetadata,
     private _adapter?: ActionAdapter,
   ) {
     // if no links present, fallback to original solana pay spec
@@ -67,6 +72,10 @@ export class Action {
     return this._data.error?.message ?? null;
   }
 
+  public get metadata() {
+    return this._metadata;
+  }
+
   public get adapter() {
     if (!this._adapter) {
       throw new Error('No adapter provided');
@@ -83,9 +92,10 @@ export class Action {
   static hydrate(
     url: string,
     data: ActionsSpecGetResponse,
+    metadata: ActionMetadata,
     adapter?: ActionAdapter,
   ) {
-    return new Action(url, data, adapter);
+    return new Action(url, data, metadata, adapter);
   }
 
   static async fetch(apiUrl: string, adapter?: ActionAdapter) {
@@ -104,7 +114,16 @@ export class Action {
 
     const data = (await response.json()) as ActionsSpecGetResponse;
 
-    return new Action(apiUrl, data, adapter);
+    // for multi-chain x-blockchain-ids
+    const blockchainIds = (
+      response?.headers?.get('x-blockchain-ids') || ''
+    ).split(',');
+
+    const metadata: ActionMetadata = {
+      blockchainIds,
+    };
+
+    return new Action(apiUrl, data, metadata, adapter);
   }
 }
 

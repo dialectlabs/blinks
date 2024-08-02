@@ -2,11 +2,15 @@ import { Action } from './Action';
 
 export type LookupType = 'action' | 'website' | 'interstitial';
 
+const DEFAULT_REFRESH_INTERVAL = 10 * 60 * 1000; // 10 minutes
+
 export class ActionsRegistry {
   private static instance: ActionsRegistry | null = null;
   private actionsByHost: Record<string, RegisteredEntity>;
   private websitesByHost: Record<string, RegisteredEntity>;
   private interstitialsByHost: Record<string, RegisteredEntity>;
+
+  private initPromise: Promise<ActionsRegistryConfig> | null = null;
 
   private constructor(config?: ActionsRegistryConfig) {
     this.actionsByHost = config
@@ -39,7 +43,16 @@ export class ActionsRegistry {
   }
 
   public async init(): Promise<void> {
-    const config = await fetchActionsRegistryConfig();
+    if (this.initPromise !== null) {
+      return;
+    }
+    await this.refresh();
+    setInterval(() => this.refresh(), DEFAULT_REFRESH_INTERVAL);
+  }
+
+  public async refresh(): Promise<void> {
+    this.initPromise = fetchActionsRegistryConfig();
+    const config = await this.initPromise;
     this.actionsByHost = Object.fromEntries(
       config.actions.map((action) => [action.host, action]),
     );
@@ -171,7 +184,7 @@ export const getExtendedInterstitialState = (
 
 async function fetchActionsRegistryConfig(): Promise<ActionsRegistryConfig> {
   try {
-    const response = await fetch('https://actions-registry.dialectapi.to/all');
+    const response = await fetch('https://actions-registry.dial.to/all');
 
     if (!response.ok) {
       console.error(

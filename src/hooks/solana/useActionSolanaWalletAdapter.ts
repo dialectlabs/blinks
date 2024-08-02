@@ -3,7 +3,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Connection, VersionedTransaction } from '@solana/web3.js';
 import { useMemo } from 'react';
-import { ActionConfig } from '../api';
+import { ActionConfig } from '../../api';
 
 /**
  * Hook to create an action adapter using solana's wallet adapter.
@@ -13,7 +13,7 @@ import { ActionConfig } from '../api';
  * @param rpcUrlOrConnection
  * @see {Action}
  */
-export function useActionAdapter(rpcUrlOrConnection: string | Connection) {
+export function useActionSolanaWalletAdapter(rpcUrlOrConnection: string | Connection) {
   const wallet = useWallet();
   const walletModal = useWalletModal();
 
