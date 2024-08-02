@@ -9,7 +9,6 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
     preserveAspectRatio="xMidYMid meet"
     {...props}
   >
-    <path fill="#fff" d="M0 0h16v16H0z" />
     <path
       fill="currentColor"
       fillRule="evenodd"

@@ -226,14 +226,16 @@ function createAction({
   const actionRoot = createRoot(container);
 
   actionRoot.render(
-    <ActionContainer
-      stylePreset={resolveXStylePreset()}
-      action={action}
-      websiteUrl={originalUrl.toString()}
-      websiteText={originalUrl.hostname}
-      callbacks={callbacks}
-      securityLevel={options.securityLevel}
-    />,
+    <div onClick={(e) => e.stopPropagation()}>
+      <ActionContainer
+        stylePreset={resolveXStylePreset()}
+        action={action}
+        websiteUrl={originalUrl.toString()}
+        websiteText={originalUrl.hostname}
+        callbacks={callbacks}
+        securityLevel={options.securityLevel}
+      />
+    </div>,
   );
 
   return container;
