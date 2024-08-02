@@ -45,9 +45,8 @@ export const ActionTextArea = ({
       maxLength,
       pattern,
       title: description,
-      required,
     }),
-    [minLength, maxLength, pattern, description, required],
+    [minLength, maxLength, pattern, description],
   );
 
   return (

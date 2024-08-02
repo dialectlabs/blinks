@@ -95,61 +95,67 @@ const DisclaimerBlock = ({
   hidden,
   ignorable,
   onSkip,
+  className,
 }: {
   type: DisclaimerType;
   ignorable: boolean;
   onSkip?: () => void;
   hidden: boolean;
+  className?: string;
 }) => {
   if (type === DisclaimerType.BLOCKED && !hidden) {
     return (
-      <Snackbar variant="error">
-        <p>
-          This Action or it&apos;s origin has been flagged as an unsafe action,
-          & has been blocked. If you believe this action has been blocked in
-          error, please{' '}
-          <a
-            href="https://discord.gg/saydialect"
-            className="cursor-pointer underline"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            submit an issue
-          </a>
-          .
-          {!ignorable &&
-            ' Your action provider blocks execution of this action.'}
-        </p>
-        {ignorable && onSkip && (
-          <button
-            className="mt-3 font-semibold transition-colors hover:text-text-error-hover motion-reduce:transition-none"
-            onClick={onSkip}
-          >
-            Ignore warning & proceed
-          </button>
-        )}
-      </Snackbar>
+      <div className={className}>
+        <Snackbar variant="error">
+          <p>
+            This Action or it&apos;s origin has been flagged as an unsafe
+            action, & has been blocked. If you believe this action has been
+            blocked in error, please{' '}
+            <a
+              href="https://discord.gg/saydialect"
+              className="cursor-pointer underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              submit an issue
+            </a>
+            .
+            {!ignorable &&
+              ' Your action provider blocks execution of this action.'}
+          </p>
+          {ignorable && onSkip && (
+            <button
+              className="mt-3 font-semibold transition-colors hover:text-text-error-hover motion-reduce:transition-none"
+              onClick={onSkip}
+            >
+              Ignore warning & proceed
+            </button>
+          )}
+        </Snackbar>
+      </div>
     );
   }
 
   if (type === DisclaimerType.UNKNOWN) {
     return (
-      <Snackbar variant="warning">
-        <p>
-          This Action has not yet been registered. Only use it if you trust the
-          source. This Action will not unfurl on X until it is registered.
-          {!ignorable &&
-            ' Your action provider blocks execution of this action.'}
-        </p>
-        <a
-          className="mt-3 inline-block font-semibold transition-colors hover:text-text-warning-hover motion-reduce:transition-none"
-          href="https://discord.gg/saydialect"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Report
-        </a>
-      </Snackbar>
+      <div className={className}>
+        <Snackbar variant="warning">
+          <p>
+            This Action has not yet been registered. Only use it if you trust
+            the source. This Action will not unfurl on X until it is registered.
+            {!ignorable &&
+              ' Your action provider blocks execution of this action.'}
+          </p>
+          <a
+            className="mt-3 inline-block font-semibold transition-colors hover:text-text-warning-hover motion-reduce:transition-none"
+            href="https://discord.gg/saydialect"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Report
+          </a>
+        </Snackbar>
+      </div>
     );
   }
 
@@ -241,22 +247,21 @@ export const ActionLayout = ({
             {description}
           </span>
           {disclaimer && (
-            <div className="mb-4">
-              <DisclaimerBlock
-                type={disclaimer.type}
-                ignorable={disclaimer.ignorable}
-                hidden={
-                  disclaimer.type === DisclaimerType.BLOCKED
-                    ? disclaimer.hidden
-                    : false
-                }
-                onSkip={
-                  disclaimer.type === DisclaimerType.BLOCKED
-                    ? disclaimer.onSkip
-                    : undefined
-                }
-              />
-            </div>
+            <DisclaimerBlock
+              className="mb-4"
+              type={disclaimer.type}
+              ignorable={disclaimer.ignorable}
+              hidden={
+                disclaimer.type === DisclaimerType.BLOCKED
+                  ? disclaimer.hidden
+                  : false
+              }
+              onSkip={
+                disclaimer.type === DisclaimerType.BLOCKED
+                  ? disclaimer.onSkip
+                  : undefined
+              }
+            />
           )}
           <ActionContent form={form} inputs={inputs} buttons={buttons} />
           {success && (

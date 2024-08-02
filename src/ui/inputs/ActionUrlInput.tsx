@@ -1,4 +1,4 @@
-import { type ChangeEvent, useMemo, useState } from 'react';
+import { type ChangeEvent, useId, useMemo, useState } from 'react';
 import { LinkIcon } from '../icons';
 import { ActionButton } from './ActionButton.tsx';
 import { BaseInputContainer } from './BaseInputContainer.tsx';
@@ -21,6 +21,7 @@ export const ActionUrlInput = ({
   onChange?: (value: string) => void;
   onValidityChange?: (state: boolean) => void;
 }) => {
+  const id = useId();
   const [value, setValue] = useState('');
   const [isValid, setValid] = useState(button ? false : !required);
   const minLength = min as number;
@@ -46,9 +47,8 @@ export const ActionUrlInput = ({
       maxLength,
       pattern,
       title: description,
-      required,
     }),
-    [minLength, maxLength, pattern, description, required],
+    [minLength, maxLength, pattern, description],
   );
 
   return (
@@ -57,7 +57,11 @@ export const ActionUrlInput = ({
         description ??
         buildDefaultTextDescription({ min: minLength, max: maxLength })
       }
-      leftAdornment={<LinkIcon className="text-icon-primary" />}
+      leftAdornment={
+        <label htmlFor={id}>
+          <LinkIcon className="text-icon-primary" />
+        </label>
+      }
       rightAdornment={
         button ? (
           <ActionButton
@@ -69,6 +73,7 @@ export const ActionUrlInput = ({
       }
     >
       <input
+        id={id}
         type={pattern ? 'text' : 'url'}
         placeholder={placeholderWithRequired}
         value={value}

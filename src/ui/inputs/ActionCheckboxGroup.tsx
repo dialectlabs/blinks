@@ -133,15 +133,15 @@ export const ActionCheckboxGroup = ({
         </div>
       )}
       {finalDescription && (
-        <span
+        <div
           className={clsx(
-            'text-caption font-medium',
+            'text-caption',
             touched && !isValid ? 'text-text-error' : 'text-text-secondary',
-            isStandalone ? 'mb-2 mt-2.5' : 'mt-3',
+            isStandalone ? 'mb-2 mt-2.5 px-2' : 'mt-3',
           )}
         >
           {finalDescription}
-        </span>
+        </div>
       )}
     </div>
   );

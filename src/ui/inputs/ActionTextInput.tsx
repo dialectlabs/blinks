@@ -45,9 +45,8 @@ export const ActionTextInput = ({
       maxLength,
       pattern,
       title: description,
-      required,
     }),
-    [minLength, maxLength, pattern, description, required],
+    [minLength, maxLength, pattern, description],
   );
 
   return (

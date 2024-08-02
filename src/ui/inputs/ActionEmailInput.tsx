@@ -1,4 +1,4 @@
-import { type ChangeEvent, useMemo, useState } from 'react';
+import { type ChangeEvent, useId, useMemo, useState } from 'react';
 import EmailIcon from '../icons/EmailIcon.tsx';
 import { ActionButton } from './ActionButton.tsx';
 import { BaseInputContainer } from './BaseInputContainer.tsx';
@@ -21,6 +21,7 @@ export const ActionEmailInput = ({
   onChange?: (value: string) => void;
   onValidityChange?: (state: boolean) => void;
 }) => {
+  const id = useId();
   const [value, setValue] = useState('');
   const [isValid, setValid] = useState(button ? false : !required);
   const minLength = min as number | undefined;
@@ -46,9 +47,8 @@ export const ActionEmailInput = ({
       maxLength,
       pattern,
       title: description,
-      required,
     }),
-    [minLength, maxLength, pattern, description, required],
+    [minLength, maxLength, pattern, description],
   );
 
   return (
@@ -57,7 +57,11 @@ export const ActionEmailInput = ({
         description ??
         buildDefaultTextDescription({ min: minLength, max: maxLength })
       }
-      leftAdornment={<EmailIcon className="text-icon-primary" />}
+      leftAdornment={
+        <label htmlFor={id}>
+          <EmailIcon className="text-icon-primary" />
+        </label>
+      }
       rightAdornment={
         button ? (
           <ActionButton
@@ -69,6 +73,7 @@ export const ActionEmailInput = ({
       }
     >
       <input
+        id={id}
         type={pattern ? 'text' : 'email'}
         placeholder={placeholderWithRequired}
         value={value}

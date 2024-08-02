@@ -1,4 +1,5 @@
-import { type ChangeEvent, useMemo, useState } from 'react';
+import { type ChangeEvent, useId, useMemo, useState } from 'react';
+import NumberIcon from '../icons/NumberIcon.tsx';
 import { ActionButton } from './ActionButton.tsx';
 import { BaseInputContainer } from './BaseInputContainer.tsx';
 import type { BaseInputProps } from './types.ts';
@@ -20,6 +21,7 @@ export const ActionNumberInput = ({
   onChange?: (value: string) => void;
   onValidityChange?: (state: boolean) => void;
 }) => {
+  const id = useId();
   const [value, setValue] = useState('');
   const [isValid, setValid] = useState(button ? false : !required);
 
@@ -43,9 +45,8 @@ export const ActionNumberInput = ({
       max: !pattern ? (max as number | undefined) : undefined,
       pattern,
       title: description,
-      required,
     }),
-    [min, max, pattern, description, required],
+    [min, max, pattern, description],
   );
 
   return (
@@ -56,6 +57,11 @@ export const ActionNumberInput = ({
           min: min as number | undefined,
           max: max as number | undefined,
         })
+      }
+      leftAdornment={
+        <label htmlFor={id}>
+          <NumberIcon className="text-icon-primary" />
+        </label>
       }
       rightAdornment={
         button ? (
@@ -68,6 +74,7 @@ export const ActionNumberInput = ({
       }
     >
       <input
+        id={id}
         type={pattern ? 'text' : 'number'}
         placeholder={placeholderWithRequired}
         value={value}

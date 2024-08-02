@@ -1,10 +1,4 @@
-import {
-  type ChangeEvent,
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { type ChangeEvent, useCallback, useId, useMemo, useState } from 'react';
 import CalendarIcon from '../icons/CalendarIcon.tsx';
 import { ActionButton } from './ActionButton.tsx';
 import { BaseInputContainer } from './BaseInputContainer.tsx';
@@ -29,7 +23,7 @@ export const ActionDateInput = ({
   onChange?: (value: string) => void;
   onValidityChange?: (state: boolean) => void;
 }) => {
-  const ref = useRef<HTMLInputElement>(null);
+  const id = useId();
   const [value, setValue] = useState('');
   const [isValid, setValid] = useState(button ? false : !required);
   const [touched, setTouched] = useState(false);
@@ -59,9 +53,8 @@ export const ActionDateInput = ({
       max: maxDate,
       pattern,
       title: description,
-      required,
     }),
-    [minDate, maxDate, pattern, description, required],
+    [minDate, maxDate, pattern, description],
   );
 
   return (
@@ -71,12 +64,9 @@ export const ActionDateInput = ({
         buildDefaultDateDescription({ min: minDate, max: maxDate })
       }
       leftAdornment={
-        <button
-          className="flex items-center"
-          onClick={() => ref.current?.focus()}
-        >
+        <label htmlFor={id}>
           <CalendarIcon className="text-icon-primary" />
-        </button>
+        </label>
       }
       rightAdornment={
         button ? (
@@ -89,7 +79,7 @@ export const ActionDateInput = ({
       }
     >
       <input
-        ref={ref}
+        id={id}
         type={pattern || !touched ? 'text' : type}
         placeholder={placeholderWithRequired}
         value={value}
