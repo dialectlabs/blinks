@@ -348,6 +348,7 @@ export const ActionContainer = ({
       return;
     }
 
+    console.log(component);
     dispatch({ type: ExecutionType.INITIATE, executingAction: component });
 
     const context: ActionContext = {
@@ -406,7 +407,7 @@ export const ActionContainer = ({
     disabled: action.disabled || executionState.status !== 'idle',
     variant: buttonVariantMap[executionState.status],
     onClick: (params?: Record<string, string | string[]>) =>
-      execute(it, params),
+      execute(it.parentComponent ?? it, params),
   });
 
   const asInputProps = (
@@ -429,7 +430,9 @@ export const ActionContainer = ({
           ? it.parameter.pattern
           : undefined,
       options:
-        it instanceof MultiValueActionComponent
+        it.parameter.type === 'select' ||
+        it.parameter.type === 'radio' ||
+        it.parameter.type === 'checkbox'
           ? it.parameter.options
           : undefined,
       description: it.parameter.description,

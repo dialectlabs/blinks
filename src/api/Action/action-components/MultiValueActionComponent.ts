@@ -3,11 +3,26 @@ import type {
   SelectableParameterType,
   TypedParameter,
 } from '../../actions-spec.ts';
+import { Action } from '../Action.ts';
 import { AbstractActionComponent } from './AbstractActionComponent.ts';
 import { ButtonActionComponent } from './ButtonActionComponent.ts';
 
 export class MultiValueActionComponent extends AbstractActionComponent {
   private parameterValue: Array<string> = [];
+
+  constructor(
+    protected _parent: Action,
+    protected _label: string,
+    protected _href: string,
+    protected _parameters?: TypedParameter[],
+    protected _parentComponent?: AbstractActionComponent,
+  ) {
+    super(_parent, _label, _href, _parameters);
+  }
+
+  get parentComponent() {
+    return this._parentComponent ?? null;
+  }
 
   protected buildBody(account: string): ActionsSpecPostRequestBody {
     if (this._href.indexOf(`{${this.parameter.name}}`) > -1) {
@@ -46,6 +61,12 @@ export class MultiValueActionComponent extends AbstractActionComponent {
   }
 
   toButtonActionComponent(): ButtonActionComponent {
-    return new ButtonActionComponent(this._parent, this._label, this.href);
+    return new ButtonActionComponent(
+      this._parent,
+      this._label,
+      this.href,
+      undefined,
+      this,
+    );
   }
 }

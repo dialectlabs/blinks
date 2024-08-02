@@ -78,6 +78,7 @@ export const ActionNumberInput = ({
         type={pattern ? 'text' : 'number'}
         placeholder={placeholderWithRequired}
         value={value}
+        step="any"
         onChange={extendedChange}
         {...validationProps}
         required={button ? true : required}
