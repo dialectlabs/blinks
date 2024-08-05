@@ -1,6 +1,7 @@
 import type {
-  ActionsSpecPostRequestBody,
-  TypedParameter,
+  ActionParameter,
+  ActionParameterType,
+  ActionPostRequest,
 } from '../../actions-spec.ts';
 import { Action } from '../Action.ts';
 import { AbstractActionComponent } from './AbstractActionComponent.ts';
@@ -14,7 +15,7 @@ export class FormActionComponent extends AbstractActionComponent {
     protected _parent: Action,
     protected _label: string,
     protected _href: string,
-    protected _parameters?: TypedParameter[],
+    protected _parameters?: ActionParameter<ActionParameterType>[],
     protected _parentComponent?: AbstractActionComponent,
   ) {
     super(_parent, _label, _href, _parameters);
@@ -24,7 +25,8 @@ export class FormActionComponent extends AbstractActionComponent {
     return this._parentComponent ?? null;
   }
 
-  protected buildBody(account: string): ActionsSpecPostRequestBody {
+  // any, since we don't know the parameter names on the client level
+  protected buildBody(account: string): ActionPostRequest<any> {
     const paramNames = Object.keys(this.parameterValues);
     const bodyParams: string[] = [];
 

@@ -7,6 +7,7 @@ import {
   getExtendedActionState,
   getExtendedInterstitialState,
   getExtendedWebsiteState,
+  isParameterSelectable,
   isPatternAllowed,
   mergeActionStates,
   MultiValueActionComponent,
@@ -427,12 +428,9 @@ export const ActionContainer = ({
         isPatternAllowed(it.parameter)
           ? it.parameter.pattern
           : undefined,
-      options:
-        it.parameter.type === 'select' ||
-        it.parameter.type === 'radio' ||
-        it.parameter.type === 'checkbox'
-          ? it.parameter.options
-          : undefined,
+      options: isParameterSelectable(it.parameter)
+        ? it.parameter.options
+        : undefined,
       description: it.parameter.patternDescription,
       button:
         placement === 'standalone'

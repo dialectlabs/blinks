@@ -1,7 +1,8 @@
 import type {
-  ActionsSpecPostRequestBody,
+  ActionParameter,
+  ActionParameterType,
+  ActionPostRequest,
   SelectableParameterType,
-  TypedParameter,
 } from '../../actions-spec.ts';
 import { Action } from '../Action.ts';
 import { AbstractActionComponent } from './AbstractActionComponent.ts';
@@ -14,7 +15,7 @@ export class MultiValueActionComponent extends AbstractActionComponent {
     protected _parent: Action,
     protected _label: string,
     protected _href: string,
-    protected _parameters?: TypedParameter[],
+    protected _parameters?: ActionParameter<ActionParameterType>[],
     protected _parentComponent?: AbstractActionComponent,
   ) {
     super(_parent, _label, _href, _parameters);
@@ -24,7 +25,8 @@ export class MultiValueActionComponent extends AbstractActionComponent {
     return this._parentComponent ?? null;
   }
 
-  protected buildBody(account: string): ActionsSpecPostRequestBody {
+  // any, since we don't know the parameter names on the client level
+  protected buildBody(account: string): ActionPostRequest<any> {
     if (this._href.indexOf(`{${this.parameter.name}}`) > -1) {
       return { account };
     }
@@ -43,10 +45,10 @@ export class MultiValueActionComponent extends AbstractActionComponent {
     return this.parameter.type === 'checkbox';
   }
 
-  public get parameter(): TypedParameter<SelectableParameterType> {
+  public get parameter(): ActionParameter<SelectableParameterType> {
     const [param] = this.parameters;
 
-    return param as TypedParameter<SelectableParameterType>;
+    return param as ActionParameter<SelectableParameterType>;
   }
 
   public setValue(value: string | Array<string>) {

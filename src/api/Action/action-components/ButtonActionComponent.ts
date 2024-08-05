@@ -1,6 +1,7 @@
 import type {
-  ActionsSpecPostRequestBody,
-  TypedParameter,
+  ActionParameter,
+  ActionParameterType,
+  ActionPostRequest,
 } from '../../actions-spec.ts';
 import { Action } from '../Action.ts';
 import { AbstractActionComponent } from './AbstractActionComponent.ts';
@@ -10,7 +11,7 @@ export class ButtonActionComponent extends AbstractActionComponent {
     protected _parent: Action,
     protected _label: string,
     protected _href: string,
-    protected _parameters?: TypedParameter[],
+    protected _parameters?: ActionParameter<ActionParameterType>[],
     protected _parentComponent?: AbstractActionComponent,
   ) {
     super(_parent, _label, _href, _parameters);
@@ -20,7 +21,7 @@ export class ButtonActionComponent extends AbstractActionComponent {
     return this._parentComponent ?? null;
   }
 
-  protected buildBody(account: string): ActionsSpecPostRequestBody {
+  protected buildBody(account: string): ActionPostRequest {
     return { account };
   }
 

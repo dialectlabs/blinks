@@ -1,18 +1,19 @@
 import { proxify } from '../../../utils/proxify.ts';
 import type {
   ActionError,
-  ActionsSpecPostRequestBody,
-  ActionsSpecPostResponse,
-  TypedParameter,
+  ActionParameter,
+  ActionParameterType,
+  ActionPostRequest,
+  ActionPostResponse,
 } from '../../actions-spec.ts';
 import { Action } from '../Action.ts';
 
 export abstract class AbstractActionComponent {
-  constructor(
+  protected constructor(
     protected _parent: Action,
     protected _label: string,
     protected _href: string,
-    protected _parameters?: TypedParameter[],
+    protected _parameters?: ActionParameter<ActionParameterType>[],
   ) {}
 
   public get parent() {
@@ -29,7 +30,7 @@ export abstract class AbstractActionComponent {
 
   public abstract get href(): string;
 
-  protected abstract buildBody(account: string): ActionsSpecPostRequestBody;
+  protected abstract buildBody(account: string): ActionPostRequest;
 
   public async post(account: string) {
     const proxyUrl = proxify(this.href);
@@ -52,6 +53,6 @@ export abstract class AbstractActionComponent {
       } as ActionError;
     }
 
-    return (await response.json()) as ActionsSpecPostResponse;
+    return (await response.json()) as ActionPostResponse;
   }
 }

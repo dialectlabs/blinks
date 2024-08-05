@@ -1,8 +1,9 @@
 import { proxify, proxifyImage } from '../../utils/proxify.ts';
 import type { ActionAdapter } from '../ActionConfig.ts';
 import type {
-  ActionsSpecGetResponse,
-  TypedParameter,
+  ActionGetResponse,
+  ActionParameter,
+  ActionParameterType,
 } from '../actions-spec.ts';
 import {
   type AbstractActionComponent,
@@ -21,7 +22,7 @@ export class Action {
 
   private constructor(
     private readonly _url: string,
-    private readonly _data: ActionsSpecGetResponse,
+    private readonly _data: ActionGetResponse,
     private readonly _metadata: ActionMetadata,
     private _adapter?: ActionAdapter,
   ) {
@@ -91,7 +92,7 @@ export class Action {
   // be sure to use this only if the action is valid
   static hydrate(
     url: string,
-    data: ActionsSpecGetResponse,
+    data: ActionGetResponse,
     metadata: ActionMetadata,
     adapter?: ActionAdapter,
   ) {
@@ -112,7 +113,7 @@ export class Action {
       );
     }
 
-    const data = (await response.json()) as ActionsSpecGetResponse;
+    const data = (await response.json()) as ActionGetResponse;
 
     // for multi-chain x-blockchain-ids
     const blockchainIds = (
@@ -131,7 +132,7 @@ const componentFactory = (
   parent: Action,
   label: string,
   href: string,
-  parameters?: TypedParameter[],
+  parameters?: ActionParameter<ActionParameterType>[],
 ): AbstractActionComponent => {
   if (!parameters?.length) {
     return new ButtonActionComponent(parent, label, href);
