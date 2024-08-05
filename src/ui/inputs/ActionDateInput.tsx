@@ -1,4 +1,11 @@
-import { type ChangeEvent, useCallback, useId, useMemo, useState } from 'react';
+import {
+  type ChangeEvent,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useState,
+} from 'react';
 import CalendarIcon from '../icons/CalendarIcon.tsx';
 import { ActionButton } from './ActionButton.tsx';
 import { BaseInputContainer } from './BaseInputContainer.tsx';
@@ -24,11 +31,17 @@ export const ActionDateInput = ({
   onValidityChange?: (state: boolean) => void;
 }) => {
   const id = useId();
+  const isStandalone = !!button;
   const [value, setValue] = useState('');
-  const [isValid, setValid] = useState(button ? false : !required);
+  const [isValid, setValid] = useState(!isStandalone || !required);
   const [touched, setTouched] = useState(false);
   const minDate = min as string | undefined;
   const maxDate = max as string | undefined;
+
+  useEffect(() => {
+    onValidityChange?.(isValid);
+    // calling this once, just to give the idea for the parent
+  }, []);
 
   const extendedChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -59,6 +72,7 @@ export const ActionDateInput = ({
 
   return (
     <BaseInputContainer
+      standalone={isStandalone}
       description={
         description ??
         buildDefaultDateDescription({ min: minDate, max: maxDate })

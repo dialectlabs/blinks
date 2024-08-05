@@ -18,6 +18,7 @@ interface Props {
   rightAdornment?: ReactNode;
   footer?: ReactNode;
   description?: string | null;
+  standalone?: boolean;
 }
 
 export const BaseInputContainer = ({
@@ -26,16 +27,18 @@ export const BaseInputContainer = ({
   rightAdornment,
   footer,
   description,
+  standalone = true,
 }: Props) => {
   return (
     <div>
       <div
         className={clsx(
-          'peer relative flex items-center gap-1.5 rounded-input border border-input-stroke py-1.5 pl-4 pr-1.5 transition-colors motion-reduce:transition-none',
+          'peer relative flex min-h-10 items-center gap-1.5 border border-input-stroke py-1.5 pl-4 pr-1.5 transition-colors motion-reduce:transition-none',
           // focus, invalid, required
           'focus-within:has-[:invalid]:border-input-stroke-error focus-within:has-[:valid]:border-input-stroke-selected focus-within:hover:has-[:invalid]:border-input-stroke-error focus-within:hover:has-[:valid]:border-input-stroke-selected',
           // enabled,
           'hover:has-[:enabled]:border-input-stroke-hover',
+          standalone ? 'rounded-input-standalone' : 'rounded-input',
         )}
       >
         {leftAdornment && <div>{leftAdornment}</div>}

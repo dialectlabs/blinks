@@ -1,4 +1,4 @@
-import { type ChangeEvent, useId, useMemo, useState } from 'react';
+import { type ChangeEvent, useEffect, useId, useMemo, useState } from 'react';
 import { ActionButton } from './ActionButton.tsx';
 import { BaseInputContainer } from './BaseInputContainer.tsx';
 import type { BaseInputProps } from './types.ts';
@@ -17,6 +17,7 @@ export const ActionSelect = ({
   onChange?: (value: string) => void;
   onValidityChange?: (state: boolean) => void;
 }) => {
+  const isStandalone = !!button;
   const placeholderValueId = useId();
   const placeholderWithRequired =
     (placeholder || 'Select...') + (required ? '*' : '');
@@ -30,10 +31,15 @@ export const ActionSelect = ({
     initiallySelectedOption?.value ?? placeholderValueId,
   );
   const [isValid, setValid] = useState(
-    button
+    isStandalone
       ? !!initiallySelectedOption
       : !(required && !initiallySelectedOption),
   );
+
+  useEffect(() => {
+    onValidityChange?.(isValid);
+    // calling this once, just to give the idea for the parent
+  }, []);
 
   const extendedChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const value = e.currentTarget.value;
@@ -49,6 +55,7 @@ export const ActionSelect = ({
 
   return (
     <BaseInputContainer
+      standalone={isStandalone}
       description={description}
       rightAdornment={
         button ? (

@@ -55,6 +55,7 @@ export default {
       '2xl': 'var(--blink-border-radius-rounded-2xl)',
       button: 'var(--blink-border-radius-rounded-button)',
       input: 'var(--blink-border-radius-rounded-input)',
+      'input-standalone': 'var(--blink-border-radius-rounded-input-standalone)',
       full: '9999px',
       none: '0px',
     },

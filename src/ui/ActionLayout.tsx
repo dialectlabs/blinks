@@ -316,12 +316,19 @@ const ActionForm = ({ form }: Required<Pick<LayoutProps, 'form'>>) => {
   const [values, setValues] = useState<Record<string, string | string[]>>(
     Object.fromEntries(form.inputs.map((i) => [i.name, ''])),
   );
+  const [validity, setValidity] = useState<Record<string, boolean>>(
+    Object.fromEntries(form.inputs.map((i) => [i.name, false])),
+  );
 
   const onChange = (name: string, value: string | string[]) => {
     setValues((prev) => ({ ...prev, [name]: value }));
   };
 
-  const disabled = form.inputs.some((i) => i.required && values[i.name] === '');
+  const onValidityChange = (name: string, state: boolean) => {
+    setValidity((prev) => ({ ...prev, [name]: state }));
+  };
+
+  const disabled = Object.values(validity).some((v) => !v);
 
   return (
     <div className="flex flex-col gap-3">
@@ -330,6 +337,7 @@ const ActionForm = ({ form }: Required<Pick<LayoutProps, 'form'>>) => {
           key={input.name}
           {...input}
           onChange={(v) => onChange(input.name, v)}
+          onValidityChange={(v) => onValidityChange(input.name, v)}
         />
       ))}
       <ActionButton
@@ -342,7 +350,10 @@ const ActionForm = ({ form }: Required<Pick<LayoutProps, 'form'>>) => {
 };
 
 const ActionInputFactory = (
-  input: InputProps & { onChange?: (value: string | string[]) => void },
+  input: InputProps & {
+    onChange?: (value: string | string[]) => void;
+    onValidityChange?: (state: boolean) => void;
+  },
 ) => {
   switch (input.type) {
     case 'checkbox':

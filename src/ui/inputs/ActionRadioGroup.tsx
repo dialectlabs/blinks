@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Radio } from '../Radio.tsx';
 import { ActionButton } from './ActionButton.tsx';
 import type { BaseInputProps } from './types.ts';
@@ -26,6 +26,11 @@ export const ActionRadioGroup = ({
   const [isValid, setValid] = useState(!isStandalone || !required);
   const [touched, setTouched] = useState(false);
 
+  useEffect(() => {
+    onValidityChange?.(isValid);
+    // calling this once, just to give the idea for the parent
+  }, []);
+
   const extendedChange = useCallback(
     (value: string) => {
       setValue(value);
@@ -40,13 +45,13 @@ export const ActionRadioGroup = ({
 
   return (
     <div
-      className={clsx({
-        'bg-bg-secondary rounded-button p-1.5 pt-2': isStandalone,
+      className={clsx('py-1.5', {
+        'bg-bg-secondary rounded-input px-1.5 pt-2': isStandalone,
       })}
     >
       <div className={clsx(isStandalone && 'px-2')}>
         {label && (
-          <div className="mb-2">
+          <div className="mb-1">
             <label className="block text-text font-semibold text-text-input">
               {label}
               {required ? '*' : ''}

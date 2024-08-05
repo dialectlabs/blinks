@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Checkbox } from '../Checkbox.tsx';
 import { ActionButton } from './ActionButton.tsx';
 import type { BaseInputProps } from './types.ts';
@@ -22,6 +22,12 @@ const validate = (
   }
 
   return true;
+};
+
+const normalizeValue = (value: Record<string, boolean>) => {
+  return Object.entries(value)
+    .filter(([, v]) => v)
+    .map(([k]) => k);
 };
 
 export const ActionCheckboxGroup = ({
@@ -50,50 +56,60 @@ export const ActionCheckboxGroup = ({
       max: maxChoices,
     });
 
-  const [value, setValue] = useState<Record<string, boolean>>(
-    Object.fromEntries(
+  const [state, setState] = useState<{
+    value: Record<string, boolean>;
+    valid: boolean;
+  }>({
+    value: Object.fromEntries(
       options.map((option) => [option.value, option.selected ?? false]),
     ),
-  );
-  const normalizedValue = useMemo(
-    () =>
-      Object.entries(value)
-        .filter(([, v]) => v)
-        .map(([k]) => k),
-    [value],
-  );
-  const [isValid, setValid] = useState(!isStandalone || !required);
+    valid: !isStandalone || !required,
+  });
+
   const [touched, setTouched] = useState(false);
 
   useEffect(() => {
-    onChange?.(normalizedValue);
-  }, [onChange, normalizedValue]);
-
-  useEffect(() => {
-    const validity = validate(normalizedValue, {
-      required: isStandalone,
-      min: minChoices,
-      max: maxChoices,
-    });
-
-    setValid(validity);
-    onValidityChange?.(validity);
-  }, [isStandalone, maxChoices, minChoices, normalizedValue, onValidityChange]);
-
-  const extendedChange = useCallback((name: string, value: boolean) => {
-    setValue((prev) => ({ ...prev, [name]: value }));
-    setTouched(true);
+    onValidityChange?.(state.valid);
+    // calling this once, just to give the idea for the parent
   }, []);
+
+  const extendedChange = (name: string, value: boolean) => {
+    setState((prev) => {
+      const newValue = { ...prev.value, [name]: value };
+
+      const normalizedValue = normalizeValue(newValue);
+      onChange?.(normalizedValue);
+
+      const validity = validate(normalizedValue, {
+        required: isStandalone,
+        min: minChoices,
+        max: maxChoices,
+      });
+
+      onValidityChange?.(validity);
+
+      return {
+        value: newValue,
+        valid: validity,
+      };
+    });
+    setTouched(true);
+  };
+
+  const normalizedValue = useMemo(
+    () => normalizeValue(state.value),
+    [state.value],
+  );
 
   return (
     <div
-      className={clsx({
-        'bg-bg-secondary rounded-button p-1.5 pt-2': isStandalone,
+      className={clsx('py-1.5', {
+        'bg-bg-secondary rounded-input px-1.5 pt-2': isStandalone,
       })}
     >
       <div className={clsx(isStandalone && 'px-2')}>
         {label && (
-          <div className="mb-2">
+          <div className="mb-1">
             <label className="block text-text font-semibold text-text-input">
               {label}
               {required ? '*' : ''}
@@ -113,7 +129,7 @@ export const ActionCheckboxGroup = ({
             >
               <Checkbox
                 label={option.label}
-                value={value[option.value]}
+                value={state.value[option.value]}
                 inputValue={option.value}
                 onChange={(value) => extendedChange(option.value, value)}
                 name={name}
@@ -128,7 +144,9 @@ export const ActionCheckboxGroup = ({
           <ActionButton
             {...button}
             onClick={() => button.onClick({ [name]: normalizedValue })}
-            disabled={button.disabled || !normalizedValue.length || !isValid}
+            disabled={
+              button.disabled || !normalizedValue.length || !state.valid
+            }
           />
         </div>
       )}
@@ -136,7 +154,7 @@ export const ActionCheckboxGroup = ({
         <div
           className={clsx(
             'text-caption',
-            touched && !isValid ? 'text-text-error' : 'text-text-secondary',
+            touched && !state.valid ? 'text-text-error' : 'text-text-secondary',
             isStandalone ? 'mb-2 mt-2.5 px-2' : 'mt-3',
           )}
         >

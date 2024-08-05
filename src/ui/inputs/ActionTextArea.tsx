@@ -1,4 +1,4 @@
-import { type ChangeEvent, useMemo, useState } from 'react';
+import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { ActionButton } from './ActionButton.tsx';
 import { BaseInputContainer } from './BaseInputContainer.tsx';
 import type { BaseInputProps } from './types.ts';
@@ -20,10 +20,16 @@ export const ActionTextArea = ({
   onChange?: (value: string) => void;
   onValidityChange?: (state: boolean) => void;
 }) => {
+  const isStandalone = !!button;
   const [value, setValue] = useState('');
-  const [isValid, setValid] = useState(button ? false : !required);
+  const [isValid, setValid] = useState(!isStandalone || !required);
   const minLength = min as number;
   const maxLength = max as number;
+
+  useEffect(() => {
+    onValidityChange?.(isValid);
+    // calling this once, just to give the idea for the parent
+  }, []);
 
   const extendedChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.currentTarget.value;
@@ -51,6 +57,7 @@ export const ActionTextArea = ({
 
   return (
     <BaseInputContainer
+      standalone={false}
       description={
         description ??
         buildDefaultTextDescription({ min: minLength, max: maxLength })

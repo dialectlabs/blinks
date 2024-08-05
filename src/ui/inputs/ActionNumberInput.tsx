@@ -1,4 +1,4 @@
-import { type ChangeEvent, useId, useMemo, useState } from 'react';
+import { type ChangeEvent, useEffect, useId, useMemo, useState } from 'react';
 import NumberIcon from '../icons/NumberIcon.tsx';
 import { ActionButton } from './ActionButton.tsx';
 import { BaseInputContainer } from './BaseInputContainer.tsx';
@@ -22,8 +22,14 @@ export const ActionNumberInput = ({
   onValidityChange?: (state: boolean) => void;
 }) => {
   const id = useId();
+  const isStandalone = !!button;
   const [value, setValue] = useState('');
-  const [isValid, setValid] = useState(button ? false : !required);
+  const [isValid, setValid] = useState(!isStandalone || !required);
+
+  useEffect(() => {
+    onValidityChange?.(isValid);
+    // calling this once, just to give the idea for the parent
+  }, []);
 
   const extendedChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
@@ -51,6 +57,7 @@ export const ActionNumberInput = ({
 
   return (
     <BaseInputContainer
+      standalone={isStandalone}
       description={
         description ??
         buildDefaultNumberDescription({

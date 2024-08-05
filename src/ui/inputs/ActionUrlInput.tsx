@@ -1,4 +1,4 @@
-import { type ChangeEvent, useId, useMemo, useState } from 'react';
+import { type ChangeEvent, useEffect, useId, useMemo, useState } from 'react';
 import { LinkIcon } from '../icons';
 import { ActionButton } from './ActionButton.tsx';
 import { BaseInputContainer } from './BaseInputContainer.tsx';
@@ -21,11 +21,17 @@ export const ActionUrlInput = ({
   onChange?: (value: string) => void;
   onValidityChange?: (state: boolean) => void;
 }) => {
+  const isStandalone = !!button;
   const id = useId();
   const [value, setValue] = useState('');
-  const [isValid, setValid] = useState(button ? false : !required);
+  const [isValid, setValid] = useState(!isStandalone || !required);
   const minLength = min as number;
   const maxLength = max as number;
+
+  useEffect(() => {
+    onValidityChange?.(isValid);
+    // calling this once, just to give the idea for the parent
+  }, []);
 
   const extendedChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
@@ -53,6 +59,7 @@ export const ActionUrlInput = ({
 
   return (
     <BaseInputContainer
+      standalone={isStandalone}
       description={
         description ??
         buildDefaultTextDescription({ min: minLength, max: maxLength })
