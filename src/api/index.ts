@@ -1,4 +1,4 @@
-export * from './Action/Action.ts';
+export * from './Action';
 export * from './ActionCallbacks.ts';
 export * from './ActionConfig';
 export * from './actions-spec';

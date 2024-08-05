@@ -1,22 +1,20 @@
 import { useEffect, useMemo, useReducer, useState } from 'react';
 import {
+  AbstractActionComponent,
   Action,
+  ButtonActionComponent,
+  FormActionComponent,
   getExtendedActionState,
   getExtendedInterstitialState,
   getExtendedWebsiteState,
+  isPatternAllowed,
   mergeActionStates,
+  MultiValueActionComponent,
+  SingleValueActionComponent,
   type ActionCallbacksConfig,
   type ActionContext,
   type ExtendedActionState,
 } from '../api';
-import {
-  AbstractActionComponent,
-  ButtonActionComponent,
-  FormActionComponent,
-  isPatternAllowed,
-  MultiValueActionComponent,
-  SingleValueActionComponent,
-} from '../api/Action/action-components';
 import { checkSecurity, type SecurityLevel } from '../shared';
 import { isInterstitial } from '../utils/interstitial-url.ts';
 import {

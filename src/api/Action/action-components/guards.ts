@@ -1,6 +1,11 @@
-import type { TypedParameter } from '../../actions-spec.ts';
+import type {
+  ActionParameter,
+  ActionParameterType,
+} from '../../actions-spec.ts';
 
-export const isPatternAllowed = (parameter: TypedParameter) => {
+export const isPatternAllowed = (
+  parameter: ActionParameter<ActionParameterType>,
+) => {
   return (
     parameter.type !== 'select' &&
     parameter.type !== 'radio' &&

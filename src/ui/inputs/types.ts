@@ -1,6 +1,6 @@
-import type { ParameterSelectable, ParameterType } from '../../api';
+import type { ActionParameterSelectable, ActionParameterType } from '../../api';
 
-export type InputType = ParameterType;
+export type InputType = ActionParameterType;
 
 export interface BaseButtonProps {
   text: string | null;
@@ -21,5 +21,7 @@ export interface BaseInputProps {
   pattern?: string;
   description?: string;
   button?: BaseButtonProps;
-  options?: ParameterSelectable<'select' | 'radio' | 'checkbox'>['options'];
+  options?: ActionParameterSelectable<
+    'select' | 'radio' | 'checkbox'
+  >['options'];
 }
