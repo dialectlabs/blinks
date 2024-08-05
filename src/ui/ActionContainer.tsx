@@ -435,7 +435,7 @@ export const ActionContainer = ({
         it.parameter.type === 'checkbox'
           ? it.parameter.options
           : undefined,
-      description: it.parameter.description,
+      description: it.parameter.patternDescription,
       button:
         placement === 'standalone'
           ? asButtonProps(it.toButtonActionComponent())

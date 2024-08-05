@@ -63,17 +63,19 @@ type MinMax<T extends ParameterType> = T extends 'date' | 'datetime-local'
 export interface Parameter<T extends ParameterType, M = MinMax<T>> {
   /** input field type */
   type?: T;
-  /** regular expression pattern to validate user input client side */
-  pattern?: string;
-  /** human-readable description of the `pattern` */
-  description?: string;
   /** parameter name in url */
   name: string;
-  /** input placeholder */
+  /** placeholder text for the user input field */
   label?: string;
-  /** input required */
+  /** declare if this field is required (defaults to `false`) */
   required?: boolean;
+  /** regular expression pattern to validate user input client side */
+  pattern?: string;
+  /** human-readable description of the `type` and/or `pattern`, represents a caption and error, if value doesn't match */
+  patternDescription?: string;
+  /** the minimum value allowed based on the `type` */
   min?: M;
+  /** the maximum value allowed based on the `type` */
   max?: M;
 }
 
