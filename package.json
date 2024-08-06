@@ -10,7 +10,8 @@
     "url": "https://github.com/dialectlabs/blinks"
   },
   "scripts": {
-    "build": "tsup-node"
+    "build": "tsup-node",
+    "dev": "tsup-node --watch"
   },
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -42,6 +43,7 @@
     "dist"
   ],
   "devDependencies": {
+    "@solana/actions-spec": "^2.2.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.16.1",

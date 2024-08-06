@@ -1,11 +1,12 @@
 import { Connection } from '@solana/web3.js';
-import { ActionComponent, type Action } from './Action.ts';
+import { type Action } from './Action';
+import { AbstractActionComponent } from './Action/action-components';
 
 export interface ActionContext {
   originalUrl: string;
   action: Action;
   actionType: 'trusted' | 'malicious' | 'unknown';
-  triggeredLinkedAction: ActionComponent;
+  triggeredLinkedAction: AbstractActionComponent;
 }
 
 export interface IncomingActionConfig {

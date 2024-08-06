@@ -5,10 +5,21 @@
 @layer base {
   .blink {
     container-type: inline-size;
-  }  
+  }
+
+  .blink input[type="date"]::-webkit-inner-spin-button, input[type="date"]::-webkit-calendar-picker-indicator, input[type="datetime-local"]::-webkit-inner-spin-button, input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    /*
+      this is very dirty hack to make picker openable, since in chrome ext environment, programmatic `showPicker` doesn't work and/or crashes the browser
+      https://issues.chromium.org/issues/356419161
+    */
+    position: absolute;
+    left: 1rem;
+    opacity: 0;
+  }
 
   .dial-light {
     --blink-bg-primary: #ffffff;
+    --blink-bg-secondary: #f2f3f5;
     --blink-button: #2a2a2b;
     --blink-button-disabled: #737373;
     --blink-button-hover: #323335;
@@ -20,6 +31,8 @@
     --blink-icon-warning: #d55f00;
     --blink-icon-warning-hover: #ef6f08;
     --blink-input-bg: #ffffff;
+    --blink-input-bg-selected: #08c0b4;
+    --blink-input-bg-disabled: #dee1e7;
     --blink-input-stroke: #c4c6c8;
     --blink-input-stroke-disabled: #dee1e7;
     --blink-input-stroke-error: #ff402e;
@@ -54,6 +67,7 @@
     --blink-border-radius-rounded-2xl: 1rem;
     --blink-border-radius-rounded-button: 0.5rem;
     --blink-border-radius-rounded-input: 0.5rem;
+    --blink-border-radius-rounded-input-standalone: 0.5rem;
 
     --blink-shadow-container: 0px 129.333px 103.467px 0px rgba(0, 0, 0, 0.07), 0px 54.032px 43.226px 0px rgba(0, 0, 0, 0.05), 0px 16.195px 12.956px 0px rgba(0, 0, 0, 0.04), 0px 8.601px 6.881px 0px rgba(0, 0, 0, 0.03), 0px 3.579px 2.863px 0px rgba(0, 0, 0, 0.02);
   }
@@ -63,11 +77,13 @@
     --blink-border-radius-rounded-xl: 0.5rem;
     --blink-border-radius-rounded-2xl: 1.125rem;
     --blink-border-radius-rounded-button: 624.9375rem;
-    --blink-border-radius-rounded-input: 624.9375rem;
+    --blink-border-radius-rounded-input: 1.25rem;
+    --blink-border-radius-rounded-input-standalone: 1.75rem;
   }
 
   .x-dark {
     --blink-bg-primary: #202327;
+    --blink-bg-secondary: #262A2D;
     --blink-button: #1d9bf0;
     --blink-button-disabled: #2f3336;
     --blink-button-hover: #3087da;
@@ -79,6 +95,8 @@
     --blink-icon-warning: #ffb545;
     --blink-icon-warning-hover: #ffc875;
     --blink-input-bg: #202327;
+    --blink-input-bg-selected: #1d9bf0;
+    --blink-input-bg-disabled: #2f3336;
     --blink-input-stroke: #3d4144;
     --blink-input-stroke-disabled: #2f3336;
     --blink-input-stroke-error: #ff6565;
@@ -113,6 +131,7 @@
 
   .x-light {
     --blink-bg-primary: #ffffff;
+    --blink-bg-secondary: #F7F7F7;
     --blink-button: #499bea;
     --blink-button-disabled: #F0F3F4;
     --blink-button-hover: #428cd2;
@@ -124,6 +143,8 @@
     --blink-icon-warning: #ef6f08;
     --blink-icon-warning-hover: #ffbc6e;
     --blink-input-bg: #ffffff;
+    --blink-input-bg-selected: #499bea;
+    --blink-input-bg-disabled: #f0f3f4;
     --blink-input-stroke: #d1d9de;
     --blink-input-stroke-disabled: #f0f3f4;
     --blink-input-stroke-error: #ff402e;

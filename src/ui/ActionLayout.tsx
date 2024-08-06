@@ -1,18 +1,26 @@
 import clsx from 'clsx';
-import { useState, type ChangeEvent, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import type { ExtendedActionState } from '../api';
 import { Badge } from './Badge.tsx';
-import { Button } from './Button';
 import { Snackbar } from './Snackbar.tsx';
+import { ExclamationShieldIcon, InfoShieldIcon, LinkIcon } from './icons';
 import {
-  CheckIcon,
-  ExclamationShieldIcon,
-  InfoShieldIcon,
-  LinkIcon,
-  SpinnerDots,
-} from './icons';
+  ActionButton,
+  ActionDateInput,
+  ActionEmailInput,
+  ActionNumberInput,
+  ActionRadioGroup,
+  ActionSelect,
+  ActionTextInput,
+  ActionUrlInput,
+} from './inputs';
+import { ActionCheckboxGroup } from './inputs/ActionCheckboxGroup.tsx';
+import { ActionTextArea } from './inputs/ActionTextArea.tsx';
+import type { BaseButtonProps, BaseInputProps } from './inputs/types.ts';
 
 type ActionType = ExtendedActionState;
+type ButtonProps = BaseButtonProps;
+type InputProps = BaseInputProps;
 
 export type StylePreset = 'default' | 'x-dark' | 'x-light' | 'custom';
 export enum DisclaimerType {
@@ -54,21 +62,6 @@ interface LayoutProps {
   inputs?: InputProps[];
   form?: FormProps;
 }
-export interface ButtonProps {
-  text: string | null;
-  loading?: boolean;
-  variant?: 'default' | 'success' | 'error';
-  disabled?: boolean;
-  onClick: (params?: Record<string, string>) => void;
-}
-
-export interface InputProps {
-  placeholder?: string;
-  name: string;
-  disabled: boolean;
-  required?: boolean;
-  button?: ButtonProps;
-}
 
 export interface FormProps {
   inputs: Array<Omit<InputProps, 'button'>>;
@@ -102,61 +95,67 @@ const DisclaimerBlock = ({
   hidden,
   ignorable,
   onSkip,
+  className,
 }: {
   type: DisclaimerType;
   ignorable: boolean;
   onSkip?: () => void;
   hidden: boolean;
+  className?: string;
 }) => {
   if (type === DisclaimerType.BLOCKED && !hidden) {
     return (
-      <Snackbar variant="error">
-        <p>
-          This Action or it&apos;s origin has been flagged as an unsafe action,
-          & has been blocked. If you believe this action has been blocked in
-          error, please{' '}
-          <a
-            href="https://discord.gg/saydialect"
-            className="cursor-pointer underline"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            submit an issue
-          </a>
-          .
-          {!ignorable &&
-            ' Your action provider blocks execution of this action.'}
-        </p>
-        {ignorable && onSkip && (
-          <button
-            className="mt-3 font-semibold transition-colors hover:text-text-error-hover motion-reduce:transition-none"
-            onClick={onSkip}
-          >
-            Ignore warning & proceed
-          </button>
-        )}
-      </Snackbar>
+      <div className={className}>
+        <Snackbar variant="error">
+          <p>
+            This Action or it&apos;s origin has been flagged as an unsafe
+            action, & has been blocked. If you believe this action has been
+            blocked in error, please{' '}
+            <a
+              href="https://discord.gg/saydialect"
+              className="cursor-pointer underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              submit an issue
+            </a>
+            .
+            {!ignorable &&
+              ' Your action provider blocks execution of this action.'}
+          </p>
+          {ignorable && onSkip && (
+            <button
+              className="mt-3 font-semibold transition-colors hover:text-text-error-hover motion-reduce:transition-none"
+              onClick={onSkip}
+            >
+              Ignore warning & proceed
+            </button>
+          )}
+        </Snackbar>
+      </div>
     );
   }
 
   if (type === DisclaimerType.UNKNOWN) {
     return (
-      <Snackbar variant="warning">
-        <p>
-          This Action has not yet been registered. Only use it if you trust the
-          source. This Action will not unfurl on X until it is registered.
-          {!ignorable &&
-            ' Your action provider blocks execution of this action.'}
-        </p>
-        <a
-          className="mt-3 inline-block font-semibold transition-colors hover:text-text-warning-hover motion-reduce:transition-none"
-          href="https://discord.gg/saydialect"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Report
-        </a>
-      </Snackbar>
+      <div className={className}>
+        <Snackbar variant="warning">
+          <p>
+            This Action has not yet been registered. Only use it if you trust
+            the source. This Action will not unfurl on X until it is registered.
+            {!ignorable &&
+              ' Your action provider blocks execution of this action.'}
+          </p>
+          <a
+            className="mt-3 inline-block font-semibold transition-colors hover:text-text-warning-hover motion-reduce:transition-none"
+            href="https://discord.gg/saydialect"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Report
+          </a>
+        </Snackbar>
+      </div>
     );
   }
 
@@ -205,13 +204,13 @@ export const ActionLayout = ({
                 rel="noopener noreferrer"
               >
                 <LinkIcon className="mr-2 text-icon-primary transition-colors group-hover:text-icon-primary-hover motion-reduce:transition-none" />
-                <span className="text-text-link group-hover:text-text-link-hover transition-colors group-hover:underline motion-reduce:transition-none">
+                <span className="text-text-link transition-colors group-hover:text-text-link-hover group-hover:underline motion-reduce:transition-none">
                   {websiteText ?? websiteUrl}
                 </span>
               </a>
             )}
             {websiteText && !websiteUrl && (
-              <span className="text-text-link inline-flex items-center truncate text-subtext">
+              <span className="inline-flex items-center truncate text-subtext text-text-link">
                 {websiteText}
               </span>
             )}
@@ -250,22 +249,21 @@ export const ActionLayout = ({
             {description}
           </span>
           {disclaimer && (
-            <div className="mb-4">
-              <DisclaimerBlock
-                type={disclaimer.type}
-                ignorable={disclaimer.ignorable}
-                hidden={
-                  disclaimer.type === DisclaimerType.BLOCKED
-                    ? disclaimer.hidden
-                    : false
-                }
-                onSkip={
-                  disclaimer.type === DisclaimerType.BLOCKED
-                    ? disclaimer.onSkip
-                    : undefined
-                }
-              />
-            </div>
+            <DisclaimerBlock
+              className="mb-4"
+              type={disclaimer.type}
+              ignorable={disclaimer.ignorable}
+              hidden={
+                disclaimer.type === DisclaimerType.BLOCKED
+                  ? disclaimer.hidden
+                  : false
+              }
+              onSkip={
+                disclaimer.type === DisclaimerType.BLOCKED
+                  ? disclaimer.onSkip
+                  : undefined
+              }
+            />
           )}
           <ActionContent form={form} inputs={inputs} buttons={buttons} />
           {success && (
@@ -307,29 +305,59 @@ const ActionContent = ({
           ))}
         </div>
       )}
-      {inputs?.map((input) => <ActionInput key={input.name} {...input} />)}
+      {inputs?.map((input) => (
+        <ActionInputFactory key={input.name} {...input} />
+      ))}
     </div>
   );
 };
 
+const buildDefaultFormValues = (
+  inputs: InputProps[],
+): Record<string, string | string[]> => {
+  return Object.fromEntries(
+    inputs
+      .map((i) => {
+        if (i.type === 'checkbox') {
+          return [
+            i.name,
+            i.options?.filter((o) => o.selected).map((o) => o.value),
+          ];
+        }
+        return i.type === 'radio'
+          ? [i.name, i.options?.find((o) => o.selected)?.value]
+          : null;
+      })
+      .filter((i) => !!i),
+  );
+};
+
 const ActionForm = ({ form }: Required<Pick<LayoutProps, 'form'>>) => {
-  const [values, setValues] = useState(
-    Object.fromEntries(form.inputs.map((i) => [i.name, ''])),
+  const [values, setValues] = useState<Record<string, string | string[]>>(
+    buildDefaultFormValues(form.inputs),
+  );
+  const [validity, setValidity] = useState<Record<string, boolean>>(
+    Object.fromEntries(form.inputs.map((i) => [i.name, false])),
   );
 
-  const onChange = (name: string, value: string) => {
+  const onChange = (name: string, value: string | string[]) => {
     setValues((prev) => ({ ...prev, [name]: value }));
   };
 
-  const disabled = form.inputs.some((i) => i.required && values[i.name] === '');
+  const onValidityChange = (name: string, state: boolean) => {
+    setValidity((prev) => ({ ...prev, [name]: state }));
+  };
+
+  const disabled = Object.values(validity).some((v) => !v);
 
   return (
     <div className="flex flex-col gap-3">
       {form.inputs.map((input) => (
-        <ActionInput
+        <ActionInputFactory
           key={input.name}
           {...input}
           onChange={(v) => onChange(input.name, v)}
+          onValidityChange={(v) => onValidityChange(input.name, v)}
         />
       ))}
       <ActionButton
@@ -341,81 +369,31 @@ const ActionForm = ({ form }: Required<Pick<LayoutProps, 'form'>>) => {
   );
 };
 
-const ActionInput = ({
-  placeholder,
-  name,
-  button,
-  disabled,
-  onChange: extOnChange,
-  required,
-}: InputProps & { onChange?: (value: string) => void }) => {
-  const [value, onChange] = useState('');
-
-  const extendedChange = (e: ChangeEvent<HTMLInputElement>) => {
-    onChange(e.currentTarget.value);
-    extOnChange?.(e.currentTarget.value);
-  };
-
-  const placeholderWithRequired =
-    (placeholder || 'Type here...') + (required ? '*' : '');
-
-  return (
-    <div
-      className={clsx(
-        'border-input-stroke focus-within:border-input-stroke-selected flex items-center gap-2 rounded-input border transition-colors motion-reduce:transition-none',
-        {
-          'hover:border-input-stroke-hover hover:focus-within:border-input-stroke-selected':
-            !disabled,
-        },
-      )}
-    >
-      <input
-        placeholder={placeholderWithRequired}
-        value={value}
-        disabled={disabled}
-        onChange={extendedChange}
-        className="bg-input-bg text-text-input placeholder:text-text-input-placeholder disabled:text-text-input-disabled my-3 ml-4 flex-1 truncate outline-none"
-      />
-      {button && (
-        <div className="my-2 mr-2">
-          <ActionButton
-            {...button}
-            onClick={() => button.onClick({ [name]: value })}
-            disabled={button.disabled || value === ''}
-          />
-        </div>
-      )}
-    </div>
-  );
-};
-
-const ActionButton = ({
-  text,
-  loading,
-  disabled,
-  variant,
-  onClick,
-}: ButtonProps) => {
-  const ButtonContent = () => {
-    if (loading)
-      return (
-        <span className="flex flex-row items-center justify-center gap-2 text-nowrap">
-          {text} <SpinnerDots />
-        </span>
-      );
-    if (variant === 'success')
-      return (
-        <span className="flex flex-row items-center justify-center gap-2 text-nowrap">
-          {text}
-          <CheckIcon />
-        </span>
-      );
-    return text;
-  };
-
-  return (
-    <Button onClick={() => onClick()} disabled={disabled} variant={variant}>
-      <ButtonContent />
-    </Button>
-  );
+const ActionInputFactory = (
+  input: InputProps & {
+    onChange?: (value: string | string[]) => void;
+    onValidityChange?: (state: boolean) => void;
+  },
+) => {
+  switch (input.type) {
+    case 'checkbox':
+      return <ActionCheckboxGroup {...input} />;
+    case 'radio':
+      return <ActionRadioGroup {...input} />;
+    case 'date':
+    case 'datetime-local':
+      return <ActionDateInput {...input} type={input.type} />;
+    case 'select':
+      return <ActionSelect {...input} />;
+    case 'email':
+      return <ActionEmailInput {...input} />;
+    case 'number':
+      return <ActionNumberInput {...input} />;
+    case 'url':
+      return <ActionUrlInput {...input} />;
+    case 'textarea':
+      return <ActionTextArea {...input} />;
+    default:
+      return <ActionTextInput {...input} />;
+  }
 };

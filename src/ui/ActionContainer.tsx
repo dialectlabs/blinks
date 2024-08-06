@@ -1,15 +1,20 @@
 import { useEffect, useMemo, useReducer, useState } from 'react';
 import {
+  AbstractActionComponent,
   Action,
-  ActionComponent,
+  ButtonActionComponent,
+  FormActionComponent,
   getExtendedActionState,
   getExtendedInterstitialState,
   getExtendedWebsiteState,
+  isParameterSelectable,
+  isPatternAllowed,
   mergeActionStates,
+  MultiValueActionComponent,
+  SingleValueActionComponent,
   type ActionCallbacksConfig,
   type ActionContext,
   type ExtendedActionState,
-  type Parameter,
 } from '../api';
 import { checkSecurity, type SecurityLevel } from '../shared';
 import { isInterstitial } from '../utils/interstitial-url.ts';
@@ -20,7 +25,6 @@ import {
 import {
   ActionLayout,
   DisclaimerType,
-  type ButtonProps,
   type Disclaimer,
   type StylePreset,
 } from './ActionLayout';
@@ -29,7 +33,7 @@ type ExecutionStatus = 'blocked' | 'idle' | 'executing' | 'success' | 'error';
 
 interface ExecutionState {
   status: ExecutionStatus;
-  executingAction?: ActionComponent | null;
+  executingAction?: AbstractActionComponent | null;
   errorMessage?: string | null;
   successMessage?: string | null;
 }
@@ -47,7 +51,7 @@ enum ExecutionType {
 type ActionValue =
   | {
       type: ExecutionType.INITIATE;
-      executingAction: ActionComponent;
+      executingAction: AbstractActionComponent;
       errorMessage?: string;
     }
   | {
@@ -263,7 +267,7 @@ export const ActionContainer = ({
   const buttons = useMemo(
     () =>
       action?.actions
-        .filter((it) => !it.parameter)
+        .filter((it) => it instanceof ButtonActionComponent)
         .filter((it) =>
           executionState.executingAction
             ? executionState.executingAction === it
@@ -275,7 +279,11 @@ export const ActionContainer = ({
   const inputs = useMemo(
     () =>
       action?.actions
-        .filter((it) => it.parameters.length === 1)
+        .filter(
+          (it) =>
+            it instanceof SingleValueActionComponent ||
+            it instanceof MultiValueActionComponent,
+        )
         .filter((it) =>
           executionState.executingAction
             ? executionState.executingAction === it
@@ -287,7 +295,7 @@ export const ActionContainer = ({
   const form = useMemo(() => {
     const [formComponent] =
       action?.actions
-        .filter((it) => it.parameters.length > 1)
+        .filter((it) => it instanceof FormActionComponent)
         .filter((it) =>
           executionState.executingAction
             ? executionState.executingAction === it
@@ -298,13 +306,28 @@ export const ActionContainer = ({
   }, [action, executionState.executingAction]);
 
   const execute = async (
-    component: ActionComponent,
-    params?: Record<string, string>,
+    component: AbstractActionComponent,
+    params?: Record<string, string | string[]>,
   ) => {
-    if (component.parameters && params) {
-      Object.entries(params).forEach(([name, value]) =>
-        component.setValue(value, name),
-      );
+    if (params) {
+      if (component instanceof FormActionComponent) {
+        Object.entries(params).forEach(([name, value]) =>
+          component.setValue(value, name),
+        );
+      }
+
+      if (component instanceof MultiValueActionComponent) {
+        component.setValue(params[component.parameter.name]);
+      }
+
+      if (component instanceof SingleValueActionComponent) {
+        const incomingValues = params[component.parameter.name];
+        const value =
+          typeof incomingValues === 'string'
+            ? incomingValues
+            : incomingValues[0];
+        component.setValue(value);
+      }
     }
 
     const newActionState = getOverallActionState(action, websiteUrl);
@@ -374,37 +397,55 @@ export const ActionContainer = ({
     }
   };
 
-  const asButtonProps = (it: ActionComponent): ButtonProps => ({
+  const asButtonProps = (it: ButtonActionComponent) => ({
     text: buttonLabelMap[executionState.status] ?? it.label,
     loading:
       executionState.status === 'executing' &&
       it === executionState.executingAction,
     disabled: action.disabled || executionState.status !== 'idle',
     variant: buttonVariantMap[executionState.status],
-    onClick: (params?: Record<string, string>) => execute(it, params),
+    onClick: (params?: Record<string, string | string[]>) =>
+      execute(it.parentComponent ?? it, params),
   });
 
-  const asInputProps = (it: ActionComponent, parameter?: Parameter) => {
-    const placeholder = !parameter ? it.parameter!.label : parameter.label;
-    const name = !parameter ? it.parameter!.name : parameter.name;
-    const required = !parameter ? it.parameter!.required : parameter.required;
-
+  const asInputProps = (
+    it: SingleValueActionComponent | MultiValueActionComponent,
+    { placement }: { placement: 'form' | 'standalone' } = {
+      placement: 'standalone',
+    },
+  ) => {
     return {
-      // since we already filter this, we can safely assume that parameter is not null
-      placeholder,
+      type: it.parameter.type ?? 'text',
+      placeholder: it.parameter.label,
       disabled: action.disabled || executionState.status !== 'idle',
-      name,
-      required,
-      button: !parameter ? asButtonProps(it) : undefined,
+      name: it.parameter.name,
+      required: it.parameter.required,
+      min: it.parameter.min,
+      max: it.parameter.max,
+      pattern:
+        it instanceof SingleValueActionComponent &&
+        isPatternAllowed(it.parameter)
+          ? it.parameter.pattern
+          : undefined,
+      options: isParameterSelectable(it.parameter)
+        ? it.parameter.options
+        : undefined,
+      description: it.parameter.patternDescription,
+      button:
+        placement === 'standalone'
+          ? asButtonProps(it.toButtonActionComponent())
+          : undefined,
     };
   };
 
-  const asFormProps = (it: ActionComponent) => {
+  const asFormProps = (it: FormActionComponent) => {
     return {
-      button: asButtonProps(it),
-      inputs: it.parameters
-        .toSpliced(SOFT_LIMIT_FORM_INPUTS)
-        .map((parameter) => asInputProps(it, parameter)),
+      button: asButtonProps(it.toButtonActionComponent()),
+      inputs: it.parameters.toSpliced(SOFT_LIMIT_FORM_INPUTS).map((parameter) =>
+        asInputProps(it.toInputActionComponent(parameter.name), {
+          placement: 'form',
+        }),
+      ),
     };
   };
 
