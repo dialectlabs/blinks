@@ -40,10 +40,9 @@ export class FormActionComponent extends AbstractActionComponent {
       return {
         account,
         data: Object.fromEntries(
-          paramNames.map((paramName) => [
-            paramName,
-            this.parameterValues[paramName],
-          ]),
+          paramNames
+            .filter((name) => bodyParams.includes(name))
+            .map((paramName) => [paramName, this.parameterValues[paramName]]),
         ),
       };
     }
@@ -52,8 +51,12 @@ export class FormActionComponent extends AbstractActionComponent {
   }
 
   get href(): string {
-    return this.parameters.reduce((href, param) => {
+    const replacedHref = this.parameters.reduce((href, param) => {
       const value = this.parameterValues[param.name];
+
+      if (!value) {
+        return href;
+      }
 
       return href.replace(
         `{${param.name}}`,
@@ -62,6 +65,10 @@ export class FormActionComponent extends AbstractActionComponent {
         ),
       );
     }, this._href);
+
+    return replacedHref
+      .replaceAll(/={[^}]+}&/g, '=&')
+      .replaceAll(/={[^}]+}/g, '=');
   }
 
   public setValue(value: string | Array<string>, name: string) {

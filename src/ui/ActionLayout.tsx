@@ -312,8 +312,30 @@ const ActionContent = ({
   );
 };
 
+const buildDefaultFormValues = (
+  inputs: InputProps[],
+): Record<string, string | string[]> => {
+  return Object.fromEntries(
+    inputs
+      .map((i) => {
+        if (i.type === 'checkbox') {
+          return [
+            i.name,
+            i.options?.filter((o) => o.selected).map((o) => o.value),
+          ];
+        }
+        return i.type === 'radio'
+          ? [i.name, i.options?.find((o) => o.selected)?.value]
+          : null;
+      })
+      .filter((i) => !!i),
+  );
+};
+
 const ActionForm = ({ form }: Required<Pick<LayoutProps, 'form'>>) => {
-  const [values, setValues] = useState<Record<string, string | string[]>>({});
+  const [values, setValues] = useState<Record<string, string | string[]>>(
+    buildDefaultFormValues(form.inputs),
+  );
   const [validity, setValidity] = useState<Record<string, boolean>>(
     Object.fromEntries(form.inputs.map((i) => [i.name, false])),
   );
