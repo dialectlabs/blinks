@@ -11,7 +11,6 @@ export const ActionTextArea = ({
   disabled,
   onChange,
   onValidityChange,
-  pattern,
   min,
   max,
   description,
@@ -50,10 +49,9 @@ export const ActionTextArea = ({
     () => ({
       minLength,
       maxLength,
-      pattern,
       title: description,
     }),
-    [minLength, maxLength, pattern, description],
+    [minLength, maxLength, description],
   );
 
   return (
