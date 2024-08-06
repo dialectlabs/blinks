@@ -16,7 +16,8 @@ import {
 const MULTI_VALUE_TYPES: ActionParameterType[] = ['checkbox'];
 
 interface ActionMetadata {
-  blockchainIds: string[];
+  blockchainIds?: string[];
+  version?: string;
 }
 
 export class Action {
@@ -117,13 +118,16 @@ export class Action {
 
     const data = (await response.json()) as ActionGetResponse;
 
-    // for multi-chain x-blockchain-ids
-    const blockchainIds = (
-      response?.headers?.get('x-blockchain-ids') || ''
-    ).split(',');
+    const blockchainIds =
+      response.headers
+        .get('x-blockchain-ids')
+        ?.split(',')
+        .map((id) => id.trim()) ?? [];
+    const version = response.headers.get('x-action-version')?.trim();
 
     const metadata: ActionMetadata = {
       blockchainIds,
+      version,
     };
 
     return new Action(apiUrl, data, metadata, adapter);
