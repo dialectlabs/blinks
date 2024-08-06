@@ -2,7 +2,10 @@ import { useEffect, useMemo, useReducer, useState } from 'react';
 import {
   AbstractActionComponent,
   Action,
+  type ActionCallbacksConfig,
+  type ActionContext,
   ButtonActionComponent,
+  type ExtendedActionState,
   FormActionComponent,
   getExtendedActionState,
   getExtendedInterstitialState,
@@ -12,9 +15,6 @@ import {
   mergeActionStates,
   MultiValueActionComponent,
   SingleValueActionComponent,
-  type ActionCallbacksConfig,
-  type ActionContext,
-  type ExtendedActionState,
 } from '../api';
 import { checkSecurity, type SecurityLevel } from '../shared';
 import { isInterstitial } from '../utils/interstitial-url.ts';
@@ -24,8 +24,8 @@ import {
 } from '../utils/type-guards.ts';
 import {
   ActionLayout,
-  DisclaimerType,
   type Disclaimer,
+  DisclaimerType,
   type StylePreset,
 } from './ActionLayout';
 
@@ -205,6 +205,7 @@ export const ActionContainer = ({
   securityLevel = DEFAULT_SECURITY_LEVEL,
   stylePreset = 'default',
   Experimental__ActionLayout = ActionLayout,
+  isSupported,
 }: {
   action: Action;
   websiteUrl?: string | null;
@@ -212,6 +213,7 @@ export const ActionContainer = ({
   callbacks?: Partial<ActionCallbacksConfig>;
   securityLevel?: SecurityLevel | NormalizedSecurityLevel;
   stylePreset?: StylePreset;
+  isSupported: boolean;
 
   // please do not use it yet, better api is coming..
   Experimental__ActionLayout?: typeof ActionLayout;
@@ -488,6 +490,7 @@ export const ActionContainer = ({
       inputs={inputs.map((input) => asInputProps(input))}
       form={form ? asFormProps(form) : undefined}
       disclaimer={disclaimer}
+      isSupported={isSupported}
     />
   );
 };

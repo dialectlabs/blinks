@@ -1,9 +1,10 @@
 import clsx from 'clsx';
-import { useState, type ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import type { ExtendedActionState } from '../api';
 import { Badge } from './Badge.tsx';
 import { Snackbar } from './Snackbar.tsx';
 import { ExclamationShieldIcon, InfoShieldIcon, LinkIcon } from './icons';
+import ConfigIcon from './icons/ConfigIcon.tsx';
 import {
   ActionButton,
   ActionDateInput,
@@ -23,6 +24,7 @@ type ButtonProps = BaseButtonProps;
 type InputProps = BaseInputProps;
 
 export type StylePreset = 'default' | 'x-dark' | 'x-light' | 'custom';
+
 export enum DisclaimerType {
   BLOCKED = 'blocked',
   UNKNOWN = 'unknown',
@@ -61,6 +63,7 @@ interface LayoutProps {
   buttons?: ButtonProps[];
   inputs?: InputProps[];
   form?: FormProps;
+  isSupported: boolean;
 }
 
 export interface FormProps {
@@ -89,6 +92,23 @@ const Linkable = ({
   ) : (
     <div className={className}>{children}</div>
   );
+
+const NotSupportedBlock = ({ className }: { className?: string }) => {
+  return (
+    <div className={className}>
+      <Snackbar variant="info">
+        <div className="flex flex-row gap-2">
+          <ConfigIcon className="text-icon-primary" />
+          <div className="flex flex-col justify-center gap-[3px]">
+            <a className="font-semibold">This action is not supported</a>
+            <p>Ensure you use latest blink client compatible with solana.</p>
+            {/*  TODO: replace solana with CAIP-2 chain name*/}
+          </div>
+        </div>
+      </Snackbar>
+    </div>
+  );
+};
 
 const DisclaimerBlock = ({
   type,
@@ -176,6 +196,7 @@ export const ActionLayout = ({
   form,
   error,
   success,
+  isSupported,
 }: LayoutProps) => {
   return (
     <div className={clsx('blink', stylePresetClassMap[stylePreset])}>
@@ -248,33 +269,39 @@ export const ActionLayout = ({
           <span className="mb-4 whitespace-pre-wrap text-subtext text-text-secondary">
             {description}
           </span>
-          {disclaimer && (
-            <DisclaimerBlock
-              className="mb-4"
-              type={disclaimer.type}
-              ignorable={disclaimer.ignorable}
-              hidden={
-                disclaimer.type === DisclaimerType.BLOCKED
-                  ? disclaimer.hidden
-                  : false
-              }
-              onSkip={
-                disclaimer.type === DisclaimerType.BLOCKED
-                  ? disclaimer.onSkip
-                  : undefined
-              }
-            />
-          )}
-          <ActionContent form={form} inputs={inputs} buttons={buttons} />
-          {success && (
-            <span className="mt-4 flex justify-center text-subtext text-text-success">
-              {success}
-            </span>
-          )}
-          {error && !success && (
-            <span className="mt-4 flex justify-center text-subtext text-text-error">
-              {error}
-            </span>
+          {!isSupported ? (
+            <NotSupportedBlock />
+          ) : (
+            <>
+              {disclaimer && (
+                <DisclaimerBlock
+                  className="mb-4"
+                  type={disclaimer.type}
+                  ignorable={disclaimer.ignorable}
+                  hidden={
+                    disclaimer.type === DisclaimerType.BLOCKED
+                      ? disclaimer.hidden
+                      : false
+                  }
+                  onSkip={
+                    disclaimer.type === DisclaimerType.BLOCKED
+                      ? disclaimer.onSkip
+                      : undefined
+                  }
+                />
+              )}
+              <ActionContent form={form} inputs={inputs} buttons={buttons} />
+              {success && (
+                <span className="mt-4 flex justify-center text-subtext text-text-success">
+                  {success}
+                </span>
+              )}
+              {error && !success && (
+                <span className="mt-4 flex justify-center text-subtext text-text-error">
+                  {error}
+                </span>
+              )}
+            </>
           )}
         </div>
       </div>

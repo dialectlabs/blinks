@@ -186,16 +186,13 @@ async function handleNewNode(
     return;
   }
 
-  if (config.isSupported) {
-    const supported = await config.isSupported({
-      originalUrl: actionUrl.toString(),
-      action,
-      actionType: state,
-    });
-    if (!supported) {
-      return;
-    }
-  }
+  const isSupported = config.isSupported
+    ? await config.isSupported({
+        originalUrl: actionUrl.toString(),
+        action,
+        actionType: state,
+      })
+    : true;
 
   addMargin(container).replaceChildren(
     createAction({
@@ -204,6 +201,7 @@ async function handleNewNode(
       callbacks,
       options,
       isInterstitial: interstitialData.isInterstitial,
+      isSupported,
     }),
   );
 }
@@ -213,12 +211,14 @@ function createAction({
   action,
   callbacks,
   options,
+  isSupported,
 }: {
   originalUrl: URL;
   action: Action;
   callbacks: Partial<ActionCallbacksConfig>;
   options: NormalizedObserverOptions;
   isInterstitial: boolean;
+  isSupported: boolean;
 }) {
   const container = document.createElement('div');
   container.className = 'dialect-action-root-container';
@@ -234,6 +234,7 @@ function createAction({
         websiteText={originalUrl.hostname}
         callbacks={callbacks}
         securityLevel={options.securityLevel}
+        isSupported={isSupported}
       />
     </div>,
   );
