@@ -3,6 +3,10 @@ import type { ActionAdapter } from '../ActionConfig.ts';
 import type {
   ActionGetResponse,
   ActionParameterType,
+  NextAction,
+  NextActionLink,
+  NextActionPostRequest,
+  PostNextActionLink,
   TypedActionParameter,
 } from '../actions-spec.ts';
 import {
@@ -24,12 +28,12 @@ export class Action {
 
   private constructor(
     private readonly _url: string,
-    private readonly _data: ActionGetResponse,
+    private readonly _data: NextAction,
     private readonly _metadata: ActionMetadata,
     private _adapter?: ActionAdapter,
   ) {
-    // if no links present, fallback to original solana pay spec
-    if (!_data.links?.actions) {
+    // if no links present or completed, fallback to original solana pay spec (or just using the button as a placeholder)
+    if (_data.type === 'completed' || !_data.links?.actions) {
       this._actions = [new ButtonActionComponent(this, _data.label, _url)];
       return;
     }
@@ -91,10 +95,39 @@ export class Action {
     this._adapter = adapter;
   }
 
+  public async chain<N extends NextActionLink>(
+    next: N,
+    chainData: N extends PostNextActionLink ? NextActionPostRequest : never,
+  ): Promise<Action> {
+    if (next.type === 'inline') {
+      return new Action(this.url, next.action, this.metadata, this.adapter);
+    }
+
+    const proxyUrl = proxify(next.href);
+    const response = await fetch(proxyUrl, {
+      method: 'POST',
+      body: JSON.stringify(chainData),
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to chain action ${proxyUrl}, action url: ${next.href}`,
+      );
+    }
+
+    const data = (await response.json()) as NextAction;
+    const metadata = getActionMetadata(response);
+
+    return new Action(next.href, data, metadata, this.adapter);
+  }
+
   // be sure to use this only if the action is valid
   static hydrate(
     url: string,
-    data: ActionGetResponse,
+    data: NextAction,
     metadata: ActionMetadata,
     adapter?: ActionAdapter,
   ) {
@@ -116,19 +149,22 @@ export class Action {
     }
 
     const data = (await response.json()) as ActionGetResponse;
+    const metadata = getActionMetadata(response);
 
-    // for multi-chain x-blockchain-ids
-    const blockchainIds = (
-      response?.headers?.get('x-blockchain-ids') || ''
-    ).split(',');
-
-    const metadata: ActionMetadata = {
-      blockchainIds,
-    };
-
-    return new Action(apiUrl, data, metadata, adapter);
+    return new Action(apiUrl, { ...data, type: 'action' }, metadata, adapter);
   }
 }
+
+const getActionMetadata = (response: Response): ActionMetadata => {
+  // for multi-chain x-blockchain-ids
+  const blockchainIds = (
+    response?.headers?.get('x-blockchain-ids') || ''
+  ).split(',');
+
+  return {
+    blockchainIds,
+  } satisfies ActionMetadata;
+};
 
 const componentFactory = (
   parent: Action,
