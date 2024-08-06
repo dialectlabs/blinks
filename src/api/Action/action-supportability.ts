@@ -23,10 +23,34 @@ const BASELINE_ACTION_BLOCKCHAIN_IDS = [
   BlockchainIds.SOLANA_MAINNET, // Solana mainnet CAIP-2 Blockchain ID
 ];
 
+type CheckSupportedParams = {
+  acceptBlockchainIds: string[];
+};
+
 type IsVersionCompatibleParams = {
   actionVersion?: string;
   acceptActionVersion?: string;
 };
+
+type IsBlockchainSupportedParams = {
+  actionBlockchainIds?: string[];
+  acceptBlockchainIds: string[];
+};
+
+export function defaultCheckSupported(
+  context: Omit<ActionContext, 'triggeredLinkedAction'>,
+  { acceptBlockchainIds }: CheckSupportedParams,
+) {
+  return (
+    isVersionSupported({
+      actionVersion: context.action.metadata.version,
+    }) &&
+    isBlockchainSupported({
+      acceptBlockchainIds,
+      actionBlockchainIds: context.action.metadata.blockchainIds,
+    })
+  );
+}
 
 export function isVersionSupported({
   acceptActionVersion = ACCEPT_ACTION_VERSION,
@@ -48,11 +72,6 @@ function compareSemverVersionsIgnoringPatch(v1: string, v2: string): number {
   return 0;
 }
 
-type IsBlockchainSupportedParams = {
-  actionBlockchainIds?: string[];
-  acceptBlockchainIds: string[];
-};
-
 export function isBlockchainSupported({
   acceptBlockchainIds,
   actionBlockchainIds = BASELINE_ACTION_BLOCKCHAIN_IDS,
@@ -62,24 +81,5 @@ export function isBlockchainSupported({
   );
   return actionBlockchainIds.every((chain) =>
     sanitizedAcceptBlockchainIds.includes(chain),
-  );
-}
-
-type CheckSupportedParams = {
-  acceptBlockchainIds: string[];
-};
-
-export function defaultCheckSupported(
-  context: Omit<ActionContext, 'triggeredLinkedAction'>,
-  { acceptBlockchainIds }: CheckSupportedParams,
-) {
-  return (
-    isBlockchainSupported({
-      acceptBlockchainIds,
-      actionBlockchainIds: context.action.metadata.blockchainIds,
-    }) &&
-    isVersionSupported({
-      actionVersion: context.action.metadata.version,
-    })
   );
 }
