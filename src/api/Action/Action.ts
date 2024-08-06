@@ -13,6 +13,8 @@ import {
   SingleValueActionComponent,
 } from './action-components';
 
+const MULTI_VALUE_TYPES: ActionParameterType[] = ['checkbox'];
+
 interface ActionMetadata {
   blockchainIds: string[];
 }
@@ -148,7 +150,7 @@ const componentFactory = (
     return new SingleValueActionComponent(parent, label, href, parameters);
   }
 
-  if (['checkbox'].includes(parameter.type)) {
+  if (MULTI_VALUE_TYPES.includes(parameter.type)) {
     return new MultiValueActionComponent(parent, label, href, parameters);
   }
 
