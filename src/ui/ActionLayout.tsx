@@ -313,9 +313,7 @@ const ActionContent = ({
 };
 
 const ActionForm = ({ form }: Required<Pick<LayoutProps, 'form'>>) => {
-  const [values, setValues] = useState<Record<string, string | string[]>>(
-    Object.fromEntries(form.inputs.map((i) => [i.name, ''])),
-  );
+  const [values, setValues] = useState<Record<string, string | string[]>>({});
   const [validity, setValidity] = useState<Record<string, boolean>>(
     Object.fromEntries(form.inputs.map((i) => [i.name, false])),
   );

@@ -1,1 +1,1 @@
-export * from '@solana/actions-spec';
+export type * from '@solana/actions-spec';

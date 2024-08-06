@@ -23,12 +23,13 @@ export const ActionRadioGroup = ({
   const [value, setValue] = useState<string>(
     options.find((option) => option.selected)?.value ?? '',
   );
-  const [isValid, setValid] = useState(!isStandalone || !required);
+  const [isValid, setValid] = useState(!isStandalone && !required);
   const [touched, setTouched] = useState(false);
 
   useEffect(() => {
     onValidityChange?.(isValid);
     // calling this once, just to give the idea for the parent
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const extendedChange = useCallback(

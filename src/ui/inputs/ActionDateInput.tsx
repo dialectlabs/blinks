@@ -33,7 +33,7 @@ export const ActionDateInput = ({
   const id = useId();
   const isStandalone = !!button;
   const [value, setValue] = useState('');
-  const [isValid, setValid] = useState(!isStandalone || !required);
+  const [isValid, setValid] = useState(!isStandalone && !required);
   const [touched, setTouched] = useState(false);
   const minDate = min as string | undefined;
   const maxDate = max as string | undefined;
@@ -41,6 +41,7 @@ export const ActionDateInput = ({
   useEffect(() => {
     onValidityChange?.(isValid);
     // calling this once, just to give the idea for the parent
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const extendedChange = useCallback(

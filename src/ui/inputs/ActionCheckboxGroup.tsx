@@ -63,7 +63,7 @@ export const ActionCheckboxGroup = ({
     value: Object.fromEntries(
       options.map((option) => [option.value, option.selected ?? false]),
     ),
-    valid: !isStandalone || !required,
+    valid: !isStandalone && !required,
   });
 
   const [touched, setTouched] = useState(false);
@@ -71,6 +71,7 @@ export const ActionCheckboxGroup = ({
   useEffect(() => {
     onValidityChange?.(state.valid);
     // calling this once, just to give the idea for the parent
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const extendedChange = (name: string, value: boolean) => {

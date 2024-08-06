@@ -24,13 +24,14 @@ export const ActionUrlInput = ({
   const isStandalone = !!button;
   const id = useId();
   const [value, setValue] = useState('');
-  const [isValid, setValid] = useState(!isStandalone || !required);
+  const [isValid, setValid] = useState(!isStandalone && !required);
   const minLength = min as number;
   const maxLength = max as number;
 
   useEffect(() => {
     onValidityChange?.(isValid);
     // calling this once, just to give the idea for the parent
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const extendedChange = (e: ChangeEvent<HTMLInputElement>) => {
