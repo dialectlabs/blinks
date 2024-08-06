@@ -2,8 +2,8 @@ import { proxify, proxifyImage } from '../../utils/proxify.ts';
 import type { ActionAdapter } from '../ActionConfig.ts';
 import type {
   ActionGetResponse,
-  ActionParameter,
   ActionParameterType,
+  TypedActionParameter,
 } from '../actions-spec.ts';
 import {
   type AbstractActionComponent,
@@ -134,7 +134,7 @@ const componentFactory = (
   parent: Action,
   label: string,
   href: string,
-  parameters?: ActionParameter<ActionParameterType>[],
+  parameters?: TypedActionParameter[],
 ): AbstractActionComponent => {
   if (!parameters?.length) {
     return new ButtonActionComponent(parent, label, href);
