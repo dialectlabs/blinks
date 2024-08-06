@@ -56,6 +56,11 @@ export const ActionCheckboxGroup = ({
       max: maxChoices,
     });
 
+  const hasInitiallySelectedOption = useMemo(
+    () => options.find((option) => option.selected),
+    [options],
+  );
+
   const [state, setState] = useState<{
     value: Record<string, boolean>;
     valid: boolean;
@@ -63,7 +68,9 @@ export const ActionCheckboxGroup = ({
     value: Object.fromEntries(
       options.map((option) => [option.value, option.selected ?? false]),
     ),
-    valid: !isStandalone && !required,
+    valid: isStandalone
+      ? !!hasInitiallySelectedOption
+      : !(required && !hasInitiallySelectedOption),
   });
 
   const [touched, setTouched] = useState(false);

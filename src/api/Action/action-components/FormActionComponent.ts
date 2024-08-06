@@ -96,7 +96,7 @@ export class FormActionComponent extends AbstractActionComponent {
     return new SingleValueActionComponent(
       this._parent,
       this._label,
-      this.href,
+      this._href,
       [parameter],
       this,
     );

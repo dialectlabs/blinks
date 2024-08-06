@@ -347,7 +347,6 @@ export const ActionContainer = ({
       return;
     }
 
-    console.log(component);
     dispatch({ type: ExecutionType.INITIATE, executingAction: component });
 
     const context: ActionContext = {

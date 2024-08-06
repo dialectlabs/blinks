@@ -66,7 +66,7 @@ export class MultiValueActionComponent extends AbstractActionComponent {
     return new ButtonActionComponent(
       this._parent,
       this._label,
-      this.href,
+      this._href,
       undefined,
       this,
     );

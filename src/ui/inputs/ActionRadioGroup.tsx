@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Radio } from '../Radio.tsx';
 import { ActionButton } from './ActionButton.tsx';
 import type { BaseInputProps } from './types.ts';
@@ -19,11 +19,19 @@ export const ActionRadioGroup = ({
   onValidityChange?: (state: boolean) => void;
 }) => {
   const isStandalone = !!button;
+  const hasInitiallySelectedOption = useMemo(
+    () => options.find((option) => option.selected),
+    [options],
+  );
 
   const [value, setValue] = useState<string>(
     options.find((option) => option.selected)?.value ?? '',
   );
-  const [isValid, setValid] = useState(!isStandalone && !required);
+  const [isValid, setValid] = useState(
+    isStandalone
+      ? !!hasInitiallySelectedOption
+      : !(required && !hasInitiallySelectedOption),
+  );
   const [touched, setTouched] = useState(false);
 
   useEffect(() => {
