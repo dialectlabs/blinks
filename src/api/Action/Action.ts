@@ -12,12 +12,16 @@ import {
   MultiValueActionComponent,
   SingleValueActionComponent,
 } from './action-components';
+import {
+  BASELINE_ACTION_BLOCKCHAIN_IDS,
+  BASELINE_ACTION_VERSION,
+} from './action-supportability.ts';
 
 const MULTI_VALUE_TYPES: ActionParameterType[] = ['checkbox'];
 
 interface ActionMetadata {
-  blockchainIds?: string[];
-  version?: string;
+  blockchainIds: string[];
+  version: string;
 }
 
 export class Action {
@@ -26,7 +30,7 @@ export class Action {
   private constructor(
     private readonly _url: string,
     private readonly _data: ActionGetResponse,
-    private readonly _metadata: ActionMetadata,
+    private readonly _metadata: Partial<ActionMetadata>,
     private _adapter?: ActionAdapter,
   ) {
     // if no links present, fallback to original solana pay spec
@@ -76,8 +80,12 @@ export class Action {
     return this._data.error?.message ?? null;
   }
 
-  public get metadata() {
-    return this._metadata;
+  public get metadata(): ActionMetadata {
+    return {
+      blockchainIds:
+        this._metadata.blockchainIds ?? BASELINE_ACTION_BLOCKCHAIN_IDS,
+      version: this._metadata.version ?? BASELINE_ACTION_VERSION,
+    };
   }
 
   public get adapter() {
@@ -124,7 +132,7 @@ export class Action {
       .map((id) => id.trim());
     const version = response.headers.get('x-action-version')?.trim();
 
-    const metadata: ActionMetadata = {
+    const metadata: Partial<ActionMetadata> = {
       blockchainIds,
       version,
     };

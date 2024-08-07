@@ -186,13 +186,11 @@ async function handleNewNode(
     return;
   }
 
-  const isSupported = config.isSupported
-    ? await config.isSupported({
-        originalUrl: actionUrl.toString(),
-        action,
-        actionType: state,
-      })
-    : true;
+  const isSupported = await config.isSupported({
+    originalUrl: actionUrl.toString(),
+    action,
+    actionType: state,
+  });
 
   addMargin(container).replaceChildren(
     createAction({

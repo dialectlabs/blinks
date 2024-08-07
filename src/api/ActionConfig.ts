@@ -1,10 +1,8 @@
 import { Connection } from '@solana/web3.js';
+import { BlockchainIds } from '../utils';
 import { type Action } from './Action';
 import { AbstractActionComponent } from './Action/action-components';
-import {
-  BlockchainIds,
-  defaultCheckSupported,
-} from './Action/action-supportability.ts';
+import { defaultCheckSupported } from './Action/action-supportability.ts';
 
 export interface ActionContext {
   originalUrl: string;

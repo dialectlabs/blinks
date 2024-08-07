@@ -17,6 +17,7 @@ import {
   SingleValueActionComponent,
 } from '../api';
 import { checkSecurity, type SecurityLevel } from '../shared';
+import { BlockchainNames } from '../utils/caip-2.ts';
 import { isInterstitial } from '../utils/interstitial-url.ts';
 import {
   isPostRequestError,
@@ -471,6 +472,10 @@ export const ActionContainer = ({
     return null;
   }, [executionState.status, isPassingSecurityCheck, overallState]);
 
+  const actionBlockchainNames = action.metadata.blockchainIds.map(
+    (it) => BlockchainNames[it] ?? it,
+  );
+
   return (
     <Experimental__ActionLayout
       stylePreset={stylePreset}
@@ -490,7 +495,10 @@ export const ActionContainer = ({
       inputs={inputs.map((input) => asInputProps(input))}
       form={form ? asFormProps(form) : undefined}
       disclaimer={disclaimer}
-      isSupported={isSupported}
+      supportability={{
+        isSupported,
+        actionBlockchainNames,
+      }}
     />
   );
 };

@@ -49,6 +49,11 @@ const stylePresetClassMap: Record<StylePreset, string> = {
   custom: 'custom',
 };
 
+export interface ActionSupportability {
+  isSupported: boolean;
+  actionBlockchainNames: string[];
+}
+
 interface LayoutProps {
   stylePreset?: StylePreset;
   image?: string;
@@ -63,7 +68,7 @@ interface LayoutProps {
   buttons?: ButtonProps[];
   inputs?: InputProps[];
   form?: FormProps;
-  isSupported: boolean;
+  supportability: ActionSupportability;
 }
 
 export interface FormProps {
@@ -93,7 +98,13 @@ const Linkable = ({
     <div className={className}>{children}</div>
   );
 
-const NotSupportedBlock = ({ className }: { className?: string }) => {
+const NotSupportedBlock = ({
+  actionBlockchainIds,
+  className,
+}: {
+  actionBlockchainIds: string[];
+  className?: string;
+}) => {
   return (
     <div className={className}>
       <Snackbar variant="info">
@@ -101,8 +112,10 @@ const NotSupportedBlock = ({ className }: { className?: string }) => {
           <ConfigIcon className="text-icon-primary" />
           <div className="flex flex-col justify-center gap-[3px]">
             <a className="font-semibold">This action is not supported</a>
-            <p>Ensure you use latest blink client compatible with solana.</p>
-            {/*  TODO: replace solana with CAIP-2 chain name*/}
+            <p>
+              Make sure you are using the latest Blink client, which includes
+              support for {actionBlockchainIds.join(', ')}.
+            </p>
           </div>
         </div>
       </Snackbar>
@@ -196,7 +209,7 @@ export const ActionLayout = ({
   form,
   error,
   success,
-  isSupported,
+  supportability,
 }: LayoutProps) => {
   return (
     <div className={clsx('blink', stylePresetClassMap[stylePreset])}>
@@ -269,8 +282,10 @@ export const ActionLayout = ({
           <span className="mb-4 whitespace-pre-wrap text-subtext text-text-secondary">
             {description}
           </span>
-          {!isSupported ? (
-            <NotSupportedBlock />
+          {!supportability.isSupported ? (
+            <NotSupportedBlock
+              actionBlockchainIds={supportability.actionBlockchainNames}
+            />
           ) : (
             <>
               {disclaimer && (

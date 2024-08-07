@@ -1,41 +1,33 @@
+import { BlockchainIds } from '../../utils';
 import { ACTIONS_SPEC_VERSION } from '../../utils/dependency-versions.ts';
 import type { ActionContext } from '../ActionConfig.ts';
 
 /**
- * CAIP-2 Blockchain IDs.
- */
-export const BlockchainIds = {
-  SOLANA_MAINNET: 'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp',
-  SOLANA_DEVNET: 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1',
-  SOLANA_TESTNET: 'solana:4uhcVJyU9pJkvQyS88uRDiswHXSCkY3',
-};
-
-/**
  * Max spec version the Blink client supports.
  */
-const MAX_SUPPORTED_ACTION_VERSION = ACTIONS_SPEC_VERSION;
+export const MAX_SUPPORTED_ACTION_VERSION = ACTIONS_SPEC_VERSION;
 /**
  * Baseline action version to be used when not set by action provider.
  * Defaults to latest release that doesn't support versioning.
  */
-const BASELINE_ACTION_VERSION = '1.5.1';
+export const BASELINE_ACTION_VERSION = '1.5.1';
 /**
  * Baseline blockchain IDs to be used when not set by action provider.
  * Defaults to Solana mainnet.
  */
-const BASELINE_ACTION_BLOCKCHAIN_IDS = [BlockchainIds.SOLANA_MAINNET];
+export const BASELINE_ACTION_BLOCKCHAIN_IDS = [BlockchainIds.SOLANA_MAINNET];
 
 type CheckSupportedParams = {
   supportedBlockchainIds: string[];
 };
 
 type IsVersionSupportedParams = {
-  actionVersion?: string;
+  actionVersion: string;
   supportedActionVersion?: string;
 };
 
 type IsBlockchainIdSupportedParams = {
-  actionBlockchainIds?: string[];
+  actionBlockchainIds: string[];
   supportedBlockchainIds: string[];
 };
 
@@ -104,6 +96,9 @@ export function isBlockchainSupported({
   supportedBlockchainIds,
   actionBlockchainIds = BASELINE_ACTION_BLOCKCHAIN_IDS,
 }: IsBlockchainIdSupportedParams): boolean {
+  if (actionBlockchainIds.length === 0 || supportedBlockchainIds.length === 0) {
+    return false;
+  }
   const sanitizedSupportedBlockchainIds = supportedBlockchainIds.map((it) =>
     it.trim(),
   );

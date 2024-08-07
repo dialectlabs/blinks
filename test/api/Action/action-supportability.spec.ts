@@ -47,16 +47,6 @@ describe('isVersionSupported', () => {
     ).toBe(false);
   });
 
-  test('returns true when action version is not provided and uses baseline action version', () => {
-    expect(isVersionSupported({ supportedActionVersion: '1.4.1' })).toBe(false);
-    expect(isVersionSupported({ supportedActionVersion: '1.5.1' })).toBe(true);
-    expect(isVersionSupported({ supportedActionVersion: '1.6.0' })).toBe(true);
-  });
-
-  test('returns true when both versions are not provided', () => {
-    expect(isVersionSupported({})).toBe(true);
-  });
-
   test('returns true ignoring patch version', () => {
     expect(
       isVersionSupported({
@@ -140,39 +130,29 @@ describe('isBlockchainSupported', () => {
     ).toBe(false);
   });
 
-  test('returns true when actionBlockchainIds is not provided and uses baseline', () => {
-    expect(
-      isBlockchainSupported({
-        supportedBlockchainIds: [
-          'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp',
-          'ethereum:1',
-        ],
-      }),
-    ).toBe(true);
-  });
-
-  test('returns false when actionBlockchainIds is not provided and baseline is not supported', () => {
-    expect(
-      isBlockchainSupported({
-        supportedBlockchainIds: ['ethereum:1'],
-      }),
-    ).toBe(false);
-  });
-
-  test('returns true when both blockchainIds and actionBlockchainIds are empty', () => {
+  test('returns false when both blockchainIds and actionBlockchainIds are empty', () => {
     expect(
       isBlockchainSupported({
         supportedBlockchainIds: [],
         actionBlockchainIds: [],
       }),
-    ).toBe(true);
+    ).toBe(false);
   });
 
-  test('returns false when blockchainIds is empty and actionBlockchainIds is not', () => {
+  test('returns false when supportedBlockchainIds is empty and actionBlockchainIds is not', () => {
     expect(
       isBlockchainSupported({
         supportedBlockchainIds: [],
         actionBlockchainIds: ['solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp'],
+      }),
+    ).toBe(false);
+  });
+
+  test('returns false when actionBlockchainIds is empty and actionBlockchainIds is not', () => {
+    expect(
+      isBlockchainSupported({
+        supportedBlockchainIds: ['solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp'],
+        actionBlockchainIds: [],
       }),
     ).toBe(false);
   });
