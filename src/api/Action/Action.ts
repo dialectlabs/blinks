@@ -1,3 +1,4 @@
+import { isUrlSameOrigin } from '../../shared';
 import { proxify, proxifyImage } from '../../utils/proxify.ts';
 import type { ActionAdapter } from '../ActionConfig.ts';
 import type {
@@ -23,6 +24,11 @@ interface ActionMetadata {
   blockchainIds: string[];
 }
 
+interface ActionChainMetadata {
+  isChained: boolean;
+  isInline: boolean;
+}
+
 export class Action {
   private readonly _actions: AbstractActionComponent[];
 
@@ -31,6 +37,7 @@ export class Action {
     private readonly _data: NextAction,
     private readonly _metadata: ActionMetadata,
     private _adapter?: ActionAdapter,
+    private readonly _chainMetadata?: ActionChainMetadata,
   ) {
     // if no links present or completed, fallback to original solana pay spec (or just using the button as a placeholder)
     if (_data.type === 'completed' || !_data.links?.actions) {
@@ -46,6 +53,18 @@ export class Action {
 
       return componentFactory(this, action.label, href, action.parameters);
     });
+  }
+
+  public get isChained() {
+    return this._chainMetadata?.isChained ?? false;
+  }
+
+  public get isInline() {
+    return this._chainMetadata?.isInline ?? false;
+  }
+
+  public get type() {
+    return this._data.type;
   }
 
   public get url() {
@@ -97,13 +116,29 @@ export class Action {
 
   public async chain<N extends NextActionLink>(
     next: N,
-    chainData: N extends PostNextActionLink ? NextActionPostRequest : never,
-  ): Promise<Action> {
+    chainData?: N extends PostNextActionLink ? NextActionPostRequest : never,
+  ): Promise<Action | null> {
     if (next.type === 'inline') {
-      return new Action(this.url, next.action, this.metadata, this.adapter);
+      return new Action(this.url, next.action, this.metadata, this.adapter, {
+        isChained: true,
+        isInline: true,
+      });
     }
 
-    const proxyUrl = proxify(next.href);
+    const baseUrlObj = new URL(this.url);
+
+    if (!isUrlSameOrigin(baseUrlObj.origin, next.href)) {
+      console.error(
+        `Chained action is not the same origin as the current action. Original: ${this.url}, chained: ${next.href}`,
+      );
+      return null;
+    }
+
+    const href = next.href.startsWith('http')
+      ? next.href
+      : baseUrlObj.origin + next.href;
+
+    const proxyUrl = proxify(href);
     const response = await fetch(proxyUrl, {
       method: 'POST',
       body: JSON.stringify(chainData),
@@ -113,15 +148,19 @@ export class Action {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to chain action ${proxyUrl}, action url: ${next.href}`,
+      console.error(
+        `Failed to fetch chained action ${proxyUrl}, action url: ${next.href}`,
       );
+      return null;
     }
 
     const data = (await response.json()) as NextAction;
     const metadata = getActionMetadata(response);
 
-    return new Action(next.href, data, metadata, this.adapter);
+    return new Action(href, data, metadata, this.adapter, {
+      isChained: true,
+      isInline: false,
+    });
   }
 
   // be sure to use this only if the action is valid

@@ -51,14 +51,14 @@ export type ActionType = 'action' | 'completed';
 /**
  * Response body payload returned from the initial Action GET Request
  */
-export interface ActionGetResponse extends Omit<Action, 'type'> {
+export interface ActionGetResponse extends Omit<TypedAction, 'type'> {
   type?: 'action';
 }
 
 /**
  * A single Solana Action
  */
-export interface Action<T extends ActionType = 'action'> {
+export interface TypedAction<T extends ActionType = 'action'> {
   /** type of Action to present to the user */
   type: T;
   /** image url that represents the source of the action request */
@@ -233,10 +233,10 @@ export interface InlineNextActionLink {
 }
 
 /** The completed action, used to declare the "completed" state within action chaining. */
-export type CompletedAction = Omit<Action<'completed'>, 'links'>;
+export type CompletedAction = Omit<TypedAction<'completed'>, 'links'>;
 
 /** The next action to be performed */
-export type NextAction = Action<'action'> | CompletedAction;
+export type NextAction = TypedAction<'action'> | CompletedAction;
 
 /**
  * Response body payload sent via POST request to obtain the next action

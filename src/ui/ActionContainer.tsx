@@ -14,6 +14,7 @@ import {
   SingleValueActionComponent,
   type ActionCallbacksConfig,
   type ActionContext,
+  type ActionPostResponse,
   type ExtendedActionState,
 } from '../api';
 import { checkSecurity, type SecurityLevel } from '../shared';
@@ -198,7 +199,7 @@ type Source = 'websites' | 'interstitials' | 'actions';
 type NormalizedSecurityLevel = Record<Source, SecurityLevel>;
 
 export const ActionContainer = ({
-  action,
+  action: initialAction,
   websiteUrl,
   websiteText,
   callbacks,
@@ -216,6 +217,7 @@ export const ActionContainer = ({
   // please do not use it yet, better api is coming..
   Experimental__ActionLayout?: typeof ActionLayout;
 }) => {
+  const [action, setAction] = useState(initialAction);
   const normalizedSecurityLevel: NormalizedSecurityLevel = useMemo(() => {
     if (typeof securityLevel === 'string') {
       return {
@@ -367,10 +369,12 @@ export const ActionContainer = ({
         .post(account)
         .catch((e: Error) => ({ error: e.message }));
 
-      if (isPostRequestError(tx)) {
+      if (!(tx as ActionPostResponse).transaction || isPostRequestError(tx)) {
         dispatch({
           type: ExecutionType.SOFT_RESET,
-          errorMessage: tx.error,
+          errorMessage: isPostRequestError(tx)
+            ? tx.error
+            : 'Transaction data missing',
         });
         return;
       }
@@ -384,10 +388,31 @@ export const ActionContainer = ({
         dispatch({ type: ExecutionType.RESET });
       } else {
         await action.adapter.confirmTransaction(signResult.signature, context);
-        dispatch({
-          type: ExecutionType.FINISH,
-          successMessage: tx.message,
+
+        if (!tx.links?.next) {
+          dispatch({
+            type: ExecutionType.FINISH,
+            successMessage: tx.message,
+          });
+          return;
+        }
+
+        // chain
+        const nextAction = await action.chain(tx.links.next, {
+          signature: signResult.signature,
+          account: account,
         });
+
+        if (!nextAction) {
+          dispatch({
+            type: ExecutionType.FINISH,
+            successMessage: tx.message,
+          });
+          return;
+        }
+
+        setAction(nextAction);
+        dispatch({ type: ExecutionType.RESET });
       }
     } catch (e) {
       dispatch({
@@ -402,8 +427,14 @@ export const ActionContainer = ({
     loading:
       executionState.status === 'executing' &&
       it === executionState.executingAction,
-    disabled: action.disabled || executionState.status !== 'idle',
-    variant: buttonVariantMap[executionState.status],
+    disabled:
+      action.disabled ||
+      action.type === 'completed' ||
+      executionState.status !== 'idle',
+    variant:
+      buttonVariantMap[
+        action.type === 'completed' ? 'success' : executionState.status
+      ],
     onClick: (params?: Record<string, string | string[]>) =>
       execute(it.parentComponent ?? it, params),
   });
@@ -417,7 +448,10 @@ export const ActionContainer = ({
     return {
       type: it.parameter.type ?? 'text',
       placeholder: it.parameter.label,
-      disabled: action.disabled || executionState.status !== 'idle',
+      disabled:
+        action.disabled ||
+        action.type === 'completed' ||
+        executionState.status !== 'idle',
       name: it.parameter.name,
       required: it.parameter.required,
       min: it.parameter.min,
