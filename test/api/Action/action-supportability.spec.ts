@@ -1,27 +1,24 @@
 import { describe, expect, test } from 'bun:test';
-import {
-  isBlockchainSupported,
-  isVersionSupported,
-} from '../../../src/api/Action/action-supportability.ts';
+import { isBlockchainSupported, isVersionSupported } from '../../../src';
 
 describe('isVersionSupported', () => {
   test('returns true when action version is less than client version', () => {
     expect(
       isVersionSupported({
         actionVersion: '2.1.0',
-        acceptActionVersion: '2.2.0',
+        supportedActionVersion: '2.2.0',
       }),
     ).toBe(true);
     expect(
       isVersionSupported({
         actionVersion: '2.2.0',
-        acceptActionVersion: '2.3.0',
+        supportedActionVersion: '2.3.0',
       }),
     ).toBe(true);
     expect(
       isVersionSupported({
         actionVersion: '1.0.0',
-        acceptActionVersion: '2.2.0',
+        supportedActionVersion: '2.2.0',
       }),
     ).toBe(true);
   });
@@ -30,7 +27,7 @@ describe('isVersionSupported', () => {
     expect(
       isVersionSupported({
         actionVersion: '2.2.0',
-        acceptActionVersion: '2.2.0',
+        supportedActionVersion: '2.2.0',
       }),
     ).toBe(true);
   });
@@ -39,36 +36,50 @@ describe('isVersionSupported', () => {
     expect(
       isVersionSupported({
         actionVersion: '2.3.0',
-        acceptActionVersion: '2.2.0',
+        supportedActionVersion: '2.2.0',
       }),
     ).toBe(false);
     expect(
       isVersionSupported({
         actionVersion: '3.0.0',
-        acceptActionVersion: '2.2.0',
+        supportedActionVersion: '2.2.0',
       }),
     ).toBe(false);
   });
 
-  test('returns true when action version is not provided and uses baseline version', () => {
-    expect(isVersionSupported({ acceptActionVersion: '2.2.0' })).toBe(true);
+  test('returns true when action version is not provided and uses baseline action version', () => {
+    expect(isVersionSupported({ supportedActionVersion: '1.4.1' })).toBe(false);
+    expect(isVersionSupported({ supportedActionVersion: '1.5.1' })).toBe(true);
+    expect(isVersionSupported({ supportedActionVersion: '1.6.0' })).toBe(true);
   });
 
-  test('returns true when acceptActionVersion is not provided and uses default', () => {
-    expect(isVersionSupported({ actionVersion: '2.1.0' })).toBe(true);
-    expect(isVersionSupported({ actionVersion: '2.2.0' })).toBe(true);
-    expect(isVersionSupported({ actionVersion: '2.3.0' })).toBe(false);
-  });
-
-  test('returns true when both versions are not provided and uses baseline version', () => {
+  test('returns true when both versions are not provided', () => {
     expect(isVersionSupported({})).toBe(true);
   });
 
-  test('returns true when action version has patch version less than client version', () => {
+  test('returns true ignoring patch version', () => {
     expect(
       isVersionSupported({
         actionVersion: '2.2.1',
-        acceptActionVersion: '2.2.2',
+        supportedActionVersion: '2.2.2',
+      }),
+    ).toBe(true);
+    expect(
+      isVersionSupported({
+        actionVersion: '2.2.1',
+        supportedActionVersion: '2.2.1',
+      }),
+    ).toBe(true);
+    expect(
+      isVersionSupported({
+        actionVersion: '2.2.2',
+        supportedActionVersion: '2.2.1',
+      }),
+    ).toBe(true);
+    expect(
+      isVersionSupported({
+        actionVersion: '2.2.2',
+        supportedActionVersion: '2.2',
       }),
     ).toBe(true);
   });
@@ -77,7 +88,13 @@ describe('isVersionSupported', () => {
     expect(
       isVersionSupported({
         actionVersion: 'invalidVersion',
-        acceptActionVersion: '2.2.0',
+        supportedActionVersion: '2.2.0',
+      }),
+    ).toBe(false);
+    expect(
+      isVersionSupported({
+        actionVersion: '2.2.0',
+        supportedActionVersion: 'invalidVersion',
       }),
     ).toBe(false);
   });
@@ -86,7 +103,7 @@ describe('isVersionSupported', () => {
     expect(
       isVersionSupported({
         actionVersion: '2.2.0',
-        acceptActionVersion: 'invalid.version',
+        supportedActionVersion: 'invalid.version',
       }),
     ).toBe(false);
   });
@@ -95,7 +112,7 @@ describe('isVersionSupported', () => {
     expect(
       isVersionSupported({
         actionVersion: 'invalid.version',
-        acceptActionVersion: 'invalid.version',
+        supportedActionVersion: 'invalid.version',
       }),
     ).toBe(false);
   });
@@ -105,7 +122,7 @@ describe('isBlockchainSupported', () => {
   test('returns true when all actionBlockchainIds are supported', () => {
     expect(
       isBlockchainSupported({
-        acceptBlockchainIds: [
+        supportedBlockchainIds: [
           'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp',
           'ethereum:1',
         ],
@@ -117,7 +134,7 @@ describe('isBlockchainSupported', () => {
   test('returns false when some actionBlockchainIds are not supported', () => {
     expect(
       isBlockchainSupported({
-        acceptBlockchainIds: ['ethereum:1'],
+        supportedBlockchainIds: ['ethereum:1'],
         actionBlockchainIds: ['solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp'],
       }),
     ).toBe(false);
@@ -126,7 +143,7 @@ describe('isBlockchainSupported', () => {
   test('returns true when actionBlockchainIds is not provided and uses baseline', () => {
     expect(
       isBlockchainSupported({
-        acceptBlockchainIds: [
+        supportedBlockchainIds: [
           'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp',
           'ethereum:1',
         ],
@@ -137,7 +154,7 @@ describe('isBlockchainSupported', () => {
   test('returns false when actionBlockchainIds is not provided and baseline is not supported', () => {
     expect(
       isBlockchainSupported({
-        acceptBlockchainIds: ['ethereum:1'],
+        supportedBlockchainIds: ['ethereum:1'],
       }),
     ).toBe(false);
   });
@@ -145,7 +162,7 @@ describe('isBlockchainSupported', () => {
   test('returns true when both blockchainIds and actionBlockchainIds are empty', () => {
     expect(
       isBlockchainSupported({
-        acceptBlockchainIds: [],
+        supportedBlockchainIds: [],
         actionBlockchainIds: [],
       }),
     ).toBe(true);
@@ -154,7 +171,7 @@ describe('isBlockchainSupported', () => {
   test('returns false when blockchainIds is empty and actionBlockchainIds is not', () => {
     expect(
       isBlockchainSupported({
-        acceptBlockchainIds: [],
+        supportedBlockchainIds: [],
         actionBlockchainIds: ['solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp'],
       }),
     ).toBe(false);

@@ -6,62 +6,80 @@ import type { ActionContext } from '../ActionConfig.ts';
  */
 export const BlockchainIds = {
   SOLANA_MAINNET: 'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp',
+  SOLANA_DEVNET: 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1',
+  SOLANA_TESTNET: 'solana:4uhcVJyU9pJkvQyS88uRDiswHXSCkY3',
 };
 
 /**
  * Max spec version the Blink client supports.
  */
-const ACCEPT_ACTION_VERSION = ACTIONS_SPEC_VERSION;
+const MAX_SUPPORTED_ACTION_VERSION = ACTIONS_SPEC_VERSION;
 /**
- * Baseline action version to be used when not set by action provider. Defaults to latest pre-versioning actions spec release.
+ * Baseline action version to be used when not set by action provider.
+ * Defaults to latest release that doesn't support versioning.
  */
 const BASELINE_ACTION_VERSION = '1.5.1';
 /**
- * Baseline blockchain IDs to be used when not set by action provider. Defaults to Solana mainnet.
+ * Baseline blockchain IDs to be used when not set by action provider.
+ * Defaults to Solana mainnet.
  */
-const BASELINE_ACTION_BLOCKCHAIN_IDS = [
-  BlockchainIds.SOLANA_MAINNET, // Solana mainnet CAIP-2 Blockchain ID
-];
+const BASELINE_ACTION_BLOCKCHAIN_IDS = [BlockchainIds.SOLANA_MAINNET];
 
 type CheckSupportedParams = {
-  acceptBlockchainIds: string[];
+  supportedBlockchainIds: string[];
 };
 
-type IsVersionCompatibleParams = {
+type IsVersionSupportedParams = {
   actionVersion?: string;
-  acceptActionVersion?: string;
+  supportedActionVersion?: string;
 };
 
-type IsBlockchainSupportedParams = {
+type IsBlockchainIdSupportedParams = {
   actionBlockchainIds?: string[];
-  acceptBlockchainIds: string[];
+  supportedBlockchainIds: string[];
 };
 
+/**
+ * Default implementation for checking if an action is supported.
+ * Checks if the action version and the action blockchain IDs are supported by blink.
+ * @param context Action context.
+ * @param supportedBlockchainIds List of CAIP-2 {@link BlockchainIds} the client supports.
+ *
+ * @see {isVersionSupported}
+ * @see {isBlockchainSupported}
+ */
 export function defaultCheckSupported(
   context: Omit<ActionContext, 'triggeredLinkedAction'>,
-  { acceptBlockchainIds }: CheckSupportedParams,
+  { supportedBlockchainIds }: CheckSupportedParams,
 ) {
+  const { version: actionVersion, blockchainIds: actionBlockchainIds } =
+    context.action.metadata;
   return (
     isVersionSupported({
-      actionVersion: context.action.metadata.version,
+      actionVersion,
     }) &&
     isBlockchainSupported({
-      acceptBlockchainIds,
-      actionBlockchainIds: context.action.metadata.blockchainIds,
+      supportedBlockchainIds,
+      actionBlockchainIds,
     })
   );
 }
 
+/**
+ * Check if the action version is supported by blink.
+ * @param supportedActionVersion The version the blink supports.
+ * @param actionVersion The version of the action.
+ *
+ * @returns `true` if the action version is less than or equal to the supported ignoring patch version, `false` otherwise.
+ */
 export function isVersionSupported({
-  acceptActionVersion = ACCEPT_ACTION_VERSION,
+  supportedActionVersion = MAX_SUPPORTED_ACTION_VERSION,
   actionVersion = BASELINE_ACTION_VERSION,
-}: IsVersionCompatibleParams): boolean {
-  return (
-    compareSemverVersionsIgnoringPatch(actionVersion, acceptActionVersion) <= 0
-  );
+}: IsVersionSupportedParams): boolean {
+  return compareSemverIgnoringPatch(actionVersion, supportedActionVersion) <= 0;
 }
 
-function compareSemverVersionsIgnoringPatch(v1: string, v2: string): number {
+function compareSemverIgnoringPatch(v1: string, v2: string): number {
   const [major1, minor1] = v1.split('.').map(Number);
   const [major2, minor2] = v2.split('.').map(Number);
   if (major1 !== major2) {
@@ -72,14 +90,27 @@ function compareSemverVersionsIgnoringPatch(v1: string, v2: string): number {
   return 0;
 }
 
+/**
+ * Check if action blockchain IDs are supported by the blink.
+ *
+ * @param supportedBlockchainIds List of CAIP-2 blockchain IDs the client supports.
+ * @param actionBlockchainIds List of CAIP-2 blockchain IDs the action supports.
+ *
+ * @returns `true` if all action blockchain IDs are supported by blink, `false` otherwise.
+ *
+ * @see BlockchainIds
+ */
 export function isBlockchainSupported({
-  acceptBlockchainIds,
+  supportedBlockchainIds,
   actionBlockchainIds = BASELINE_ACTION_BLOCKCHAIN_IDS,
-}: IsBlockchainSupportedParams): boolean {
-  const sanitizedAcceptBlockchainIds = acceptBlockchainIds.map((it) =>
+}: IsBlockchainIdSupportedParams): boolean {
+  const sanitizedSupportedBlockchainIds = supportedBlockchainIds.map((it) =>
     it.trim(),
   );
-  return actionBlockchainIds.every((chain) =>
-    sanitizedAcceptBlockchainIds.includes(chain),
+  const sanitizedActionBlockchainIds = actionBlockchainIds.map((it) =>
+    it.trim(),
+  );
+  return sanitizedActionBlockchainIds.every((chain) =>
+    sanitizedSupportedBlockchainIds.includes(chain),
   );
 }

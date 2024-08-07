@@ -118,11 +118,10 @@ export class Action {
 
     const data = (await response.json()) as ActionGetResponse;
 
-    const blockchainIds =
-      response.headers
-        .get('x-blockchain-ids')
-        ?.split(',')
-        .map((id) => id.trim()) ?? [];
+    const blockchainIds = response.headers
+      .get('x-blockchain-ids')
+      ?.split(',')
+      .map((id) => id.trim());
     const version = response.headers.get('x-action-version')?.trim();
 
     const metadata: ActionMetadata = {
