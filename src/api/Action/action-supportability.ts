@@ -10,7 +10,7 @@ export const MAX_SUPPORTED_ACTION_VERSION = ACTIONS_SPEC_VERSION;
  * Baseline action version to be used when not set by action provider.
  * Defaults to latest release that doesn't support versioning.
  */
-export const BASELINE_ACTION_VERSION = '1.5.1';
+export const BASELINE_ACTION_VERSION = '2.0.0';
 /**
  * Baseline blockchain IDs to be used when not set by action provider.
  * Defaults to Solana mainnet.
@@ -66,7 +66,7 @@ export function defaultCheckSupported(
  */
 export function isVersionSupported({
   supportedActionVersion = MAX_SUPPORTED_ACTION_VERSION,
-  actionVersion = BASELINE_ACTION_VERSION,
+  actionVersion,
 }: IsVersionSupportedParams): boolean {
   return compareSemverIgnoringPatch(actionVersion, supportedActionVersion) <= 0;
 }
@@ -94,7 +94,7 @@ function compareSemverIgnoringPatch(v1: string, v2: string): number {
  */
 export function isBlockchainSupported({
   supportedBlockchainIds,
-  actionBlockchainIds = BASELINE_ACTION_BLOCKCHAIN_IDS,
+  actionBlockchainIds,
 }: IsBlockchainIdSupportedParams): boolean {
   if (actionBlockchainIds.length === 0 || supportedBlockchainIds.length === 0) {
     return false;
