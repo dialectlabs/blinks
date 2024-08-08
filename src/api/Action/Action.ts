@@ -82,6 +82,7 @@ export class Action {
 
   public get metadata(): ActionMetadata {
     return {
+      // TODO: remove defaults after a few weeks and make action incompatible if metadata not set by action provider
       blockchainIds:
         this._metadata.blockchainIds ?? BASELINE_ACTION_BLOCKCHAIN_IDS,
       version: this._metadata.version ?? BASELINE_ACTION_VERSION,
