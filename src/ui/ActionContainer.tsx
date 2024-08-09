@@ -416,8 +416,8 @@ export const ActionContainer = ({
       }
     } catch (e) {
       dispatch({
-        type: ExecutionType.FAIL,
-        errorMessage: (e as Error).message ?? 'Unknown error',
+        type: ExecutionType.SOFT_RESET,
+        errorMessage: (e as Error).message ?? 'Unknown error, please try again',
       });
     }
   };
