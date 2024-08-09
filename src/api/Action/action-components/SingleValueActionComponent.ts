@@ -1,7 +1,6 @@
 import type {
-  ActionParameter,
-  ActionParameterType,
   GeneralParameterType,
+  TypedActionParameter,
 } from '../../actions-spec.ts';
 import { Action } from '../Action.ts';
 import { AbstractActionComponent } from './AbstractActionComponent.ts';
@@ -14,7 +13,7 @@ export class SingleValueActionComponent extends AbstractActionComponent {
     protected _parent: Action,
     protected _label: string,
     protected _href: string,
-    protected _parameters?: ActionParameter<ActionParameterType>[],
+    protected _parameters?: TypedActionParameter[],
     protected _parentComponent?: AbstractActionComponent,
   ) {
     super(_parent, _label, _href, _parameters);
@@ -37,10 +36,10 @@ export class SingleValueActionComponent extends AbstractActionComponent {
     };
   }
 
-  public get parameter(): ActionParameter<GeneralParameterType> {
+  public get parameter(): TypedActionParameter<GeneralParameterType> {
     const [param] = this.parameters;
 
-    return param as ActionParameter<GeneralParameterType>;
+    return param as TypedActionParameter<GeneralParameterType>;
   }
 
   public setValue(value: string) {

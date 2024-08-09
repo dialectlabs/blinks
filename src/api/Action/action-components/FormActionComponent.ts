@@ -1,7 +1,6 @@
 import type {
-  ActionParameter,
-  ActionParameterType,
   ActionPostRequest,
+  TypedActionParameter,
 } from '../../actions-spec.ts';
 import { Action } from '../Action.ts';
 import { AbstractActionComponent } from './AbstractActionComponent.ts';
@@ -15,7 +14,7 @@ export class FormActionComponent extends AbstractActionComponent {
     protected _parent: Action,
     protected _label: string,
     protected _href: string,
-    protected _parameters?: ActionParameter<ActionParameterType>[],
+    protected _parameters?: TypedActionParameter[],
     protected _parentComponent?: AbstractActionComponent,
   ) {
     super(_parent, _label, _href, _parameters);

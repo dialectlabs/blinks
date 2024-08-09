@@ -1,10 +1,9 @@
 import { proxify } from '../../../utils/proxify.ts';
 import type {
   ActionError,
-  ActionParameter,
-  ActionParameterType,
   ActionPostRequest,
   ActionPostResponse,
+  TypedActionParameter,
 } from '../../actions-spec.ts';
 import { Action } from '../Action.ts';
 
@@ -13,7 +12,7 @@ export abstract class AbstractActionComponent {
     protected _parent: Action,
     protected _label: string,
     protected _href: string,
-    protected _parameters?: ActionParameter<ActionParameterType>[],
+    protected _parameters?: TypedActionParameter[],
   ) {}
 
   public get parent() {
