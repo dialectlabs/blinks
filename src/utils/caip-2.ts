@@ -8,7 +8,9 @@ export const BlockchainIds = {
 };
 
 export const BlockchainNames: Record<string, string> = {
-  [BlockchainIds.SOLANA_MAINNET]: 'solana:mainnet',
-  [BlockchainIds.SOLANA_DEVNET]: 'solana:devnet',
-  [BlockchainIds.SOLANA_TESTNET]: 'solana:testnet',
+  [BlockchainIds.SOLANA_MAINNET]: 'Solana Mainnet',
+  [BlockchainIds.SOLANA_DEVNET]: 'Solana Devnet',
+  [BlockchainIds.SOLANA_TESTNET]: 'Solana Testnet',
 };
+
+// TODO: add ethereum, and a few more blockchains

@@ -79,24 +79,32 @@ export const defaultActionSupportStrategy: ActionSupportStrategy = async (
   );
 
   if (!versionSupported && !blockchainSupported) {
+    const blockchainMessage =
+      actionBlockchainIds.length === 1
+        ? `blockchain ${actionBlockchainNames[0]}`
+        : `blockchains ${actionBlockchainNames.join(', ')}`;
     return {
       isSupported: false,
-      message: `Ensure you are using the Blink client >= ${actionVersion}, which includes
-              support for ${actionBlockchainNames.join(', ')}.`,
+      message: `Action version ${actionVersion} and ${blockchainMessage} are not supported by the Blink client.`,
     };
   }
 
   if (!versionSupported) {
     return {
       isSupported: false,
-      message: `Ensure you are using the Blink client >= ${actionVersion}.`,
+      message: `Action version is not supported by the Blink client.`,
     };
   }
 
   if (!blockchainSupported) {
+    const blockchainMessage =
+      actionBlockchainIds.length === 1
+        ? `Action blockchain ${actionBlockchainNames[0]} is not supported by the Blink client.`
+        : `Action blockchains ${actionBlockchainNames.join(', ')} are not supported by the Blink client.`;
+
     return {
       isSupported: false,
-      message: `Ensure you are using the Blink client >= ${actionVersion}.`,
+      message: blockchainMessage,
     };
   }
   return {
