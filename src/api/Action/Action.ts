@@ -13,6 +13,7 @@ import {
   SingleValueActionComponent,
 } from './action-components';
 import {
+  type ActionSupportStrategy,
   BASELINE_ACTION_BLOCKCHAIN_IDS,
   BASELINE_ACTION_VERSION,
 } from './action-supportability.ts';
@@ -20,8 +21,8 @@ import {
 const MULTI_VALUE_TYPES: ActionParameterType[] = ['checkbox'];
 
 interface ActionMetadata {
-  blockchainIds: string[];
-  version: string;
+  blockchainIds?: string[];
+  version?: string;
 }
 
 export class Action {
@@ -30,7 +31,8 @@ export class Action {
   private constructor(
     private readonly _url: string,
     private readonly _data: ActionGetResponse,
-    private readonly _metadata: Partial<ActionMetadata>,
+    private readonly _metadata: ActionMetadata,
+    private readonly _supportStrategy: ActionSupportStrategy,
     private _adapter?: ActionAdapter,
   ) {
     // if no links present, fallback to original solana pay spec
@@ -80,13 +82,17 @@ export class Action {
     return this._data.error?.message ?? null;
   }
 
-  public get metadata(): ActionMetadata {
+  public get metadata(): Required<ActionMetadata> {
+    // TODO: Change fallback to baseline version after a few weeks after proxies adopt versioning and remove Required
     return {
-      // TODO: remove defaults after a few weeks and make action incompatible if metadata not set by action provider
       blockchainIds:
         this._metadata.blockchainIds ?? BASELINE_ACTION_BLOCKCHAIN_IDS,
       version: this._metadata.version ?? BASELINE_ACTION_VERSION,
     };
+  }
+
+  public get adapterUnsafe() {
+    return this._adapter;
   }
 
   public get adapter() {
@@ -101,17 +107,25 @@ export class Action {
     this._adapter = adapter;
   }
 
+  public isSupported() {
+    return this._supportStrategy(this);
+  }
+
   // be sure to use this only if the action is valid
   static hydrate(
     url: string,
     data: ActionGetResponse,
     metadata: ActionMetadata,
+    supportStrategy: ActionSupportStrategy,
     adapter?: ActionAdapter,
   ) {
-    return new Action(url, data, metadata, adapter);
+    return new Action(url, data, metadata, supportStrategy, adapter);
   }
 
-  static async fetch(apiUrl: string, adapter?: ActionAdapter) {
+  static async fromApiUrl(
+    apiUrl: string,
+    supportStrategy: ActionSupportStrategy,
+  ) {
     const proxyUrl = proxify(apiUrl);
     const response = await fetch(proxyUrl, {
       headers: {
@@ -133,12 +147,12 @@ export class Action {
       .map((id) => id.trim());
     const version = response.headers.get('x-action-version')?.trim();
 
-    const metadata: Partial<ActionMetadata> = {
+    const metadata: ActionMetadata = {
       blockchainIds,
       version,
     };
 
-    return new Action(apiUrl, data, metadata, adapter);
+    return new Action(apiUrl, data, metadata, supportStrategy);
   }
 }
 

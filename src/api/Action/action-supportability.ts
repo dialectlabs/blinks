@@ -1,11 +1,18 @@
 import { BlockchainIds } from '../../utils';
+import { BlockchainNames } from '../../utils/caip-2.ts';
 import { ACTIONS_SPEC_VERSION } from '../../utils/dependency-versions.ts';
-import type { ActionContext } from '../ActionConfig.ts';
+import type { Action } from './Action.ts';
 
 /**
  * Max spec version the Blink client supports.
  */
 export const MAX_SUPPORTED_ACTION_VERSION = ACTIONS_SPEC_VERSION;
+
+export const DEFAULT_SUPPORTED_BLOCKCHAIN_IDS = [
+  BlockchainIds.SOLANA_MAINNET,
+  BlockchainIds.SOLANA_DEVNET,
+];
+
 /**
  * Baseline action version to be used when not set by action provider.
  * Defaults to latest release that doesn't support versioning.
@@ -17,13 +24,9 @@ export const BASELINE_ACTION_VERSION = '2.0.0';
  */
 export const BASELINE_ACTION_BLOCKCHAIN_IDS = [BlockchainIds.SOLANA_MAINNET];
 
-type CheckSupportedParams = {
-  supportedBlockchainIds: string[];
-};
-
 type IsVersionSupportedParams = {
   actionVersion: string;
-  supportedActionVersion?: string;
+  supportedActionVersion: string;
 };
 
 type IsBlockchainIdSupportedParams = {
@@ -31,31 +34,75 @@ type IsBlockchainIdSupportedParams = {
   supportedBlockchainIds: string[];
 };
 
+export type ActionSupportability =
+  | {
+      isSupported: true;
+    }
+  | {
+      isSupported: false;
+      message: string;
+    };
+
+export type ActionSupportStrategy = (
+  action: Action,
+) => Promise<ActionSupportability>;
+
 /**
  * Default implementation for checking if an action is supported.
  * Checks if the action version and the action blockchain IDs are supported by blink.
- * @param context Action context.
- * @param supportedBlockchainIds List of CAIP-2 {@link BlockchainIds} the client supports.
+ * @param action Action.
  *
  * @see {isVersionSupported}
  * @see {isBlockchainSupported}
  */
-export function defaultCheckSupported(
-  context: Omit<ActionContext, 'triggeredLinkedAction'>,
-  { supportedBlockchainIds }: CheckSupportedParams,
-) {
+export const defaultActionSupportStrategy: ActionSupportStrategy = async (
+  action,
+) => {
   const { version: actionVersion, blockchainIds: actionBlockchainIds } =
-    context.action.metadata;
-  return (
-    isVersionSupported({
-      actionVersion,
-    }) &&
-    isBlockchainSupported({
-      supportedBlockchainIds,
-      actionBlockchainIds,
-    })
+    action.metadata;
+  const supportedActionVersion = MAX_SUPPORTED_ACTION_VERSION;
+  const supportedBlockchainIds = !action.adapterUnsafe
+    ? action.metadata.blockchainIds // Assuming action is supported if this happens for optimistic compatibility
+    : action.adapterUnsafe.metadata.supportedBlockchainIds;
+
+  const versionSupported = isVersionSupported({
+    actionVersion,
+    supportedActionVersion,
+  });
+  const blockchainSupported = isBlockchainSupported({
+    actionBlockchainIds,
+    supportedBlockchainIds,
+  });
+
+  const actionBlockchainNames = actionBlockchainIds.map(
+    (id) => BlockchainNames[id] ?? id,
   );
-}
+
+  if (!versionSupported && !blockchainSupported) {
+    return {
+      isSupported: false,
+      message: `Ensure you are using the Blink client >= ${actionVersion}, which includes
+              support for ${actionBlockchainNames.join(', ')}.`,
+    };
+  }
+
+  if (!versionSupported) {
+    return {
+      isSupported: false,
+      message: `Ensure you are using the Blink client >= ${actionVersion}.`,
+    };
+  }
+
+  if (!blockchainSupported) {
+    return {
+      isSupported: false,
+      message: `Ensure you are using the Blink client >= ${actionVersion}.`,
+    };
+  }
+  return {
+    isSupported: true,
+  };
+};
 
 /**
  * Check if the action version is supported by blink.
@@ -65,7 +112,7 @@ export function defaultCheckSupported(
  * @returns `true` if the action version is less than or equal to the supported ignoring patch version, `false` otherwise.
  */
 export function isVersionSupported({
-  supportedActionVersion = MAX_SUPPORTED_ACTION_VERSION,
+  supportedActionVersion,
   actionVersion,
 }: IsVersionSupportedParams): boolean {
   return compareSemverIgnoringPatch(actionVersion, supportedActionVersion) <= 0;

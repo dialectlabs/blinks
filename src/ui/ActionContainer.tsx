@@ -4,7 +4,9 @@ import {
   Action,
   type ActionCallbacksConfig,
   type ActionContext,
+  type ActionSupportStrategy,
   ButtonActionComponent,
+  defaultActionSupportStrategy,
   type ExtendedActionState,
   FormActionComponent,
   getExtendedActionState,
@@ -17,7 +19,6 @@ import {
   SingleValueActionComponent,
 } from '../api';
 import { checkSecurity, type SecurityLevel } from '../shared';
-import { BlockchainNames } from '../utils/caip-2.ts';
 import { isInterstitial } from '../utils/interstitial-url.ts';
 import {
   isPostRequestError,
@@ -205,8 +206,8 @@ export const ActionContainer = ({
   callbacks,
   securityLevel = DEFAULT_SECURITY_LEVEL,
   stylePreset = 'default',
+  supportStrategy = defaultActionSupportStrategy,
   Experimental__ActionLayout = ActionLayout,
-  isSupported,
 }: {
   action: Action;
   websiteUrl?: string | null;
@@ -214,8 +215,7 @@ export const ActionContainer = ({
   callbacks?: Partial<ActionCallbacksConfig>;
   securityLevel?: SecurityLevel | NormalizedSecurityLevel;
   stylePreset?: StylePreset;
-  isSupported: boolean;
-
+  supportStrategy?: ActionSupportStrategy;
   // please do not use it yet, better api is coming..
   Experimental__ActionLayout?: typeof ActionLayout;
 }) => {
@@ -266,6 +266,11 @@ export const ActionContainer = ({
     // we ignore changes to `actionState.action` explicitly, since we want this to run once
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [callbacks, action, websiteUrl]);
+
+  // const supportability: ActionSupportability = useMemo(() => {
+  //   const actionSupportability = action.isSupported();
+  //   return actionSupportability;
+  // }, [action]);
 
   const buttons = useMemo(
     () =>
@@ -472,10 +477,6 @@ export const ActionContainer = ({
     return null;
   }, [executionState.status, isPassingSecurityCheck, overallState]);
 
-  const actionBlockchainNames = action.metadata.blockchainIds.map(
-    (it) => BlockchainNames[it] ?? it,
-  );
-
   return (
     <Experimental__ActionLayout
       stylePreset={stylePreset}
@@ -495,10 +496,11 @@ export const ActionContainer = ({
       inputs={inputs.map((input) => asInputProps(input))}
       form={form ? asFormProps(form) : undefined}
       disclaimer={disclaimer}
-      supportability={{
-        isSupported,
-        actionBlockchainNames,
-      }}
+      supportability={supportability}
+      // supportability={{
+      //   isSupported,
+      //   actionBlockchainNames,
+      // }}
     />
   );
 };

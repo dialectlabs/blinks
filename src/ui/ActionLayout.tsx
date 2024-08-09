@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { type ReactNode, useState } from 'react';
-import type { ExtendedActionState } from '../api';
+import type { ActionSupportability, ExtendedActionState } from '../api';
 import { Badge } from './Badge.tsx';
 import { Snackbar } from './Snackbar.tsx';
 import { ExclamationShieldIcon, InfoShieldIcon, LinkIcon } from './icons';
@@ -49,11 +49,6 @@ const stylePresetClassMap: Record<StylePreset, string> = {
   custom: 'custom',
 };
 
-export interface ActionSupportability {
-  isSupported: boolean;
-  actionBlockchainNames: string[];
-}
-
 interface LayoutProps {
   stylePreset?: StylePreset;
   image?: string;
@@ -99,10 +94,10 @@ const Linkable = ({
   );
 
 const NotSupportedBlock = ({
-  actionBlockchainIds,
+  message,
   className,
 }: {
-  actionBlockchainIds: string[];
+  message: string;
   className?: string;
 }) => {
   return (
@@ -112,10 +107,7 @@ const NotSupportedBlock = ({
           <ConfigIcon className="text-icon-primary" />
           <div className="flex flex-col justify-center gap-[3px]">
             <a className="font-semibold">This action is not supported</a>
-            <p>
-              Make sure you are using the latest Blink client, which includes
-              support for {actionBlockchainIds.join(', ')}.
-            </p>
+            <p>{message}.</p>
           </div>
         </div>
       </Snackbar>
@@ -283,9 +275,7 @@ export const ActionLayout = ({
             {description}
           </span>
           {!supportability.isSupported ? (
-            <NotSupportedBlock
-              actionBlockchainIds={supportability.actionBlockchainNames}
-            />
+            <NotSupportedBlock message={supportability.message} />
           ) : (
             <>
               {disclaimer && (

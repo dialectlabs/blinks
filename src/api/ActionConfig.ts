@@ -2,7 +2,6 @@ import { Connection } from '@solana/web3.js';
 import { BlockchainIds } from '../utils';
 import { type Action } from './Action';
 import { AbstractActionComponent } from './Action/action-components';
-import { defaultCheckSupported } from './Action/action-supportability.ts';
 
 export interface ActionContext {
   originalUrl: string;
@@ -14,7 +13,7 @@ export interface ActionContext {
 export interface IncomingActionConfig {
   rpcUrl: string;
   adapter: Pick<ActionAdapter, 'connect' | 'signTransaction'> &
-    Partial<Pick<ActionAdapter, 'metadata' | 'isSupported'>>;
+    Partial<Pick<ActionAdapter, 'metadata'>>;
 }
 
 /**
@@ -42,9 +41,6 @@ export interface ActionAdapter {
     signature: string,
     context: ActionContext,
   ) => Promise<void>;
-  isSupported: (
-    context: Omit<ActionContext, 'triggeredLinkedAction'>,
-  ) => Promise<boolean>;
 }
 
 export class ActionConfig implements ActionAdapter {
@@ -123,16 +119,5 @@ export class ActionConfig implements ActionAdapter {
     } catch {
       return null;
     }
-  }
-
-  async isSupported(
-    context: Omit<ActionContext, 'triggeredLinkedAction'>,
-  ): Promise<boolean> {
-    if (!this.adapter.isSupported) {
-      return defaultCheckSupported(context, {
-        supportedBlockchainIds: this.metadata.supportedBlockchainIds,
-      });
-    }
-    return this.adapter.isSupported(context);
   }
 }
