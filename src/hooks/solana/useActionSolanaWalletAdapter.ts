@@ -13,7 +13,9 @@ import { ActionConfig } from '../../api';
  * @param rpcUrlOrConnection
  * @see {Action}
  */
-export function useActionSolanaWalletAdapter(rpcUrlOrConnection: string | Connection) {
+export function useActionSolanaWalletAdapter(
+  rpcUrlOrConnection: string | Connection,
+) {
   const wallet = useWallet();
   const walletModal = useWalletModal();
 

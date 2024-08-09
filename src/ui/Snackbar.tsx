@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
 
-type SnackbarVariant = 'warning' | 'error';
+type SnackbarVariant = 'warning' | 'error' | 'info';
 
 interface Props {
   variant?: SnackbarVariant;
@@ -11,6 +11,7 @@ interface Props {
 const variantClasses: Record<SnackbarVariant, string> = {
   error: 'bg-transparent-error text-text-error border-stroke-error',
   warning: 'bg-transparent-warning text-text-warning border-stroke-warning',
+  info: 'bg-bg-secondary text-text-secondary border-none',
 };
 
 export const Snackbar = ({ variant = 'warning', children }: Props) => {
