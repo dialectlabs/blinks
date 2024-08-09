@@ -4,9 +4,8 @@ import {
   Action,
   type ActionCallbacksConfig,
   type ActionContext,
-  type ActionSupportStrategy,
+  type ActionSupportability,
   ButtonActionComponent,
-  defaultActionSupportStrategy,
   type ExtendedActionState,
   FormActionComponent,
   getExtendedActionState,
@@ -31,16 +30,24 @@ import {
   type StylePreset,
 } from './ActionLayout';
 
-type ExecutionStatus = 'blocked' | 'idle' | 'executing' | 'success' | 'error';
+type ExecutionStatus =
+  | 'blocked'
+  | 'checking-supportability'
+  | 'idle'
+  | 'executing'
+  | 'success'
+  | 'error';
 
 interface ExecutionState {
   status: ExecutionStatus;
+  checkingSupportability?: boolean;
   executingAction?: AbstractActionComponent | null;
   errorMessage?: string | null;
   successMessage?: string | null;
 }
 
 enum ExecutionType {
+  CHECK_SUPPORTABILITY = 'CHECK_SUPPORTABILITY',
   INITIATE = 'INITIATE',
   FINISH = 'FINISH',
   FAIL = 'FAIL',
@@ -51,6 +58,9 @@ enum ExecutionType {
 }
 
 type ActionValue =
+  | {
+      type: ExecutionType.CHECK_SUPPORTABILITY;
+    }
   | {
       type: ExecutionType.INITIATE;
       executingAction: AbstractActionComponent;
@@ -83,6 +93,11 @@ const executionReducer = (
   action: ActionValue,
 ): ExecutionState => {
   switch (action.type) {
+    case ExecutionType.CHECK_SUPPORTABILITY:
+      return {
+        status: 'checking-supportability',
+        checkingSupportability: true,
+      };
     case ExecutionType.INITIATE:
       return { status: 'executing', executingAction: action.executingAction };
     case ExecutionType.FINISH:
@@ -126,6 +141,7 @@ const buttonVariantMap: Record<
   ExecutionStatus,
   'default' | 'error' | 'success'
 > = {
+  'checking-supportability': 'default',
   blocked: 'default',
   idle: 'default',
   executing: 'default',
@@ -134,6 +150,7 @@ const buttonVariantMap: Record<
 };
 
 const buttonLabelMap: Record<ExecutionStatus, string | null> = {
+  'checking-supportability': 'Loading',
   blocked: null,
   idle: null,
   executing: 'Executing',
@@ -206,7 +223,6 @@ export const ActionContainer = ({
   callbacks,
   securityLevel = DEFAULT_SECURITY_LEVEL,
   stylePreset = 'default',
-  supportStrategy = defaultActionSupportStrategy,
   Experimental__ActionLayout = ActionLayout,
 }: {
   action: Action;
@@ -215,7 +231,6 @@ export const ActionContainer = ({
   callbacks?: Partial<ActionCallbacksConfig>;
   securityLevel?: SecurityLevel | NormalizedSecurityLevel;
   stylePreset?: StylePreset;
-  supportStrategy?: ActionSupportStrategy;
   // please do not use it yet, better api is coming..
   Experimental__ActionLayout?: typeof ActionLayout;
 }) => {
@@ -234,6 +249,11 @@ export const ActionContainer = ({
   const [actionState, setActionState] = useState(
     getOverallActionState(action, websiteUrl),
   );
+
+  const [supportability, setSupportability] = useState<ActionSupportability>({
+    isSupported: true,
+  });
+
   const overallState = useMemo(
     () =>
       mergeActionStates(
@@ -266,6 +286,20 @@ export const ActionContainer = ({
     // we ignore changes to `actionState.action` explicitly, since we want this to run once
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [callbacks, action, websiteUrl]);
+
+  useEffect(() => {
+    const checkSupportability = async (action: Action) => {
+      try {
+        dispatch({ type: ExecutionType.CHECK_SUPPORTABILITY });
+        const supportability = await action.isSupported();
+        setSupportability(supportability);
+      } finally {
+        dispatch({ type: ExecutionType.RESET });
+      }
+    };
+
+    checkSupportability(action);
+  }, [action]);
 
   // const supportability: ActionSupportability = useMemo(() => {
   //   const actionSupportability = action.isSupported();
@@ -405,10 +439,12 @@ export const ActionContainer = ({
     }
   };
 
+  // TODO: disable stuff based on supportability state
   const asButtonProps = (it: ButtonActionComponent) => ({
     text: buttonLabelMap[executionState.status] ?? it.label,
     loading:
-      executionState.status === 'executing' &&
+      (executionState.status === 'executing' ||
+        executionState.status === 'checking-supportability') &&
       it === executionState.executingAction,
     disabled: action.disabled || executionState.status !== 'idle',
     variant: buttonVariantMap[executionState.status],
@@ -462,7 +498,9 @@ export const ActionContainer = ({
       return {
         type: DisclaimerType.BLOCKED,
         ignorable: isPassingSecurityCheck,
-        hidden: executionState.status !== 'blocked',
+        hidden:
+          executionState.status !== 'blocked' &&
+          executionState.status !== 'checking-supportability',
         onSkip: () => dispatch({ type: ExecutionType.UNBLOCK }),
       };
     }
@@ -497,10 +535,6 @@ export const ActionContainer = ({
       form={form ? asFormProps(form) : undefined}
       disclaimer={disclaimer}
       supportability={supportability}
-      // supportability={{
-      //   isSupported,
-      //   actionBlockchainNames,
-      // }}
     />
   );
 };

@@ -232,7 +232,6 @@ function createAction({
         websiteText={originalUrl.hostname}
         callbacks={callbacks}
         securityLevel={options.securityLevel}
-        supportStrategy={options.supportStrategy}
       />
     </div>,
   );
