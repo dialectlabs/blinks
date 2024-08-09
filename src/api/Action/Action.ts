@@ -24,10 +24,14 @@ interface ActionMetadata {
   blockchainIds: string[];
 }
 
-interface ActionChainMetadata {
-  isChained: boolean;
-  isInline: boolean;
-}
+type ActionChainMetadata =
+  | {
+      isChained: true;
+      isInline: boolean;
+    }
+  | {
+      isChained: false;
+    };
 
 export class Action {
   private readonly _actions: AbstractActionComponent[];
@@ -37,7 +41,7 @@ export class Action {
     private readonly _data: NextAction,
     private readonly _metadata: ActionMetadata,
     private _adapter?: ActionAdapter,
-    private readonly _chainMetadata?: ActionChainMetadata,
+    private readonly _chainMetadata: ActionChainMetadata = { isChained: false },
   ) {
     // if no links present or completed, fallback to original solana pay spec (or just using the button as a placeholder)
     if (_data.type === 'completed' || !_data.links?.actions) {
@@ -56,11 +60,11 @@ export class Action {
   }
 
   public get isChained() {
-    return this._chainMetadata?.isChained ?? false;
+    return this._chainMetadata.isChained;
   }
 
   public get isInline() {
-    return this._chainMetadata?.isInline ?? false;
+    return this._chainMetadata.isChained ? this._chainMetadata.isInline : false;
   }
 
   public get type() {
