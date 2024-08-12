@@ -306,11 +306,6 @@ export const ActionContainer = ({
     checkSupportability(action);
   }, [action]);
 
-  // const supportability: ActionSupportability = useMemo(() => {
-  //   const actionSupportability = action.isSupported();
-  //   return actionSupportability;
-  // }, [action]);
-
   const buttons = useMemo(
     () =>
       action?.actions
