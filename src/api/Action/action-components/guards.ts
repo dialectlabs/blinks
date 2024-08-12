@@ -1,13 +1,9 @@
 import type {
-  ActionParameter,
-  ActionParameterSelectable,
-  ActionParameterType,
   SelectableParameterType,
+  TypedActionParameter,
 } from '../../actions-spec.ts';
 
-export const isPatternAllowed = (
-  parameter: ActionParameter<ActionParameterType>,
-) => {
+export const isPatternAllowed = (parameter: TypedActionParameter) => {
   return (
     parameter.type !== 'select' &&
     parameter.type !== 'radio' &&
@@ -16,8 +12,8 @@ export const isPatternAllowed = (
 };
 
 export const isParameterSelectable = (
-  parameter: ActionParameter<ActionParameterType>,
-): parameter is ActionParameterSelectable<SelectableParameterType> => {
+  parameter: TypedActionParameter,
+): parameter is TypedActionParameter<SelectableParameterType> => {
   return (
     parameter.type === 'select' ||
     parameter.type === 'radio' ||

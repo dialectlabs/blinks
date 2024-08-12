@@ -1,9 +1,14 @@
+import { isUrlSameOrigin } from '../../shared';
 import { proxify, proxifyImage } from '../../utils/proxify.ts';
 import type { ActionAdapter } from '../ActionConfig.ts';
 import type {
   ActionGetResponse,
-  ActionParameter,
   ActionParameterType,
+  NextAction,
+  NextActionLink,
+  NextActionPostRequest,
+  PostNextActionLink,
+  TypedActionParameter,
 } from '../actions-spec.ts';
 import {
   type AbstractActionComponent,
@@ -25,18 +30,28 @@ interface ActionMetadata {
   version?: string;
 }
 
+type ActionChainMetadata =
+  | {
+      isChained: true;
+      isInline: boolean;
+    }
+  | {
+      isChained: false;
+    };
+
 export class Action {
   private readonly _actions: AbstractActionComponent[];
 
   private constructor(
     private readonly _url: string,
-    private readonly _data: ActionGetResponse,
+    private readonly _data: NextAction,
     private readonly _metadata: ActionMetadata,
     private readonly _supportStrategy: ActionSupportStrategy,
     private _adapter?: ActionAdapter,
+    private readonly _chainMetadata: ActionChainMetadata = { isChained: false },
   ) {
-    // if no links present, fallback to original solana pay spec
-    if (!_data.links?.actions) {
+    // if no links present or completed, fallback to original solana pay spec (or just using the button as a placeholder)
+    if (_data.type === 'completed' || !_data.links?.actions) {
       this._actions = [new ButtonActionComponent(this, _data.label, _url)];
       return;
     }
@@ -49,6 +64,18 @@ export class Action {
 
       return componentFactory(this, action.label, href, action.parameters);
     });
+  }
+
+  public get isChained() {
+    return this._chainMetadata.isChained;
+  }
+
+  public get isInline() {
+    return this._chainMetadata.isChained ? this._chainMetadata.isInline : false;
+  }
+
+  public get type() {
+    return this._data.type;
   }
 
   public get url() {
@@ -111,15 +138,64 @@ export class Action {
     return this._supportStrategy(this);
   }
 
+  public async chain<N extends NextActionLink>(
+    next: N,
+    chainData?: N extends PostNextActionLink ? NextActionPostRequest : never,
+  ): Promise<Action | null> {
+    if (next.type === 'inline') {
+      return new Action(this.url, next.action, this.metadata, this.adapter, {
+        isChained: true,
+        isInline: true,
+      });
+    }
+
+    const baseUrlObj = new URL(this.url);
+
+    if (!isUrlSameOrigin(baseUrlObj.origin, next.href)) {
+      console.error(
+        `Chained action is not the same origin as the current action. Original: ${this.url}, chained: ${next.href}`,
+      );
+      return null;
+    }
+
+    const href = next.href.startsWith('http')
+      ? next.href
+      : baseUrlObj.origin + next.href;
+
+    const proxyUrl = proxify(href);
+    const response = await fetch(proxyUrl, {
+      method: 'POST',
+      body: JSON.stringify(chainData),
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      console.error(
+        `Failed to fetch chained action ${proxyUrl}, action url: ${next.href}`,
+      );
+      return null;
+    }
+
+    const data = (await response.json()) as NextAction;
+    const metadata = getActionMetadata(response);
+
+    return new Action(href, data, metadata, this.adapter, {
+      isChained: true,
+      isInline: false,
+    });
+  }
+
   // be sure to use this only if the action is valid
   static hydrate(
     url: string,
-    data: ActionGetResponse,
+    data: NextAction,
     metadata: ActionMetadata,
     supportStrategy: ActionSupportStrategy,
     adapter?: ActionAdapter,
   ) {
-    return new Action(url, data, metadata, supportStrategy, adapter);
+    return new Action(url, data, metadata, adapter);
   }
 
   static async fromApiUrl(
@@ -140,27 +216,30 @@ export class Action {
     }
 
     const data = (await response.json()) as ActionGetResponse;
+    const metadata = getActionMetadata(response);
 
-    const blockchainIds = response.headers
-      .get('x-blockchain-ids')
-      ?.split(',')
-      .map((id) => id.trim());
-    const version = response.headers.get('x-action-version')?.trim();
-
-    const metadata: ActionMetadata = {
-      blockchainIds,
-      version,
-    };
-
-    return new Action(apiUrl, data, metadata, supportStrategy);
+    return new Action(apiUrl, { ...data, type: 'action' }, metadata, adapter);
   }
 }
+
+const getActionMetadata = (response: Response): ActionMetadata => {
+  const blockchainIds = response.headers
+    .get('x-blockchain-ids')
+    ?.split(',')
+    .map((id) => id.trim());
+  const version = response.headers.get('x-action-version')?.trim();
+
+  return {
+    blockchainIds,
+    version,
+  };
+};
 
 const componentFactory = (
   parent: Action,
   label: string,
   href: string,
-  parameters?: ActionParameter<ActionParameterType>[],
+  parameters?: TypedActionParameter[],
 ): AbstractActionComponent => {
   if (!parameters?.length) {
     return new ButtonActionComponent(parent, label, href);

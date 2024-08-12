@@ -1,9 +1,9 @@
-import type { ActionsSpecPostResponse } from '../api';
+import type { ActionPostResponse } from '../api';
 
 export const isSignTransactionError = (
   data: { signature: string } | { error: string },
 ): data is { error: string } => !!(data as any).error;
 
 export const isPostRequestError = (
-  data: ActionsSpecPostResponse | { error: string },
+  data: ActionPostResponse | { error: string },
 ): data is { error: string } => !!(data as any).error;

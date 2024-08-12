@@ -15,3 +15,13 @@ export const checkSecurity = (
       return true;
   }
 };
+
+export const isUrlSameOrigin = (origin: string, url: string): boolean => {
+  if (!url.startsWith('http')) {
+    return true;
+  }
+
+  const urlObj = new URL(url);
+
+  return urlObj.origin === origin;
+};

@@ -81,7 +81,7 @@ export class ActionConfig implements ActionAdapter {
 
       const confirm = async () => {
         if (Date.now() - start >= ActionConfig.CONFIRM_TIMEOUT_MS) {
-          rej(new Error('Unable to confirm transaction'));
+          rej(new Error('Unable to confirm transaction: timeout reached'));
           return;
         }
 
@@ -90,7 +90,11 @@ export class ActionConfig implements ActionAdapter {
 
           // if error present, transaction failed
           if (status.value?.err) {
-            rej(new Error('Transaction execution failed'));
+            rej(
+              new Error(
+                `Transaction execution failed, check wallet for details`,
+              ),
+            );
             return;
           }
 

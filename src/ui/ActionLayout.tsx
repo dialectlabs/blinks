@@ -356,7 +356,8 @@ const buildDefaultFormValues = (
             i.options?.filter((o) => o.selected).map((o) => o.value),
           ];
         }
-        return i.type === 'radio'
+
+        return i.type === 'radio' || i.type === 'select'
           ? [i.name, i.options?.find((o) => o.selected)?.value]
           : null;
       })
