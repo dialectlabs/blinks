@@ -1,4 +1,4 @@
-import { BlockchainIds, BlockchainNames } from '../../utils/caip-2.ts';
+import { BlockchainIds, getShortBlockchainName } from '../../utils/caip-2.ts';
 import { ACTIONS_SPEC_VERSION } from '../../utils/dependency-versions.ts';
 import type { Action } from './Action.ts';
 
@@ -92,7 +92,7 @@ export const defaultActionSupportStrategy: ActionSupportStrategy = async (
   );
 
   const notSupportedActionBlockchainNames = notSupportedBlockchainIds.map(
-    (id) => BlockchainNames[id] ?? id,
+    getShortBlockchainName,
   );
 
   if (!versionSupported && !blockchainSupported) {

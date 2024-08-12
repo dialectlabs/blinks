@@ -102,7 +102,11 @@ const NotSupportedBlock = ({
 }) => {
   return (
     <div className={className}>
-      <Snackbar variant="info">
+      <div
+        className={clsx(
+          'rounded-xl border border-none bg-bg-secondary p-3 text-subtext text-text-secondary',
+        )}
+      >
         <div className="flex flex-row gap-2">
           <div>
             <ConfigIcon className="text-icon-primary" />
@@ -112,7 +116,7 @@ const NotSupportedBlock = ({
             <p>{message}</p>
           </div>
         </div>
-      </Snackbar>
+      </div>
     </div>
   );
 };
