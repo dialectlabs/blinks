@@ -59,7 +59,7 @@ export function useAction({
     }
 
     let ignore = false;
-    Action.fromApiUrl(actionApiUrl, supportStrategy)
+    Action.fetch(actionApiUrl, undefined, supportStrategy)
       .then((action) => {
         if (ignore) {
           return;

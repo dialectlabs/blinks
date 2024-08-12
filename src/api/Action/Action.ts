@@ -21,6 +21,7 @@ import {
   type ActionSupportStrategy,
   BASELINE_ACTION_BLOCKCHAIN_IDS,
   BASELINE_ACTION_VERSION,
+  defaultActionSupportStrategy,
 } from './action-supportability.ts';
 
 const MULTI_VALUE_TYPES: ActionParameterType[] = ['checkbox'];
@@ -143,10 +144,17 @@ export class Action {
     chainData?: N extends PostNextActionLink ? NextActionPostRequest : never,
   ): Promise<Action | null> {
     if (next.type === 'inline') {
-      return new Action(this.url, next.action, this.metadata, this.adapter, {
-        isChained: true,
-        isInline: true,
-      });
+      return new Action(
+        this.url,
+        next.action,
+        this.metadata,
+        this._supportStrategy,
+        this.adapter,
+        {
+          isChained: true,
+          isInline: true,
+        },
+      );
     }
 
     const baseUrlObj = new URL(this.url);
@@ -181,10 +189,17 @@ export class Action {
     const data = (await response.json()) as NextAction;
     const metadata = getActionMetadata(response);
 
-    return new Action(href, data, metadata, this.adapter, {
-      isChained: true,
-      isInline: false,
-    });
+    return new Action(
+      href,
+      data,
+      metadata,
+      this._supportStrategy,
+      this.adapter,
+      {
+        isChained: true,
+        isInline: false,
+      },
+    );
   }
 
   // be sure to use this only if the action is valid
@@ -195,12 +210,13 @@ export class Action {
     supportStrategy: ActionSupportStrategy,
     adapter?: ActionAdapter,
   ) {
-    return new Action(url, data, metadata, adapter);
+    return new Action(url, data, metadata, supportStrategy, adapter);
   }
 
-  static async fromApiUrl(
+  static async fetch(
     apiUrl: string,
-    supportStrategy: ActionSupportStrategy,
+    adapter?: ActionAdapter,
+    supportStrategy: ActionSupportStrategy = defaultActionSupportStrategy,
   ) {
     const proxyUrl = proxify(apiUrl);
     const response = await fetch(proxyUrl, {
@@ -218,7 +234,13 @@ export class Action {
     const data = (await response.json()) as ActionGetResponse;
     const metadata = getActionMetadata(response);
 
-    return new Action(apiUrl, { ...data, type: 'action' }, metadata, adapter);
+    return new Action(
+      apiUrl,
+      { ...data, type: 'action' },
+      metadata,
+      supportStrategy,
+      adapter,
+    );
   }
 }
 

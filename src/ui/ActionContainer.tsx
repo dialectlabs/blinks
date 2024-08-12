@@ -4,6 +4,7 @@ import {
   Action,
   type ActionCallbacksConfig,
   type ActionContext,
+  type ActionPostResponse,
   type ActionSupportability,
   ButtonActionComponent,
   type ExtendedActionState,
@@ -16,10 +17,6 @@ import {
   mergeActionStates,
   MultiValueActionComponent,
   SingleValueActionComponent,
-  type ActionCallbacksConfig,
-  type ActionContext,
-  type ActionPostResponse,
-  type ExtendedActionState,
 } from '../api';
 import { checkSecurity, type SecurityLevel } from '../shared';
 import { isInterstitial } from '../utils/interstitial-url.ts';
@@ -30,6 +27,7 @@ import {
 import {
   ActionLayout,
   type Disclaimer,
+  DisclaimerType,
   type StylePreset,
 } from './ActionLayout';
 

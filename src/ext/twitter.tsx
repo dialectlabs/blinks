@@ -186,8 +186,9 @@ async function handleNewNode(
     return;
   }
 
-  const action = await Action.fromApiUrl(
+  const action = await Action.fetch(
     actionApiUrl,
+    config,
     options.supportStrategy,
   ).catch(noop);
 

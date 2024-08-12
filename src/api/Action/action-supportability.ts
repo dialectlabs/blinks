@@ -1,5 +1,4 @@
-import { BlockchainIds } from '../../utils';
-import { BlockchainNames } from '../../utils/caip-2.ts';
+import { BlockchainIds, BlockchainNames } from '../../utils/caip-2.ts';
 import { ACTIONS_SPEC_VERSION } from '../../utils/dependency-versions.ts';
 import type { Action } from './Action.ts';
 
