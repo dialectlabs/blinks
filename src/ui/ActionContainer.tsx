@@ -291,6 +291,9 @@ export const ActionContainer = ({
 
   useEffect(() => {
     const checkSupportability = async (action: Action) => {
+      if (action.isChained) {
+        return;
+      }
       try {
         dispatch({ type: ExecutionType.CHECK_SUPPORTABILITY });
         const supportability = await action.isSupported();
