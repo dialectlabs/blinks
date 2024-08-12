@@ -135,8 +135,19 @@ export class Action {
     this._adapter = adapter;
   }
 
-  public isSupported() {
-    return this._supportStrategy(this);
+  public async isSupported() {
+    try {
+      return await this._supportStrategy(this);
+    } catch (e) {
+      console.error(
+        `[@dialectlabs/blinks] Failed to check supportability for action ${this.url}`,
+      );
+      return {
+        isSupported: false,
+        message:
+          'Failed to check supportability, please contact your Blink client provider.',
+      };
+    }
   }
 
   public async chain<N extends NextActionLink>(
