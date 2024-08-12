@@ -110,8 +110,8 @@ export class Action {
     return this._data.error?.message ?? null;
   }
 
-  public get metadata(): Required<ActionMetadata> {
-    // TODO: Change fallback to baseline version after a few weeks after proxies adopt versioning and remove Required
+  public get metadata(): ActionMetadata {
+    // TODO: Remove fallback to baseline version after a few weeks after compatibility is adopted
     return {
       blockchainIds:
         this._metadata.blockchainIds ?? BASELINE_ACTION_BLOCKCHAIN_IDS,

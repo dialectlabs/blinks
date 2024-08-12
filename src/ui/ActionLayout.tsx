@@ -104,10 +104,12 @@ const NotSupportedBlock = ({
     <div className={className}>
       <Snackbar variant="info">
         <div className="flex flex-row gap-2">
-          <ConfigIcon className="text-icon-primary" />
+          <div>
+            <ConfigIcon className="text-icon-primary" />
+          </div>
           <div className="flex flex-col justify-center gap-[3px]">
             <a className="font-semibold">This action is not supported</a>
-            <p>{message}.</p>
+            <p>{message}</p>
           </div>
         </div>
       </Snackbar>

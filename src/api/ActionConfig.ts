@@ -1,7 +1,7 @@
 import { Connection } from '@solana/web3.js';
-import { BlockchainIds } from '../utils';
 import { type Action } from './Action';
 import { AbstractActionComponent } from './Action/action-components';
+import { DEFAULT_SUPPORTED_BLOCKCHAIN_IDS } from './Action/action-supportability.ts';
 
 export interface ActionContext {
   originalUrl: string;
@@ -46,10 +46,7 @@ export interface ActionAdapter {
 export class ActionConfig implements ActionAdapter {
   private static readonly CONFIRM_TIMEOUT_MS = 60000 * 1.2; // 20% extra time
   private static readonly DEFAULT_METADATA: ActionAdapterMetadata = {
-    supportedBlockchainIds: [
-      BlockchainIds.SOLANA_MAINNET,
-      BlockchainIds.SOLANA_DEVNET,
-    ],
+    supportedBlockchainIds: DEFAULT_SUPPORTED_BLOCKCHAIN_IDS,
   };
   private connection: Connection;
 

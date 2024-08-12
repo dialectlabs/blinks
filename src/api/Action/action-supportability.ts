@@ -59,9 +59,23 @@ export const defaultActionSupportStrategy: ActionSupportStrategy = async (
 ) => {
   const { version: actionVersion, blockchainIds: actionBlockchainIds } =
     action.metadata;
+
+  // Will be displayed in the future once we remove backward compatibility fallbacks for blockchains and version
+  if (
+    !actionVersion ||
+    !actionBlockchainIds ||
+    actionBlockchainIds.length === 0
+  ) {
+    return {
+      isSupported: false,
+      message:
+        'Action compatibility metadata is not set. Please contact the action provider.',
+    };
+  }
+
   const supportedActionVersion = MAX_SUPPORTED_ACTION_VERSION;
   const supportedBlockchainIds = !action.adapterUnsafe
-    ? action.metadata.blockchainIds // Assuming action is supported if this happens for optimistic compatibility
+    ? actionBlockchainIds // Assuming action is supported if adapter absent for optimistic compatibility
     : action.adapterUnsafe.metadata.supportedBlockchainIds;
 
   const versionSupported = isVersionSupported({
@@ -73,33 +87,37 @@ export const defaultActionSupportStrategy: ActionSupportStrategy = async (
     supportedBlockchainIds,
   });
 
-  const actionBlockchainNames = actionBlockchainIds.map(
+  const notSupportedBlockchainIds = actionBlockchainIds.filter(
+    (id) => !supportedBlockchainIds.includes(id),
+  );
+
+  const notSupportedActionBlockchainNames = notSupportedBlockchainIds.map(
     (id) => BlockchainNames[id] ?? id,
   );
 
   if (!versionSupported && !blockchainSupported) {
     const blockchainMessage =
-      actionBlockchainIds.length === 1
-        ? `blockchain ${actionBlockchainNames[0]}`
-        : `blockchains ${actionBlockchainNames.join(', ')}`;
+      notSupportedActionBlockchainNames.length === 1
+        ? `blockchain ${notSupportedActionBlockchainNames[0]}`
+        : `blockchains ${notSupportedActionBlockchainNames.join(', ')}`;
     return {
       isSupported: false,
-      message: `Action version ${actionVersion} and ${blockchainMessage} are not supported by the Blink client.`,
+      message: `Action version ${actionVersion} and ${blockchainMessage} are not supported by your Blink client.`,
     };
   }
 
   if (!versionSupported) {
     return {
       isSupported: false,
-      message: `Action version is not supported by the Blink client.`,
+      message: `Action version ${actionVersion} is not supported by your Blink client.`,
     };
   }
 
   if (!blockchainSupported) {
     const blockchainMessage =
-      actionBlockchainIds.length === 1
-        ? `Action blockchain ${actionBlockchainNames[0]} is not supported by the Blink client.`
-        : `Action blockchains ${actionBlockchainNames.join(', ')} are not supported by the Blink client.`;
+      notSupportedActionBlockchainNames.length === 1
+        ? `Action blockchain ${notSupportedActionBlockchainNames[0]} is not supported by your Blink client.`
+        : `Action blockchains ${notSupportedActionBlockchainNames.join(', ')} are not supported by your Blink client.`;
 
     return {
       isSupported: false,
