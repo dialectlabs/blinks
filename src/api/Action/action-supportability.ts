@@ -16,7 +16,7 @@ export const DEFAULT_SUPPORTED_BLOCKCHAIN_IDS = [
  * Baseline action version to be used when not set by action provider.
  * Defaults to latest release that doesn't support versioning.
  */
-export const BASELINE_ACTION_VERSION = '2.0.0';
+export const BASELINE_ACTION_VERSION = '2.2';
 /**
  * Baseline blockchain IDs to be used when not set by action provider.
  * Defaults to Solana mainnet.
