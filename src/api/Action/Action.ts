@@ -17,11 +17,18 @@ import {
   MultiValueActionComponent,
   SingleValueActionComponent,
 } from './action-components';
+import {
+  type ActionSupportStrategy,
+  BASELINE_ACTION_BLOCKCHAIN_IDS,
+  BASELINE_ACTION_VERSION,
+  defaultActionSupportStrategy,
+} from './action-supportability.ts';
 
 const MULTI_VALUE_TYPES: ActionParameterType[] = ['checkbox'];
 
 interface ActionMetadata {
-  blockchainIds: string[];
+  blockchainIds?: string[];
+  version?: string;
 }
 
 type ActionChainMetadata =
@@ -40,6 +47,7 @@ export class Action {
     private readonly _url: string,
     private readonly _data: NextAction,
     private readonly _metadata: ActionMetadata,
+    private readonly _supportStrategy: ActionSupportStrategy,
     private _adapter?: ActionAdapter,
     private readonly _chainMetadata: ActionChainMetadata = { isChained: false },
   ) {
@@ -102,8 +110,17 @@ export class Action {
     return this._data.error?.message ?? null;
   }
 
-  public get metadata() {
-    return this._metadata;
+  public get metadata(): ActionMetadata {
+    // TODO: Remove fallback to baseline version after a few weeks after compatibility is adopted
+    return {
+      blockchainIds:
+        this._metadata.blockchainIds ?? BASELINE_ACTION_BLOCKCHAIN_IDS,
+      version: this._metadata.version ?? BASELINE_ACTION_VERSION,
+    };
+  }
+
+  public get adapterUnsafe() {
+    return this._adapter;
   }
 
   public get adapter() {
@@ -118,15 +135,37 @@ export class Action {
     this._adapter = adapter;
   }
 
+  public async isSupported() {
+    try {
+      return await this._supportStrategy(this);
+    } catch (e) {
+      console.error(
+        `[@dialectlabs/blinks] Failed to check supportability for action ${this.url}`,
+      );
+      return {
+        isSupported: false,
+        message:
+          'Failed to check supportability, please contact your Blink client provider.',
+      };
+    }
+  }
+
   public async chain<N extends NextActionLink>(
     next: N,
     chainData?: N extends PostNextActionLink ? NextActionPostRequest : never,
   ): Promise<Action | null> {
     if (next.type === 'inline') {
-      return new Action(this.url, next.action, this.metadata, this.adapter, {
-        isChained: true,
-        isInline: true,
-      });
+      return new Action(
+        this.url,
+        next.action,
+        this.metadata,
+        this._supportStrategy,
+        this.adapter,
+        {
+          isChained: true,
+          isInline: true,
+        },
+      );
     }
 
     const baseUrlObj = new URL(this.url);
@@ -161,10 +200,17 @@ export class Action {
     const data = (await response.json()) as NextAction;
     const metadata = getActionMetadata(response);
 
-    return new Action(href, data, metadata, this.adapter, {
-      isChained: true,
-      isInline: false,
-    });
+    return new Action(
+      href,
+      data,
+      metadata,
+      this._supportStrategy,
+      this.adapter,
+      {
+        isChained: true,
+        isInline: false,
+      },
+    );
   }
 
   // be sure to use this only if the action is valid
@@ -172,12 +218,17 @@ export class Action {
     url: string,
     data: NextAction,
     metadata: ActionMetadata,
+    supportStrategy: ActionSupportStrategy,
     adapter?: ActionAdapter,
   ) {
-    return new Action(url, data, metadata, adapter);
+    return new Action(url, data, metadata, supportStrategy, adapter);
   }
 
-  static async fetch(apiUrl: string, adapter?: ActionAdapter) {
+  static async fetch(
+    apiUrl: string,
+    adapter?: ActionAdapter,
+    supportStrategy: ActionSupportStrategy = defaultActionSupportStrategy,
+  ) {
     const proxyUrl = proxify(apiUrl);
     const response = await fetch(proxyUrl, {
       headers: {
@@ -194,19 +245,27 @@ export class Action {
     const data = (await response.json()) as ActionGetResponse;
     const metadata = getActionMetadata(response);
 
-    return new Action(apiUrl, { ...data, type: 'action' }, metadata, adapter);
+    return new Action(
+      apiUrl,
+      { ...data, type: 'action' },
+      metadata,
+      supportStrategy,
+      adapter,
+    );
   }
 }
 
 const getActionMetadata = (response: Response): ActionMetadata => {
-  // for multi-chain x-blockchain-ids
-  const blockchainIds = (
-    response?.headers?.get('x-blockchain-ids') || ''
-  ).split(',');
+  const blockchainIds = response.headers
+    .get('x-blockchain-ids')
+    ?.split(',')
+    .map((id) => id.trim());
+  const version = response.headers.get('x-action-version')?.trim();
 
   return {
     blockchainIds,
-  } satisfies ActionMetadata;
+    version,
+  };
 };
 
 const componentFactory = (

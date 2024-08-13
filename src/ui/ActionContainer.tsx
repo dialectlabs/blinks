@@ -2,7 +2,12 @@ import { useEffect, useMemo, useReducer, useState } from 'react';
 import {
   AbstractActionComponent,
   Action,
+  type ActionCallbacksConfig,
+  type ActionContext,
+  type ActionPostResponse,
+  type ActionSupportability,
   ButtonActionComponent,
+  type ExtendedActionState,
   FormActionComponent,
   getExtendedActionState,
   getExtendedInterstitialState,
@@ -12,10 +17,6 @@ import {
   mergeActionStates,
   MultiValueActionComponent,
   SingleValueActionComponent,
-  type ActionCallbacksConfig,
-  type ActionContext,
-  type ActionPostResponse,
-  type ExtendedActionState,
 } from '../api';
 import { checkSecurity, type SecurityLevel } from '../shared';
 import { isInterstitial } from '../utils/interstitial-url.ts';
@@ -25,21 +26,29 @@ import {
 } from '../utils/type-guards.ts';
 import {
   ActionLayout,
-  DisclaimerType,
   type Disclaimer,
+  DisclaimerType,
   type StylePreset,
 } from './ActionLayout';
 
-type ExecutionStatus = 'blocked' | 'idle' | 'executing' | 'success' | 'error';
+type ExecutionStatus =
+  | 'blocked'
+  | 'checking-supportability'
+  | 'idle'
+  | 'executing'
+  | 'success'
+  | 'error';
 
 interface ExecutionState {
   status: ExecutionStatus;
+  checkingSupportability?: boolean;
   executingAction?: AbstractActionComponent | null;
   errorMessage?: string | null;
   successMessage?: string | null;
 }
 
 enum ExecutionType {
+  CHECK_SUPPORTABILITY = 'CHECK_SUPPORTABILITY',
   INITIATE = 'INITIATE',
   FINISH = 'FINISH',
   FAIL = 'FAIL',
@@ -50,6 +59,9 @@ enum ExecutionType {
 }
 
 type ActionValue =
+  | {
+      type: ExecutionType.CHECK_SUPPORTABILITY;
+    }
   | {
       type: ExecutionType.INITIATE;
       executingAction: AbstractActionComponent;
@@ -82,6 +94,11 @@ const executionReducer = (
   action: ActionValue,
 ): ExecutionState => {
   switch (action.type) {
+    case ExecutionType.CHECK_SUPPORTABILITY:
+      return {
+        status: 'checking-supportability',
+        checkingSupportability: true,
+      };
     case ExecutionType.INITIATE:
       return { status: 'executing', executingAction: action.executingAction };
     case ExecutionType.FINISH:
@@ -125,6 +142,7 @@ const buttonVariantMap: Record<
   ExecutionStatus,
   'default' | 'error' | 'success'
 > = {
+  'checking-supportability': 'default',
   blocked: 'default',
   idle: 'default',
   executing: 'default',
@@ -133,6 +151,7 @@ const buttonVariantMap: Record<
 };
 
 const buttonLabelMap: Record<ExecutionStatus, string | null> = {
+  'checking-supportability': 'Loading',
   blocked: null,
   idle: null,
   executing: 'Executing',
@@ -213,7 +232,6 @@ export const ActionContainer = ({
   callbacks?: Partial<ActionCallbacksConfig>;
   securityLevel?: SecurityLevel | NormalizedSecurityLevel;
   stylePreset?: StylePreset;
-
   // please do not use it yet, better api is coming..
   Experimental__ActionLayout?: typeof ActionLayout;
 }) => {
@@ -233,6 +251,11 @@ export const ActionContainer = ({
   const [actionState, setActionState] = useState(
     getOverallActionState(action, websiteUrl),
   );
+
+  const [supportability, setSupportability] = useState<ActionSupportability>({
+    isSupported: true,
+  });
+
   const overallState = useMemo(
     () =>
       mergeActionStates(
@@ -265,6 +288,23 @@ export const ActionContainer = ({
     // we ignore changes to `actionState.action` explicitly, since we want this to run once
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [callbacks, action, websiteUrl]);
+
+  useEffect(() => {
+    const checkSupportability = async (action: Action) => {
+      if (action.isChained) {
+        return;
+      }
+      try {
+        dispatch({ type: ExecutionType.CHECK_SUPPORTABILITY });
+        const supportability = await action.isSupported();
+        setSupportability(supportability);
+      } finally {
+        dispatch({ type: ExecutionType.RESET });
+      }
+    };
+
+    checkSupportability(action);
+  }, [action]);
 
   const buttons = useMemo(
     () =>
@@ -488,7 +528,9 @@ export const ActionContainer = ({
       return {
         type: DisclaimerType.BLOCKED,
         ignorable: isPassingSecurityCheck,
-        hidden: executionState.status !== 'blocked',
+        hidden:
+          executionState.status !== 'blocked' &&
+          executionState.status !== 'checking-supportability',
         onSkip: () => dispatch({ type: ExecutionType.UNBLOCK }),
       };
     }
@@ -522,6 +564,7 @@ export const ActionContainer = ({
       inputs={inputs.map((input) => asInputProps(input))}
       form={form ? asFormProps(form) : undefined}
       disclaimer={disclaimer}
+      supportability={supportability}
     />
   );
 };

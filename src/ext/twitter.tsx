@@ -1,19 +1,21 @@
 import { createRoot } from 'react-dom/client';
 import {
   Action,
+  type ActionAdapter,
+  type ActionCallbacksConfig,
   ActionsRegistry,
+  type ActionSupportStrategy,
+  defaultActionSupportStrategy,
   getExtendedActionState,
   getExtendedInterstitialState,
   getExtendedWebsiteState,
-  type ActionAdapter,
-  type ActionCallbacksConfig,
 } from '../api';
 import { checkSecurity, type SecurityLevel } from '../shared';
 import { ActionContainer, type StylePreset } from '../ui';
 import { noop } from '../utils/constants';
 import { isInterstitial } from '../utils/interstitial-url.ts';
 import { proxify } from '../utils/proxify.ts';
-import { ActionsURLMapper, type ActionsJsonConfig } from '../utils/url-mapper';
+import { type ActionsJsonConfig, ActionsURLMapper } from '../utils/url-mapper';
 
 type ObserverSecurityLevel = SecurityLevel;
 
@@ -22,6 +24,7 @@ export interface ObserverOptions {
   securityLevel:
     | ObserverSecurityLevel
     | Record<'websites' | 'interstitials' | 'actions', ObserverSecurityLevel>;
+  supportStrategy: ActionSupportStrategy;
 }
 
 interface NormalizedObserverOptions {
@@ -29,10 +32,12 @@ interface NormalizedObserverOptions {
     'websites' | 'interstitials' | 'actions',
     ObserverSecurityLevel
   >;
+  supportStrategy: ActionSupportStrategy;
 }
 
 const DEFAULT_OPTIONS: ObserverOptions = {
   securityLevel: 'only-trusted',
+  supportStrategy: defaultActionSupportStrategy,
 };
 
 const normalizeOptions = (
@@ -100,6 +105,7 @@ export function setupTwitterObserver(
     observer.observe(twitterReactRoot, { childList: true, subtree: true });
   });
 }
+
 async function handleNewNode(
   node: Element,
   config: ActionAdapter,
@@ -180,21 +186,14 @@ async function handleNewNode(
     return;
   }
 
-  const action = await Action.fetch(actionApiUrl, config).catch(noop);
+  const action = await Action.fetch(
+    actionApiUrl,
+    config,
+    options.supportStrategy,
+  ).catch(noop);
 
   if (!action) {
     return;
-  }
-
-  if (config.isSupported) {
-    const supported = await config.isSupported({
-      originalUrl: actionUrl.toString(),
-      action,
-      actionType: state,
-    });
-    if (!supported) {
-      return;
-    }
   }
 
   addMargin(container).replaceChildren(
@@ -291,6 +290,7 @@ function findLinkPreview(element: Element) {
 
   return anchor ? { anchor, card } : null;
 }
+
 function findLastLinkInText(element: Element) {
   const tweetText = findElementByTestId(element, 'tweetText');
   if (!tweetText) {
