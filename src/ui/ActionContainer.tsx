@@ -279,6 +279,17 @@ export const ActionContainer = ({
         : 'blocked',
   });
 
+  // in case, where action or websiteUrl changes, we need to reset the action state
+  useEffect(() => {
+    if (action === initialAction || action.isChained) {
+      return;
+    }
+
+    setAction(initialAction);
+    setActionState(getOverallActionState(initialAction, websiteUrl));
+    dispatch({ type: ExecutionType.RESET });
+  }, [action, initialAction, websiteUrl]);
+
   useEffect(() => {
     callbacks?.onActionMount?.(
       action,
