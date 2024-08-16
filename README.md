@@ -89,8 +89,11 @@ import { ActionConfig } from "@dialectlabs/blinks";
 
 // your RPC_URL is used to create a connection to confirm the transaction after action execution
 setupTwitterObserver(new ActionConfig(RPC_URL, {
-  signTransaction: async (tx: string) => { ... },
-  connect: async () => { ... }
+  metadata: {
+    supportedBlockchainIds: [BlockchainIds.SOLANA_MAINNET]
+  },
+  connect: async () => { ... },
+  signTransaction: async (tx: string) => { ... }
 }))
 
 // or
@@ -98,9 +101,14 @@ setupTwitterObserver(new ActionConfig(RPC_URL, {
 import { type ActionAdapter } from "@dialectlabs/blinks";
 
 class MyActionAdapter implements ActionAdapter {
-  async signTransaction(tx: string) { ... }
   async connect() { ... }
+  async signTransaction(tx: string) { ... }
   async confirmTransaction(sig: string) { ... }
+  get metadata(): ActionAdapterMetadata {
+    return {
+      supportedBlockchainIds: [BlockchainIds.SOLANA_MAINNET],
+    };
+  }
 }
 
 setupTwitterObserver(new MyActionAdapter());
