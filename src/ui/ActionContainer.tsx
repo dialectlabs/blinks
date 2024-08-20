@@ -285,7 +285,7 @@ export const ActionContainer = ({
 
     setAction(initialAction);
     setActionState(getOverallActionState(initialAction, websiteUrl));
-    dispatch({ type: ExecutionType.RESET });
+    dispatch({ type: ExecutionType.CHECK_SUPPORTABILITY });
   }, [action, initialAction, websiteUrl]);
 
   useEffect(() => {
