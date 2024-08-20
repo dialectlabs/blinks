@@ -217,6 +217,7 @@ const DEFAULT_SECURITY_LEVEL: SecurityLevel = 'only-trusted';
 type Source = 'websites' | 'interstitials' | 'actions';
 type NormalizedSecurityLevel = Record<Source, SecurityLevel>;
 
+// overall flow: check-supportability -> idle/block -> executing -> success/error or chain
 export const ActionContainer = ({
   action: initialAction,
   websiteUrl,
@@ -273,10 +274,7 @@ export const ActionContainer = ({
   );
 
   const [executionState, dispatch] = useReducer(executionReducer, {
-    status:
-      overallState !== 'malicious' && isPassingSecurityCheck
-        ? 'idle'
-        : 'blocked',
+    status: 'checking-supportability',
   });
 
   // in case, where action or websiteUrl changes, we need to reset the action state
@@ -296,26 +294,65 @@ export const ActionContainer = ({
       websiteUrl ?? action.url,
       actionState.action,
     );
-    // we ignore changes to `actionState.action` explicitly, since we want this to run once
+    // we ignore changes to `actionState.action` or callbacks explicitly, since we want this to run once
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [callbacks, action, websiteUrl]);
+  }, [action, websiteUrl]);
+
+  useEffect(() => {
+    const dynamicDataConfig = action.dynamicData_experimental;
+    if (
+      !dynamicDataConfig ||
+      !dynamicDataConfig.enabled ||
+      executionState.status !== 'idle'
+    ) {
+      return;
+    }
+
+    let timeout: NodeJS.Timeout;
+    const fetcher = async () => {
+      try {
+        const newAction = await action.refresh();
+        setAction(newAction);
+      } catch (e) {
+        console.error(
+          `[@dialectlabs/blinks] Failed to fetch dynamic data for action ${action.url}`,
+        );
+        // if fetch failed, we retry after the same delay
+        timeout = setTimeout(fetcher, dynamicDataConfig.delayMs);
+      }
+    };
+
+    // since either way we're rebuilding the whole action, we'll update and restart this effect
+    timeout = setTimeout(fetcher, dynamicDataConfig.delayMs);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [action, executionState.status]);
 
   useEffect(() => {
     const checkSupportability = async (action: Action) => {
-      if (action.isChained) {
+      if (
+        action.isChained ||
+        executionState.status !== 'checking-supportability'
+      ) {
         return;
       }
       try {
-        dispatch({ type: ExecutionType.CHECK_SUPPORTABILITY });
         const supportability = await action.isSupported();
         setSupportability(supportability);
       } finally {
-        dispatch({ type: ExecutionType.RESET });
+        dispatch({
+          type:
+            overallState !== 'malicious' && isPassingSecurityCheck
+              ? ExecutionType.RESET
+              : ExecutionType.BLOCK,
+        });
       }
     };
 
     checkSupportability(action);
-  }, [action]);
+  }, [action, executionState.status, overallState, isPassingSecurityCheck]);
 
   const buttons = useMemo(
     () =>

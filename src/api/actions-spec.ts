@@ -256,3 +256,44 @@ export interface ActionError {
   /** simple error message to be displayed to the user */
   message: string;
 }
+
+// Dialect's extensions to the Actions API
+export interface DialectExperimentalFeatures {
+  dialectExperimental?: {
+    dynamicData?: {
+      enabled: boolean;
+      delayMs?: number; // default 1000 (1s)
+    };
+  };
+}
+
+export type ExtendedActionGetResponse = ActionGetResponse &
+  DialectExperimentalFeatures;
+export type ExtendedNextAction =
+  | (TypedAction<'action'> & DialectExperimentalFeatures)
+  | CompletedAction;
+
+export interface ExtendedInlineNextActionLink {
+  /** Indicates the type of the link. */
+  type: 'inline';
+  /** The next action to be performed */
+  action: ExtendedNextAction;
+}
+
+export type ExtendedNextActionLink =
+  | PostNextActionLink
+  | ExtendedInlineNextActionLink;
+
+export interface ExtendedActionPostResponse<T extends ActionType = ActionType> {
+  /** base64 encoded serialized transaction */
+  transaction: string;
+  /** describes the nature of the transaction */
+  message?: string;
+  links?: {
+    /**
+     * The next action in a successive chain of actions to be obtained after
+     * the previous was successful.
+     */
+    next: ExtendedNextActionLink;
+  };
+}

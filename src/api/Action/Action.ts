@@ -2,10 +2,11 @@ import { isUrlSameOrigin } from '../../shared';
 import { proxify, proxifyImage } from '../../utils/proxify.ts';
 import type { ActionAdapter } from '../ActionConfig.ts';
 import type {
-  ActionGetResponse,
   ActionParameterType,
+  ExtendedActionGetResponse,
+  ExtendedNextAction,
+  ExtendedNextActionLink,
   NextAction,
-  NextActionLink,
   NextActionPostRequest,
   PostNextActionLink,
   TypedActionParameter,
@@ -26,6 +27,8 @@ import {
 
 const MULTI_VALUE_TYPES: ActionParameterType[] = ['checkbox'];
 
+const EXPERIMENTAL_DYNAMIC_DATA_DEFAULT_DELAY_MS = 1000;
+
 interface ActionMetadata {
   blockchainIds?: string[];
   version?: string;
@@ -40,6 +43,15 @@ type ActionChainMetadata =
       isChained: false;
     };
 
+interface DynamicData {
+  enabled: boolean;
+  delayMs?: number;
+}
+
+interface ExperimentalFeatures {
+  dynamicData?: DynamicData;
+}
+
 export class Action {
   private readonly _actions: AbstractActionComponent[];
 
@@ -50,6 +62,7 @@ export class Action {
     private readonly _supportStrategy: ActionSupportStrategy,
     private _adapter?: ActionAdapter,
     private readonly _chainMetadata: ActionChainMetadata = { isChained: false },
+    private readonly _experimental?: ExperimentalFeatures,
   ) {
     // if no links present or completed, fallback to original solana pay spec (or just using the button as a placeholder)
     if (_data.type === 'completed' || !_data.links?.actions) {
@@ -65,6 +78,21 @@ export class Action {
 
       return componentFactory(this, action.label, href, action.parameters);
     });
+  }
+
+  // this API MAY change in the future
+  public get dynamicData_experimental(): Required<DynamicData> | null {
+    const dynamicData = this._experimental?.dynamicData;
+
+    if (!dynamicData) {
+      return null;
+    }
+
+    return {
+      enabled: dynamicData.enabled,
+      delayMs:
+        dynamicData.delayMs ?? EXPERIMENTAL_DYNAMIC_DATA_DEFAULT_DELAY_MS,
+    };
   }
 
   public get isChained() {
@@ -150,7 +178,7 @@ export class Action {
     }
   }
 
-  public async chain<N extends NextActionLink>(
+  public async chain<N extends ExtendedNextActionLink>(
     next: N,
     chainData?: N extends PostNextActionLink ? NextActionPostRequest : never,
   ): Promise<Action | null> {
@@ -165,6 +193,9 @@ export class Action {
           isChained: true,
           isInline: true,
         },
+        next.action.type === 'action'
+          ? next.action.dialectExperimental
+          : undefined,
       );
     }
 
@@ -197,7 +228,7 @@ export class Action {
       return null;
     }
 
-    const data = (await response.json()) as NextAction;
+    const data = (await response.json()) as ExtendedNextAction;
     const metadata = getActionMetadata(response);
 
     return new Action(
@@ -210,6 +241,7 @@ export class Action {
         isChained: true,
         isInline: false,
       },
+      data.type === 'action' ? data.dialectExperimental : undefined,
     );
   }
 
@@ -224,10 +256,11 @@ export class Action {
     return new Action(url, data, metadata, supportStrategy, adapter);
   }
 
-  static async fetch(
+  private static async _fetch(
     apiUrl: string,
     adapter?: ActionAdapter,
     supportStrategy: ActionSupportStrategy = defaultActionSupportStrategy,
+    chainMetadata?: ActionChainMetadata,
   ) {
     const proxyUrl = proxify(apiUrl);
     const response = await fetch(proxyUrl, {
@@ -242,7 +275,7 @@ export class Action {
       );
     }
 
-    const data = (await response.json()) as ActionGetResponse;
+    const data = (await response.json()) as ExtendedActionGetResponse;
     const metadata = getActionMetadata(response);
 
     return new Action(
@@ -251,6 +284,27 @@ export class Action {
       metadata,
       supportStrategy,
       adapter,
+      chainMetadata,
+      data.dialectExperimental,
+    );
+  }
+
+  static async fetch(
+    apiUrl: string,
+    adapter?: ActionAdapter,
+    supportStrategy: ActionSupportStrategy = defaultActionSupportStrategy,
+  ) {
+    return Action._fetch(apiUrl, adapter, supportStrategy, {
+      isChained: false,
+    });
+  }
+
+  refresh() {
+    return Action._fetch(
+      this.url,
+      this.adapter,
+      this._supportStrategy,
+      this._chainMetadata,
     );
   }
 }

@@ -2,7 +2,7 @@ import { proxify } from '../../../utils/proxify.ts';
 import type {
   ActionError,
   ActionPostRequest,
-  ActionPostResponse,
+  ExtendedActionPostResponse,
   TypedActionParameter,
 } from '../../actions-spec.ts';
 import { Action } from '../Action.ts';
@@ -52,6 +52,6 @@ export abstract class AbstractActionComponent {
       } as ActionError;
     }
 
-    return (await response.json()) as ActionPostResponse;
+    return (await response.json()) as ExtendedActionPostResponse;
   }
 }
