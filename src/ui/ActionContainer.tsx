@@ -516,8 +516,6 @@ export const ActionContainer = ({
     }
   };
 
-  console.log({ action, status: executionState.status });
-
   const asButtonProps = (it: ButtonActionComponent) => {
     return {
       text: buttonLabelMap[executionState.status] ?? it.label,
