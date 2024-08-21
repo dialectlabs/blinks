@@ -314,7 +314,11 @@ export const ActionContainer = ({
     const fetcher = async () => {
       try {
         const newAction = await action.refresh();
-        setAction(newAction);
+
+        // if after refresh user clicked started execution, we should not update the action
+        if (executionState.status === 'idle') {
+          setAction(newAction);
+        }
       } catch (e) {
         console.error(
           `[@dialectlabs/blinks] Failed to fetch dynamic data for action ${action.url}`,
