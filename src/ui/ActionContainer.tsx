@@ -277,7 +277,7 @@ export const ActionContainer = ({
     status: 'checking-supportability',
   });
 
-  // in case, where action or websiteUrl changes, we need to reset the action state
+  // in case, where initialAction or websiteUrl changes, we need to reset the action state
   useEffect(() => {
     if (action === initialAction || action.isChained) {
       return;
@@ -286,7 +286,9 @@ export const ActionContainer = ({
     setAction(initialAction);
     setActionState(getOverallActionState(initialAction, websiteUrl));
     dispatch({ type: ExecutionType.CHECK_SUPPORTABILITY });
-  }, [action, initialAction, websiteUrl]);
+    // we want to run this one when initialAction or websiteUrl changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialAction, websiteUrl]);
 
   useEffect(() => {
     callbacks?.onActionMount?.(
@@ -308,7 +310,7 @@ export const ActionContainer = ({
       return;
     }
 
-    let timeout: NodeJS.Timeout;
+    let timeout: any; // NodeJS.Timeout
     const fetcher = async () => {
       try {
         const newAction = await action.refresh();
@@ -510,22 +512,26 @@ export const ActionContainer = ({
     }
   };
 
-  const asButtonProps = (it: ButtonActionComponent) => ({
-    text: buttonLabelMap[executionState.status] ?? it.label,
-    loading:
-      executionState.status === 'executing' &&
-      it === executionState.executingAction,
-    disabled:
-      action.disabled ||
-      action.type === 'completed' ||
-      executionState.status !== 'idle',
-    variant:
-      buttonVariantMap[
-        action.type === 'completed' ? 'success' : executionState.status
-      ],
-    onClick: (params?: Record<string, string | string[]>) =>
-      execute(it.parentComponent ?? it, params),
-  });
+  console.log({ action, status: executionState.status });
+
+  const asButtonProps = (it: ButtonActionComponent) => {
+    return {
+      text: buttonLabelMap[executionState.status] ?? it.label,
+      loading:
+        executionState.status === 'executing' &&
+        it === executionState.executingAction,
+      disabled:
+        action.disabled ||
+        action.type === 'completed' ||
+        executionState.status !== 'idle',
+      variant:
+        buttonVariantMap[
+          action.type === 'completed' ? 'success' : executionState.status
+        ],
+      onClick: (params?: Record<string, string | string[]>) =>
+        execute(it.parentComponent ?? it, params),
+    };
+  };
 
   const asInputProps = (
     it: SingleValueActionComponent | MultiValueActionComponent,
@@ -608,7 +614,7 @@ export const ActionContainer = ({
           : null
       }
       success={executionState.successMessage}
-      buttons={buttons.map(asButtonProps)}
+      buttons={buttons.map((button) => asButtonProps(button))}
       inputs={inputs.map((input) => asInputProps(input))}
       form={form ? asFormProps(form) : undefined}
       disclaimer={disclaimer}
