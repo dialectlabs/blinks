@@ -87,6 +87,7 @@ export function setupTwitterObserver(
       // it's fast to iterate like this
       for (let i = 0; i < mutations.length; i++) {
         const mutation = mutations[i];
+
         for (let j = 0; j < mutation.addedNodes.length; j++) {
           const node = mutation.addedNodes[j];
           if (node.nodeType !== Node.ELEMENT_NODE) {
@@ -196,15 +197,29 @@ async function handleNewNode(
     return;
   }
 
-  addMargin(container).replaceChildren(
-    createAction({
-      originalUrl: actionUrl,
-      action,
-      callbacks,
-      options,
-      isInterstitial: interstitialData.isInterstitial,
-    }),
-  );
+  const { container: actionContainer, reactRoot } = createAction({
+    originalUrl: actionUrl,
+    action,
+    callbacks,
+    options,
+    isInterstitial: interstitialData.isInterstitial,
+  });
+
+  addStyles(container).replaceChildren(actionContainer);
+
+  new MutationObserver((mutations, observer) => {
+    for (const mutation of mutations) {
+      for (const removedNode of Array.from(mutation.removedNodes)) {
+        if (
+          removedNode === actionContainer ||
+          !document.body.contains(actionContainer)
+        ) {
+          reactRoot.unmount();
+          observer.disconnect();
+        }
+      }
+    }
+  }).observe(document.body, { childList: true, subtree: true });
 }
 
 function createAction({
@@ -237,7 +252,7 @@ function createAction({
     </div>,
   );
 
-  return container;
+  return { container, reactRoot: actionRoot };
 }
 
 const resolveXStylePreset = (): StylePreset => {
@@ -318,11 +333,13 @@ function getContainerForLink(tweetText: Element) {
   return root;
 }
 
-function addMargin(element: HTMLElement) {
+function addStyles(element: HTMLElement) {
   if (element && element.classList.contains('dialect-wrapper')) {
     element.style.marginTop = '12px';
     if (element.classList.contains('dialect-dm')) {
       element.style.marginBottom = '8px';
+      element.style.width = '100%';
+      element.style.minWidth = '350px';
     }
   }
   return element;
