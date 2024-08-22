@@ -4,9 +4,8 @@ import type { ActionAdapter } from '../ActionConfig.ts';
 import type {
   ActionParameterType,
   ExtendedActionGetResponse,
-  ExtendedNextAction,
-  ExtendedNextActionLink,
   NextAction,
+  NextActionLink,
   NextActionPostRequest,
   PostNextActionLink,
   TypedActionParameter,
@@ -178,7 +177,7 @@ export class Action {
     }
   }
 
-  public async chain<N extends ExtendedNextActionLink>(
+  public async chain<N extends NextActionLink>(
     next: N,
     chainData?: N extends PostNextActionLink ? NextActionPostRequest : never,
   ): Promise<Action | null> {
@@ -193,9 +192,6 @@ export class Action {
           isChained: true,
           isInline: true,
         },
-        next.action.type === 'action'
-          ? next.action.dialectExperimental
-          : undefined,
       );
     }
 
@@ -228,7 +224,7 @@ export class Action {
       return null;
     }
 
-    const data = (await response.json()) as ExtendedNextAction;
+    const data = (await response.json()) as NextAction;
     const metadata = getActionMetadata(response);
 
     return new Action(
@@ -241,7 +237,6 @@ export class Action {
         isChained: true,
         isInline: false,
       },
-      data.type === 'action' ? data.dialectExperimental : undefined,
     );
   }
 
