@@ -305,7 +305,8 @@ export const ActionContainer = ({
     if (
       !dynamicDataConfig ||
       !dynamicDataConfig.enabled ||
-      executionState.status !== 'idle'
+      executionState.status !== 'idle' ||
+      action.isChained
     ) {
       return;
     }
