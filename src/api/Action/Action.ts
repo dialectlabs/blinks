@@ -89,8 +89,12 @@ export class Action {
 
     return {
       enabled: dynamicData.enabled,
-      delayMs:
-        dynamicData.delayMs ?? EXPERIMENTAL_DYNAMIC_DATA_DEFAULT_DELAY_MS,
+      delayMs: dynamicData.delayMs
+        ? Math.max(
+            dynamicData.delayMs,
+            EXPERIMENTAL_DYNAMIC_DATA_DEFAULT_DELAY_MS,
+          )
+        : EXPERIMENTAL_DYNAMIC_DATA_DEFAULT_DELAY_MS,
     };
   }
 
