@@ -1,4 +1,5 @@
 import type {
+  ActionPostRequest,
   GeneralParameterType,
   TypedActionParameter,
 } from '../../actions-spec.ts';
@@ -23,14 +24,17 @@ export class SingleValueActionComponent extends AbstractActionComponent {
     return this._parentComponent ?? null;
   }
 
-  protected buildBody(account: string) {
-    if (this._href.indexOf(`{${this.parameter.name}}`) > -1) {
+  protected buildBody(account: string): ActionPostRequest<any> {
+    if (
+      this._href.indexOf(`{${this.parameter.name}}`) > -1 ||
+      this.parameterValue === null
+    ) {
       return { account };
     }
 
     return {
       account,
-      params: {
+      data: {
         [this.parameter.name]: this.parameterValue,
       },
     };
