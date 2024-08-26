@@ -217,6 +217,7 @@ const DEFAULT_SECURITY_LEVEL: SecurityLevel = 'only-trusted';
 type Source = 'websites' | 'interstitials' | 'actions';
 type NormalizedSecurityLevel = Record<Source, SecurityLevel>;
 
+// overall flow: check-supportability -> idle/block -> executing -> success/error or chain
 export const ActionContainer = ({
   action: initialAction,
   websiteUrl,
@@ -273,13 +274,10 @@ export const ActionContainer = ({
   );
 
   const [executionState, dispatch] = useReducer(executionReducer, {
-    status:
-      overallState !== 'malicious' && isPassingSecurityCheck
-        ? 'idle'
-        : 'blocked',
+    status: 'checking-supportability',
   });
 
-  // in case, where action or websiteUrl changes, we need to reset the action state
+  // in case, where initialAction or websiteUrl changes, we need to reset the action state
   useEffect(() => {
     if (action === initialAction || action.isChained) {
       return;
@@ -287,8 +285,10 @@ export const ActionContainer = ({
 
     setAction(initialAction);
     setActionState(getOverallActionState(initialAction, websiteUrl));
-    dispatch({ type: ExecutionType.RESET });
-  }, [action, initialAction, websiteUrl]);
+    dispatch({ type: ExecutionType.CHECK_SUPPORTABILITY });
+    // we want to run this one when initialAction or websiteUrl changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialAction, websiteUrl]);
 
   useEffect(() => {
     callbacks?.onActionMount?.(
@@ -296,26 +296,70 @@ export const ActionContainer = ({
       websiteUrl ?? action.url,
       actionState.action,
     );
-    // we ignore changes to `actionState.action` explicitly, since we want this to run once
+    // we ignore changes to `actionState.action` or callbacks explicitly, since we want this to run once
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [callbacks, action, websiteUrl]);
+  }, [action, websiteUrl]);
+
+  useEffect(() => {
+    const dynamicDataConfig = action.dynamicData_experimental;
+    if (
+      !dynamicDataConfig ||
+      !dynamicDataConfig.enabled ||
+      executionState.status !== 'idle' ||
+      action.isChained
+    ) {
+      return;
+    }
+
+    let timeout: any; // NodeJS.Timeout
+    const fetcher = async () => {
+      try {
+        const newAction = await action.refresh();
+
+        // if after refresh user clicked started execution, we should not update the action
+        if (executionState.status === 'idle') {
+          setAction(newAction);
+        }
+      } catch (e) {
+        console.error(
+          `[@dialectlabs/blinks] Failed to fetch dynamic data for action ${action.url}`,
+        );
+        // if fetch failed, we retry after the same delay
+        timeout = setTimeout(fetcher, dynamicDataConfig.delayMs);
+      }
+    };
+
+    // since either way we're rebuilding the whole action, we'll update and restart this effect
+    timeout = setTimeout(fetcher, dynamicDataConfig.delayMs);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [action, executionState.status]);
 
   useEffect(() => {
     const checkSupportability = async (action: Action) => {
-      if (action.isChained) {
+      if (
+        action.isChained ||
+        executionState.status !== 'checking-supportability'
+      ) {
         return;
       }
       try {
-        dispatch({ type: ExecutionType.CHECK_SUPPORTABILITY });
         const supportability = await action.isSupported();
         setSupportability(supportability);
       } finally {
-        dispatch({ type: ExecutionType.RESET });
+        dispatch({
+          type:
+            overallState !== 'malicious' && isPassingSecurityCheck
+              ? ExecutionType.RESET
+              : ExecutionType.BLOCK,
+        });
       }
     };
 
     checkSupportability(action);
-  }, [action]);
+  }, [action, executionState.status, overallState, isPassingSecurityCheck]);
 
   const buttons = useMemo(
     () =>
@@ -473,22 +517,24 @@ export const ActionContainer = ({
     }
   };
 
-  const asButtonProps = (it: ButtonActionComponent) => ({
-    text: buttonLabelMap[executionState.status] ?? it.label,
-    loading:
-      executionState.status === 'executing' &&
-      it === executionState.executingAction,
-    disabled:
-      action.disabled ||
-      action.type === 'completed' ||
-      executionState.status !== 'idle',
-    variant:
-      buttonVariantMap[
-        action.type === 'completed' ? 'success' : executionState.status
-      ],
-    onClick: (params?: Record<string, string | string[]>) =>
-      execute(it.parentComponent ?? it, params),
-  });
+  const asButtonProps = (it: ButtonActionComponent) => {
+    return {
+      text: buttonLabelMap[executionState.status] ?? it.label,
+      loading:
+        executionState.status === 'executing' &&
+        it === executionState.executingAction,
+      disabled:
+        action.disabled ||
+        action.type === 'completed' ||
+        executionState.status !== 'idle',
+      variant:
+        buttonVariantMap[
+          action.type === 'completed' ? 'success' : executionState.status
+        ],
+      onClick: (params?: Record<string, string | string[]>) =>
+        execute(it.parentComponent ?? it, params),
+    };
+  };
 
   const asInputProps = (
     it: SingleValueActionComponent | MultiValueActionComponent,
@@ -571,7 +617,7 @@ export const ActionContainer = ({
           : null
       }
       success={executionState.successMessage}
-      buttons={buttons.map(asButtonProps)}
+      buttons={buttons.map((button) => asButtonProps(button))}
       inputs={inputs.map((input) => asInputProps(input))}
       form={form ? asFormProps(form) : undefined}
       disclaimer={disclaimer}

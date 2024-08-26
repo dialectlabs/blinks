@@ -256,3 +256,16 @@ export interface ActionError {
   /** simple error message to be displayed to the user */
   message: string;
 }
+
+// Dialect's extensions to the Actions API
+export interface DialectExperimentalFeatures {
+  dialectExperimental?: {
+    dynamicData?: {
+      enabled: boolean;
+      delayMs?: number; // default 1000 (1s)
+    };
+  };
+}
+
+export type ExtendedActionGetResponse = ActionGetResponse &
+  DialectExperimentalFeatures;
