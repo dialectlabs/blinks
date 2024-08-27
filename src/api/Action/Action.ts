@@ -26,7 +26,7 @@ import {
 
 const MULTI_VALUE_TYPES: ActionParameterType[] = ['checkbox'];
 
-const EXPERIMENTAL_DYNAMIC_DATA_DEFAULT_DELAY_MS = 1000;
+const EXPERIMENTAL_LIVE_DATA_DEFAULT_DELAY_MS = 1000;
 
 interface ActionMetadata {
   blockchainIds?: string[];
@@ -42,13 +42,13 @@ type ActionChainMetadata =
       isChained: false;
     };
 
-interface DynamicData {
+interface LiveData {
   enabled: boolean;
   delayMs?: number;
 }
 
 interface ExperimentalFeatures {
-  dynamicData?: DynamicData;
+  liveData?: LiveData;
 }
 
 export class Action {
@@ -80,21 +80,18 @@ export class Action {
   }
 
   // this API MAY change in the future
-  public get dynamicData_experimental(): Required<DynamicData> | null {
-    const dynamicData = this._experimental?.dynamicData;
+  public get liveData_experimental(): Required<LiveData> | null {
+    const liveData = this._experimental?.liveData;
 
-    if (!dynamicData) {
+    if (!liveData) {
       return null;
     }
 
     return {
-      enabled: dynamicData.enabled,
-      delayMs: dynamicData.delayMs
-        ? Math.max(
-            dynamicData.delayMs,
-            EXPERIMENTAL_DYNAMIC_DATA_DEFAULT_DELAY_MS,
-          )
-        : EXPERIMENTAL_DYNAMIC_DATA_DEFAULT_DELAY_MS,
+      enabled: liveData.enabled,
+      delayMs: liveData.delayMs
+        ? Math.max(liveData.delayMs, EXPERIMENTAL_LIVE_DATA_DEFAULT_DELAY_MS)
+        : EXPERIMENTAL_LIVE_DATA_DEFAULT_DELAY_MS,
     };
   }
 

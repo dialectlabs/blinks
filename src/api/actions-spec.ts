@@ -260,7 +260,7 @@ export interface ActionError {
 // Dialect's extensions to the Actions API
 export interface DialectExperimentalFeatures {
   dialectExperimental?: {
-    dynamicData?: {
+    liveData?: {
       enabled: boolean;
       delayMs?: number; // default 1000 (1s)
     };

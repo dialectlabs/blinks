@@ -301,10 +301,10 @@ export const ActionContainer = ({
   }, [action, websiteUrl]);
 
   useEffect(() => {
-    const dynamicDataConfig = action.dynamicData_experimental;
+    const liveDataConfig = action.liveData_experimental;
     if (
-      !dynamicDataConfig ||
-      !dynamicDataConfig.enabled ||
+      !liveDataConfig ||
+      !liveDataConfig.enabled ||
       executionState.status !== 'idle' ||
       action.isChained
     ) {
@@ -322,15 +322,15 @@ export const ActionContainer = ({
         }
       } catch (e) {
         console.error(
-          `[@dialectlabs/blinks] Failed to fetch dynamic data for action ${action.url}`,
+          `[@dialectlabs/blinks] Failed to fetch live data for action ${action.url}`,
         );
         // if fetch failed, we retry after the same delay
-        timeout = setTimeout(fetcher, dynamicDataConfig.delayMs);
+        timeout = setTimeout(fetcher, liveDataConfig.delayMs);
       }
     };
 
     // since either way we're rebuilding the whole action, we'll update and restart this effect
-    timeout = setTimeout(fetcher, dynamicDataConfig.delayMs);
+    timeout = setTimeout(fetcher, liveDataConfig.delayMs);
 
     return () => {
       clearTimeout(timeout);
