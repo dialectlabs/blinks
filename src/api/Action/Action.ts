@@ -214,6 +214,7 @@ export class Action {
       method: 'POST',
       body: JSON.stringify(chainData),
       headers: {
+        'Content-Type': 'application/json',
         Accept: 'application/json',
       },
     });
