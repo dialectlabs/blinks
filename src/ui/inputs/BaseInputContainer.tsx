@@ -44,7 +44,8 @@ export const BaseInputContainer = ({
         {leftAdornment && <div>{leftAdornment}</div>}
         {cloneElement(children, {
           className:
-            'flex-1 truncate bg-input-bg text-text-input outline-none placeholder:text-text-input-placeholder disabled:text-text-input-disabled',
+            (children.props.className ?? '') +
+            ' min-h-7 flex-1 truncate bg-input-bg text-text-input outline-none placeholder:text-text-input-placeholder disabled:text-text-input-disabled',
         })}
         {rightAdornment && <div className="min-w-0">{rightAdornment}</div>}
       </div>

@@ -71,6 +71,7 @@ export const ActionSelect = ({
       }
     >
       <select
+        className="cursor-pointer"
         value={value}
         onChange={extendedChange}
         required={button ? true : required}
