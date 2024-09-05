@@ -43,11 +43,12 @@ export const BaseInputContainer = ({
       >
         {leftAdornment && <div>{leftAdornment}</div>}
         {cloneElement(children, {
-          className:
-            (children.props.className ?? '') +
-            ' min-h-7 min-w-0 flex-1 truncate bg-input-bg text-text-input outline-none placeholder:text-text-input-placeholder disabled:text-text-input-disabled',
+          className: clsx(
+            'min-h-7 min-w-0 flex-1 truncate bg-input-bg text-text-input outline-none placeholder:text-text-input-placeholder disabled:text-text-input-disabled',
+            children.props.className,
+          ),
         })}
-        {rightAdornment && <div>{rightAdornment}</div>}
+        {rightAdornment && <div className="max-w-[70%]">{rightAdornment}</div>}
       </div>
       {footer && <div className="mt-2">{footer}</div>}
       {description && (
