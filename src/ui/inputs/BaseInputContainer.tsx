@@ -41,11 +41,11 @@ export const BaseInputContainer = ({
           standalone ? 'rounded-input-standalone' : 'rounded-input',
         )}
       >
-        <div className="flex flex-[10] basis-1/2 items-center gap-1.5 pl-2.5">
+        <div className="flex min-w-0 flex-[10] basis-1/2 items-center gap-1.5 pl-2.5">
           {leftAdornment && <div>{leftAdornment}</div>}
           {cloneElement(children, {
             className: clsx(
-              'min-h-7 flex-1 truncate bg-input-bg text-text-input outline-none placeholder:text-text-input-placeholder disabled:text-text-input-disabled',
+              'min-h-7 min-w-0 flex-1 truncate bg-input-bg text-text-input outline-none placeholder:text-text-input-placeholder disabled:text-text-input-disabled',
               children.props.className,
             ),
           })}
