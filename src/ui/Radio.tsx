@@ -44,10 +44,10 @@ export const Radio = ({
             'mt-0.5 flex aspect-square h-[16px] items-center justify-center rounded-full border transition-colors motion-reduce:transition-none',
             {
               'border-input-stroke bg-input-bg': !value && !disabled,
-              'bg-input-bg-selected border-input-stroke-selected':
+              'border-input-stroke-selected bg-input-bg-selected':
                 value && !disabled,
               'border-input-stroke-disabled bg-input-bg': !value && disabled,
-              'bg-input-bg-disabled border-input-stroke-disabled':
+              'border-input-stroke-disabled bg-input-bg-disabled':
                 value && disabled,
             },
           )}
@@ -59,7 +59,10 @@ export const Radio = ({
           />
         </div>
       </div>
-      <label className="text-text text-text-input" id={labelId}>
+      <label
+        className="cursor-[inherit] text-text text-text-input"
+        id={labelId}
+      >
         {label}
       </label>
     </button>

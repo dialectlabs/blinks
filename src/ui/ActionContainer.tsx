@@ -622,6 +622,7 @@ export const ActionContainer = ({
       form={form ? asFormProps(form) : undefined}
       disclaimer={disclaimer}
       supportability={supportability}
+      id={action.id}
     />
   );
 };

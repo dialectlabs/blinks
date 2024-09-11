@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid';
 import { isUrlSameOrigin } from '../../shared';
 import { proxify, proxifyImage } from '../../utils/proxify.ts';
 import type { ActionAdapter } from '../ActionConfig.ts';
@@ -61,6 +62,7 @@ export class Action {
     private readonly _supportStrategy: ActionSupportStrategy,
     private _adapter?: ActionAdapter,
     private readonly _chainMetadata: ActionChainMetadata = { isChained: false },
+    private readonly _id?: string,
     private readonly _experimental?: ExperimentalFeatures,
   ) {
     // if no links present or completed, fallback to original solana pay spec (or just using the button as a placeholder)
@@ -93,6 +95,10 @@ export class Action {
         ? Math.max(liveData.delayMs, EXPERIMENTAL_LIVE_DATA_DEFAULT_DELAY_MS)
         : EXPERIMENTAL_LIVE_DATA_DEFAULT_DELAY_MS,
     };
+  }
+
+  public get id() {
+    return this._id;
   }
 
   public get isChained() {
@@ -182,6 +188,8 @@ export class Action {
     next: N,
     chainData?: N extends PostNextActionLink ? NextActionPostRequest : never,
   ): Promise<Action | null> {
+    const id = nanoid();
+
     if (next.type === 'inline') {
       return new Action(
         this.url,
@@ -193,6 +201,7 @@ export class Action {
           isChained: true,
           isInline: true,
         },
+        id,
       );
     }
 
@@ -239,6 +248,7 @@ export class Action {
         isChained: true,
         isInline: false,
       },
+      id,
     );
   }
 
@@ -250,7 +260,16 @@ export class Action {
     supportStrategy: ActionSupportStrategy,
     adapter?: ActionAdapter,
   ) {
-    return new Action(url, data, metadata, supportStrategy, adapter);
+    const id = nanoid();
+    return new Action(
+      url,
+      data,
+      metadata,
+      supportStrategy,
+      adapter,
+      { isChained: false },
+      id,
+    );
   }
 
   private static async _fetch(
@@ -258,6 +277,7 @@ export class Action {
     adapter?: ActionAdapter,
     supportStrategy: ActionSupportStrategy = defaultActionSupportStrategy,
     chainMetadata?: ActionChainMetadata,
+    id?: string,
   ) {
     const proxyUrl = proxify(apiUrl);
     const response = await fetch(proxyUrl, {
@@ -282,6 +302,7 @@ export class Action {
       supportStrategy,
       adapter,
       chainMetadata,
+      id,
       data.dialectExperimental,
     );
   }
@@ -291,9 +312,16 @@ export class Action {
     adapter?: ActionAdapter,
     supportStrategy: ActionSupportStrategy = defaultActionSupportStrategy,
   ) {
-    return Action._fetch(apiUrl, adapter, supportStrategy, {
-      isChained: false,
-    });
+    const id = nanoid();
+    return Action._fetch(
+      apiUrl,
+      adapter,
+      supportStrategy,
+      {
+        isChained: false,
+      },
+      id,
+    );
   }
 
   refresh() {
@@ -302,6 +330,7 @@ export class Action {
       this.adapter,
       this._supportStrategy,
       this._chainMetadata,
+      this._id,
     );
   }
 }

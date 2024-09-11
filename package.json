@@ -70,6 +70,7 @@
     "react-dom": ">=18"
   },
   "dependencies": {
-    "clsx": "^2.1.1"
+    "clsx": "^2.1.1",
+    "nanoid": "^5.0.7"
   }
 }

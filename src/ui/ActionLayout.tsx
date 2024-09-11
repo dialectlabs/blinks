@@ -64,6 +64,7 @@ interface LayoutProps {
   inputs?: InputProps[];
   form?: FormProps;
   supportability: ActionSupportability;
+  id?: string;
 }
 
 export interface FormProps {
@@ -208,6 +209,7 @@ export const ActionLayout = ({
   error,
   success,
   supportability,
+  id,
 }: LayoutProps) => {
   return (
     <div className={clsx('blink', stylePresetClassMap[stylePreset])}>
@@ -301,7 +303,12 @@ export const ActionLayout = ({
                   }
                 />
               )}
-              <ActionContent form={form} inputs={inputs} buttons={buttons} />
+              <ActionContent
+                key={id}
+                form={form}
+                inputs={inputs}
+                buttons={buttons}
+              />
               {success && (
                 <span className="mt-4 flex justify-center text-subtext text-text-success">
                   {success}
