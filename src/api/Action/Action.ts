@@ -267,7 +267,7 @@ export class Action {
       metadata,
       supportStrategy,
       adapter,
-      undefined,
+      { isChained: false },
       id,
     );
   }
