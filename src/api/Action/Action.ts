@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid';
 import { isUrlSameOrigin } from '../../shared';
 import { proxify, proxifyImage } from '../../utils/proxify.ts';
 import type { ActionAdapter } from '../ActionConfig.ts';
@@ -187,7 +188,7 @@ export class Action {
     next: N,
     chainData?: N extends PostNextActionLink ? NextActionPostRequest : never,
   ): Promise<Action | null> {
-    const id = Date.now().toString();
+    const id = nanoid();
 
     if (next.type === 'inline') {
       return new Action(
@@ -259,7 +260,16 @@ export class Action {
     supportStrategy: ActionSupportStrategy,
     adapter?: ActionAdapter,
   ) {
-    return new Action(url, data, metadata, supportStrategy, adapter);
+    const id = nanoid();
+    return new Action(
+      url,
+      data,
+      metadata,
+      supportStrategy,
+      adapter,
+      undefined,
+      id,
+    );
   }
 
   private static async _fetch(
@@ -302,7 +312,7 @@ export class Action {
     adapter?: ActionAdapter,
     supportStrategy: ActionSupportStrategy = defaultActionSupportStrategy,
   ) {
-    const id = Date.now().toString();
+    const id = nanoid();
     return Action._fetch(
       apiUrl,
       adapter,
