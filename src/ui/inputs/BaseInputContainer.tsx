@@ -33,7 +33,7 @@ export const BaseInputContainer = ({
     <div>
       <div
         className={clsx(
-          'peer relative flex min-h-10 items-center gap-1.5 border border-input-stroke py-1.5 pl-4 pr-1.5 transition-colors motion-reduce:transition-none',
+          'peer relative flex min-h-10 flex-wrap items-center gap-1.5 gap-y-2 border border-input-stroke p-1.5 transition-colors motion-reduce:transition-none',
           // focus, invalid, required
           'focus-within:has-[:invalid]:border-input-stroke-error focus-within:has-[:valid]:border-input-stroke-selected focus-within:hover:has-[:invalid]:border-input-stroke-error focus-within:hover:has-[:valid]:border-input-stroke-selected',
           // enabled,
@@ -41,14 +41,20 @@ export const BaseInputContainer = ({
           standalone ? 'rounded-input-standalone' : 'rounded-input',
         )}
       >
-        {leftAdornment && <div>{leftAdornment}</div>}
-        {cloneElement(children, {
-          className: clsx(
-            'min-h-7 min-w-0 flex-1 truncate bg-input-bg text-text-input outline-none placeholder:text-text-input-placeholder disabled:text-text-input-disabled',
-            children.props.className,
-          ),
-        })}
-        {rightAdornment && <div className="max-w-[70%]">{rightAdornment}</div>}
+        <div className="flex flex-[10] basis-1/2 items-center gap-1.5 pl-2.5">
+          {leftAdornment && <div>{leftAdornment}</div>}
+          {cloneElement(children, {
+            className: clsx(
+              'min-h-7 flex-1 truncate bg-input-bg text-text-input outline-none placeholder:text-text-input-placeholder disabled:text-text-input-disabled',
+              children.props.className,
+            ),
+          })}
+        </div>
+        {rightAdornment && (
+          <div className="max-w-full flex-1 whitespace-nowrap">
+            {rightAdornment}
+          </div>
+        )}
       </div>
       {footer && <div className="mt-2">{footer}</div>}
       {description && (
