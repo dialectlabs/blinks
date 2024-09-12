@@ -54,6 +54,7 @@ export interface BlinkCaption {
 }
 
 export interface BaseBlinkLayoutProps {
+  id?: string;
   type: BlinkType;
   action: Action;
   stylePreset?: StylePreset;

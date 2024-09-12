@@ -17,22 +17,11 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
-    "./hooks": {
-      "import": "./dist/hooks/index.js",
-      "require": "./dist/hooks/index.cjs",
-      "types": "./dist/hooks/index.d.ts"
-    },
-    "./hooks/solana": {
-      "import": "./dist/hooks/solana/index.js",
-      "require": "./dist/hooks/solana/index.cjs",
-      "types": "./dist/hooks/solana/index.d.ts"
-    },
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
-    },
-    "./index.css": "./dist/index.css"
+    }
   },
   "files": [
     "dist"
@@ -61,7 +50,7 @@
     "react": ">=18"
   },
   "dependencies": {
-    "clsx": "^2.1.1",
-    "@solana/web3.js": "^1.95.1"
+    "@solana/web3.js": "^1.95.1",
+    "nanoid": "^5.0.7"
   }
 }
