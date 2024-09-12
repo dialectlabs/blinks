@@ -79,7 +79,7 @@ export function useAction({
     return () => {
       ignore = true;
     };
-  }, [actionApiUrl, isRegistryLoaded]);
+  }, [actionApiUrl, isRegistryLoaded, supportStrategy]);
 
   useEffect(() => {
     action?.setAdapter(adapter);

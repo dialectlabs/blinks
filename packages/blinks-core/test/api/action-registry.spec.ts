@@ -1,8 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import {
-  ActionsRegistry,
-  type ActionsRegistryConfig,
-} from '../../src/api/ActionsRegistry.ts';
+import { ActionsRegistry, type ActionsRegistryConfig } from '../../src';
 
 describe('ActionsRegistry', () => {
   describe('actions lookup', () => {

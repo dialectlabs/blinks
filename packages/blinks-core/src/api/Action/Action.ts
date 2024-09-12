@@ -1,4 +1,4 @@
-import { proxify, proxifyImage } from '../../utils/proxify.ts';
+import { proxify, proxifyImage } from '../../utils';
 import { isUrlSameOrigin } from '../../utils/security.ts';
 import type { ActionAdapter } from '../ActionConfig.ts';
 import type {

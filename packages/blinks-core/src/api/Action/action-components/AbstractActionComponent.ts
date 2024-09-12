@@ -1,4 +1,4 @@
-import { proxify } from '../../../utils/proxify.ts';
+import { proxify } from '../../../utils';
 import type {
   ActionError,
   ActionPostRequest,

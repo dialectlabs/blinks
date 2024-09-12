@@ -1,7 +1,9 @@
 import { Connection } from '@solana/web3.js';
-import { type Action } from './Action';
-import { AbstractActionComponent } from './Action/action-components';
-import { DEFAULT_SUPPORTED_BLOCKCHAIN_IDS } from './Action/action-supportability.ts';
+import {
+  type Action,
+  AbstractActionComponent,
+  DEFAULT_SUPPORTED_BLOCKCHAIN_IDS,
+} from './Action';
 
 export interface ActionContext {
   originalUrl: string;

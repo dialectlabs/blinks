@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { isInterstitial } from '../../src/utils/interstitial-url.ts';
+import { isInterstitial } from '../../src';
 
 describe('isInterstitialUrl', () => {
   test('should return true and decode the action URL for a valid interstitial URL with solana-action: prefix (URL-encoded)', () => {

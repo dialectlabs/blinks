@@ -1,8 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import {
-  ActionsURLMapper,
-  type ActionsJsonConfig,
-} from '../../src/utils/url-mapper.ts';
+import { ActionsURLMapper, type ActionsJsonConfig } from '../../src';
 
 describe('ActionsURLMapper', () => {
   describe('Exact match rules', () => {

@@ -17,7 +17,7 @@ import {
   type StylePreset,
 } from '@dialectlabs/blinks-core';
 import { createRoot } from 'react-dom/client';
-import { Blink } from '../ui/Blink.tsx';
+import { Blink } from '../ui';
 
 type ObserverSecurityLevel = SecurityLevel;
 
