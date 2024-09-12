@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useReducer, useState } from 'react';
+import {
+  type ComponentType,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from 'react';
 import {
   AbstractActionComponent,
   Action,
@@ -6,32 +12,65 @@ import {
   type ActionContext,
   type ActionPostResponse,
   type ActionSupportability,
-  ButtonActionComponent,
   type ExtendedActionState,
   FormActionComponent,
   getExtendedActionState,
   getExtendedInterstitialState,
   getExtendedWebsiteState,
-  isParameterSelectable,
-  isPatternAllowed,
   mergeActionStates,
   MultiValueActionComponent,
   SingleValueActionComponent,
-} from '../api';
-import { checkSecurity, type SecurityLevel } from '../shared';
-import { isInterstitial } from '../utils/interstitial-url.ts';
+} from './api';
+import { checkSecurity, isInterstitial, type SecurityLevel } from './utils';
 import {
   isPostRequestError,
   isSignTransactionError,
-} from '../utils/type-guards.ts';
-import {
-  ActionLayout,
-  type Disclaimer,
-  DisclaimerType,
-  type StylePreset,
-} from './ActionLayout';
+} from './utils/type-guards.ts';
 
-type ExecutionStatus =
+export type StylePreset = 'default' | 'x-dark' | 'x-light' | 'custom';
+
+export type BlinkType = ExtendedActionState;
+
+export enum DisclaimerType {
+  BLOCKED = 'blocked',
+  UNKNOWN = 'unknown',
+}
+
+export type Disclaimer =
+  | {
+      type: DisclaimerType.BLOCKED;
+      ignorable: boolean;
+      hidden: boolean;
+      onSkip: () => void;
+    }
+  | {
+      type: DisclaimerType.UNKNOWN;
+      ignorable: boolean;
+    };
+
+export interface BlinkCaption {
+  type: 'success' | 'error';
+  text: string;
+}
+
+export interface BaseBlinkLayoutProps {
+  type: BlinkType;
+  action: Action;
+  stylePreset?: StylePreset;
+  websiteUrl?: string | null;
+  websiteText?: string | null;
+  disclaimer?: Disclaimer | null;
+  caption?: BlinkCaption | null;
+  executeFn: (
+    component: AbstractActionComponent,
+    params?: Record<string, string | string[]>,
+  ) => Promise<void>;
+  executionStatus: ExecutionStatus;
+  executingAction?: AbstractActionComponent | null;
+  supportability: ActionSupportability;
+}
+
+export type ExecutionStatus =
   | 'blocked'
   | 'checking-supportability'
   | 'idle'
@@ -39,7 +78,7 @@ type ExecutionStatus =
   | 'success'
   | 'error';
 
-interface ExecutionState {
+export interface ExecutionState {
   status: ExecutionStatus;
   checkingSupportability?: boolean;
   executingAction?: AbstractActionComponent | null;
@@ -47,7 +86,7 @@ interface ExecutionState {
   successMessage?: string | null;
 }
 
-enum ExecutionType {
+export enum ExecutionType {
   CHECK_SUPPORTABILITY = 'CHECK_SUPPORTABILITY',
   INITIATE = 'INITIATE',
   FINISH = 'FINISH',
@@ -138,27 +177,6 @@ const executionReducer = (
   }
 };
 
-const buttonVariantMap: Record<
-  ExecutionStatus,
-  'default' | 'error' | 'success'
-> = {
-  'checking-supportability': 'default',
-  blocked: 'default',
-  idle: 'default',
-  executing: 'default',
-  success: 'success',
-  error: 'error',
-};
-
-const buttonLabelMap: Record<ExecutionStatus, string | null> = {
-  'checking-supportability': 'Loading',
-  blocked: null,
-  idle: null,
-  executing: 'Executing',
-  success: 'Completed',
-  error: 'Failed',
-};
-
 type ActionStateWithOrigin =
   | {
       action: ExtendedActionState;
@@ -208,34 +226,31 @@ const checkSecurityFromActionState = (
     : true;
 };
 
-const SOFT_LIMIT_BUTTONS = 10;
-const SOFT_LIMIT_INPUTS = 3;
-const SOFT_LIMIT_FORM_INPUTS = 10;
-
 const DEFAULT_SECURITY_LEVEL: SecurityLevel = 'only-trusted';
 
 type Source = 'websites' | 'interstitials' | 'actions';
 type NormalizedSecurityLevel = Record<Source, SecurityLevel>;
 
-// overall flow: check-supportability -> idle/block -> executing -> success/error or chain
-export const ActionContainer = ({
-  action: initialAction,
-  websiteUrl,
-  websiteText,
-  callbacks,
-  securityLevel = DEFAULT_SECURITY_LEVEL,
-  stylePreset = 'default',
-  Experimental__ActionLayout = ActionLayout,
-}: {
+export interface BlinkContainerProps {
   action: Action;
   websiteUrl?: string | null;
   websiteText?: string | null;
   callbacks?: Partial<ActionCallbacksConfig>;
   securityLevel?: SecurityLevel | NormalizedSecurityLevel;
   stylePreset?: StylePreset;
-  // please do not use it yet, better api is coming..
-  Experimental__ActionLayout?: typeof ActionLayout;
-}) => {
+  Layout: ComponentType<BaseBlinkLayoutProps>;
+}
+
+// overall flow: check-supportability -> idle/block -> executing -> success/error or chain
+export const BlinkContainer = ({
+  action: initialAction,
+  websiteUrl,
+  websiteText,
+  callbacks,
+  securityLevel = DEFAULT_SECURITY_LEVEL,
+  stylePreset = 'default',
+  Layout,
+}: BlinkContainerProps) => {
   const [action, setAction] = useState(initialAction);
   const normalizedSecurityLevel: NormalizedSecurityLevel = useMemo(() => {
     if (typeof securityLevel === 'string') {
@@ -361,47 +376,6 @@ export const ActionContainer = ({
     checkSupportability(action);
   }, [action, executionState.status, overallState, isPassingSecurityCheck]);
 
-  const buttons = useMemo(
-    () =>
-      action?.actions
-        .filter((it) => it instanceof ButtonActionComponent)
-        .filter((it) =>
-          executionState.executingAction
-            ? executionState.executingAction === it
-            : true,
-        )
-        .toSpliced(SOFT_LIMIT_BUTTONS) ?? [],
-    [action, executionState.executingAction],
-  );
-  const inputs = useMemo(
-    () =>
-      action?.actions
-        .filter(
-          (it) =>
-            it instanceof SingleValueActionComponent ||
-            it instanceof MultiValueActionComponent,
-        )
-        .filter((it) =>
-          executionState.executingAction
-            ? executionState.executingAction === it
-            : true,
-        )
-        .toSpliced(SOFT_LIMIT_INPUTS) ?? [],
-    [action, executionState.executingAction],
-  );
-  const form = useMemo(() => {
-    const [formComponent] =
-      action?.actions
-        .filter((it) => it instanceof FormActionComponent)
-        .filter((it) =>
-          executionState.executingAction
-            ? executionState.executingAction === it
-            : true,
-        ) ?? [];
-
-    return formComponent;
-  }, [action, executionState.executingAction]);
-
   const execute = async (
     component: AbstractActionComponent,
     params?: Record<string, string | string[]>,
@@ -517,69 +491,6 @@ export const ActionContainer = ({
     }
   };
 
-  const asButtonProps = (it: ButtonActionComponent) => {
-    return {
-      text: buttonLabelMap[executionState.status] ?? it.label,
-      loading:
-        executionState.status === 'executing' &&
-        it === executionState.executingAction,
-      disabled:
-        action.disabled ||
-        action.type === 'completed' ||
-        executionState.status !== 'idle',
-      variant:
-        buttonVariantMap[
-          action.type === 'completed' ? 'success' : executionState.status
-        ],
-      onClick: (params?: Record<string, string | string[]>) =>
-        execute(it.parentComponent ?? it, params),
-    };
-  };
-
-  const asInputProps = (
-    it: SingleValueActionComponent | MultiValueActionComponent,
-    { placement }: { placement: 'form' | 'standalone' } = {
-      placement: 'standalone',
-    },
-  ) => {
-    return {
-      type: it.parameter.type ?? 'text',
-      placeholder: it.parameter.label,
-      disabled:
-        action.disabled ||
-        action.type === 'completed' ||
-        executionState.status !== 'idle',
-      name: it.parameter.name,
-      required: it.parameter.required,
-      min: it.parameter.min,
-      max: it.parameter.max,
-      pattern:
-        it instanceof SingleValueActionComponent &&
-        isPatternAllowed(it.parameter)
-          ? it.parameter.pattern
-          : undefined,
-      options: isParameterSelectable(it.parameter)
-        ? it.parameter.options
-        : undefined,
-      description: it.parameter.patternDescription,
-      button:
-        placement === 'standalone'
-          ? asButtonProps(it.toButtonActionComponent())
-          : undefined,
-    };
-  };
-
-  const asFormProps = (it: FormActionComponent) => {
-    return {
-      button: asButtonProps(it.toButtonActionComponent()),
-      inputs: it.parameters.toSpliced(SOFT_LIMIT_FORM_INPUTS).map((parameter) =>
-        asInputProps(it.toInputActionComponent(parameter.name), {
-          placement: 'form',
-        }),
-      ),
-    };
-  };
-
   const disclaimer: Disclaimer | null = useMemo(() => {
     if (overallState === 'malicious') {
       return {
@@ -602,24 +513,42 @@ export const ActionContainer = ({
     return null;
   }, [executionState.status, isPassingSecurityCheck, overallState]);
 
+  const blinkCaption: BlinkCaption | null = useMemo(() => {
+    if (executionState.status === 'error') {
+      return { type: 'error', text: executionState.errorMessage ?? '' };
+    }
+
+    if (executionState.status === 'success') {
+      return { type: 'success', text: executionState.successMessage ?? '' };
+    }
+
+    return null;
+  }, [
+    executionState.status,
+    executionState.errorMessage,
+    executionState.successMessage,
+  ]);
+
   return (
-    <Experimental__ActionLayout
+    <Layout
       stylePreset={stylePreset}
       type={overallState}
-      title={action.title}
-      description={action.description}
       websiteUrl={websiteUrl}
       websiteText={websiteText}
-      image={action.icon}
-      error={
-        executionState.status !== 'success'
-          ? (executionState.errorMessage ?? action.error)
-          : null
-      }
-      success={executionState.successMessage}
-      buttons={buttons.map((button) => asButtonProps(button))}
-      inputs={inputs.map((input) => asInputProps(input))}
-      form={form ? asFormProps(form) : undefined}
+      action={action}
+      caption={blinkCaption}
+      // error={
+      //   executionState.status !== 'success'
+      //     ? (executionState.errorMessage ?? action.error)
+      //     : null
+      // }
+      // success={executionState.successMessage}
+      executionStatus={executionState.status}
+      executingAction={executionState.executingAction}
+      executeFn={execute}
+      // buttons={buttons.map((button) => asButtonProps(button))}
+      // inputs={inputs.map((input) => asInputProps(input))}
+      // form={form ? asFormProps(form) : undefined}
       disclaimer={disclaimer}
       supportability={supportability}
     />

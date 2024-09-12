@@ -1,23 +1,27 @@
-import { createRoot } from 'react-dom/client';
 import {
   Action,
   type ActionAdapter,
   type ActionCallbacksConfig,
+  type ActionsJsonConfig,
   ActionsRegistry,
   type ActionSupportStrategy,
+  ActionsURLMapper,
+  checkSecurity,
   defaultActionSupportStrategy,
   getExtendedActionState,
   getExtendedInterstitialState,
   getExtendedWebsiteState,
-} from '../api';
-import { checkSecurity, type SecurityLevel } from '../shared';
-import { ActionContainer, type StylePreset } from '../ui';
-import { noop } from '../utils/constants';
-import { isInterstitial } from '../utils/interstitial-url.ts';
-import { proxify } from '../utils/proxify.ts';
-import { type ActionsJsonConfig, ActionsURLMapper } from '../utils/url-mapper';
+  isInterstitial,
+  proxify,
+  type SecurityLevel,
+  type StylePreset,
+} from '@dialectlabs/blinks-core';
+import { createRoot } from 'react-dom/client';
+import { Blink } from '../ui/Blink.tsx';
 
 type ObserverSecurityLevel = SecurityLevel;
+
+const noop = () => {};
 
 export interface ObserverOptions {
   // trusted > unknown > malicious
@@ -241,7 +245,7 @@ function createAction({
 
   actionRoot.render(
     <div onClick={(e) => e.stopPropagation()}>
-      <ActionContainer
+      <Blink
         stylePreset={resolveXStylePreset()}
         action={action}
         websiteUrl={originalUrl.toString()}

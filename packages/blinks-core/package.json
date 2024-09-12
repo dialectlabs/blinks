@@ -1,6 +1,6 @@
 {
-  "name": "@dialectlabs/blinks",
-  "version": "0.9.3",
+  "name": "@dialectlabs/blinks-core",
+  "version": "0.10.0",
   "license": "Apache-2.0",
   "private": false,
   "sideEffects": true,
@@ -17,11 +17,6 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
-    "./ext/twitter": {
-      "import": "./dist/ext/twitter.js",
-      "require": "./dist/ext/twitter.cjs",
-      "types": "./dist/ext/twitter.d.ts"
-    },
     "./hooks": {
       "import": "./dist/hooks/index.js",
       "require": "./dist/hooks/index.cjs",
@@ -63,14 +58,10 @@
     "typescript": "^5.5.3"
   },
   "peerDependencies": {
-    "@solana/wallet-adapter-react": "^0.15.0",
-    "@solana/wallet-adapter-react-ui": "^0.9.0",
-    "@solana/web3.js": "^1.95.1",
-    "react": ">=18",
-    "react-dom": ">=18"
+    "react": ">=18"
   },
   "dependencies": {
     "clsx": "^2.1.1",
-    "@dialectlabs/blinks-core": "0.10.0"
+    "@solana/web3.js": "^1.95.1"
   }
 }

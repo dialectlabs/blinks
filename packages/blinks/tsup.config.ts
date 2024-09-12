@@ -1,9 +1,4 @@
-import * as path from 'path';
 import { defineConfig, type Options } from 'tsup';
-
-const tsConfigPath = path.resolve(__dirname, '../..', 'tsconfig.json');
-
-console.log(tsConfigPath);
 
 const commonCfg: Partial<Options> = {
   splitting: true,
@@ -11,7 +6,6 @@ const commonCfg: Partial<Options> = {
   clean: true,
   format: ['cjs', 'esm'],
   target: ['esnext'],
-  tsconfig: tsConfigPath,
 };
 
 export default defineConfig([

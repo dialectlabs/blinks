@@ -1,46 +1,40 @@
+import {
+  type ActionSupportability,
+  type Disclaimer,
+  DisclaimerType,
+  type ExtendedActionState,
+  type StylePreset,
+} from '@dialectlabs/blinks-core';
 import clsx from 'clsx';
 import { type ReactNode, useState } from 'react';
-import type { ActionSupportability, ExtendedActionState } from '../api';
-import { Badge } from './Badge.tsx';
-import { Snackbar } from './Snackbar.tsx';
-import { ExclamationShieldIcon, InfoShieldIcon, LinkIcon } from './icons';
-import ConfigIcon from './icons/ConfigIcon.tsx';
+import { Badge } from './internal/Badge.tsx';
+import { Snackbar } from './internal/Snackbar.tsx';
+import {
+  ConfigIcon,
+  ExclamationShieldIcon,
+  InfoShieldIcon,
+  LinkIcon,
+} from './internal/icons';
 import {
   ActionButton,
+  ActionCheckboxGroup,
   ActionDateInput,
   ActionEmailInput,
   ActionNumberInput,
   ActionRadioGroup,
   ActionSelect,
+  ActionTextArea,
   ActionTextInput,
   ActionUrlInput,
-} from './inputs';
-import { ActionCheckboxGroup } from './inputs/ActionCheckboxGroup.tsx';
-import { ActionTextArea } from './inputs/ActionTextArea.tsx';
-import type { BaseButtonProps, BaseInputProps } from './inputs/types.ts';
+} from './internal/inputs';
+import type {
+  BaseButtonProps,
+  BaseInputProps,
+} from './internal/inputs/types.ts';
 
 type ActionType = ExtendedActionState;
 type ButtonProps = BaseButtonProps;
 type InputProps = BaseInputProps;
-
-export type StylePreset = 'default' | 'x-dark' | 'x-light' | 'custom';
-
-export enum DisclaimerType {
-  BLOCKED = 'blocked',
-  UNKNOWN = 'unknown',
-}
-
-export type Disclaimer =
-  | {
-      type: DisclaimerType.BLOCKED;
-      ignorable: boolean;
-      hidden: boolean;
-      onSkip: () => void;
-    }
-  | {
-      type: DisclaimerType.UNKNOWN;
-      ignorable: boolean;
-    };
 
 const stylePresetClassMap: Record<StylePreset, string> = {
   default: 'dial-light',
@@ -49,7 +43,7 @@ const stylePresetClassMap: Record<StylePreset, string> = {
   custom: 'custom',
 };
 
-interface LayoutProps {
+export interface InnerLayoutProps {
   stylePreset?: StylePreset;
   image?: string;
   error?: string | null;
@@ -104,7 +98,7 @@ const NotSupportedBlock = ({
     <div className={className}>
       <div
         className={clsx(
-          'rounded-xl border border-none bg-bg-secondary p-3 text-subtext text-text-secondary',
+          'bg-bg-secondary text-subtext text-text-secondary rounded-xl border border-none p-3',
         )}
       >
         <div className="flex flex-row gap-2">
@@ -156,7 +150,7 @@ const DisclaimerBlock = ({
           </p>
           {ignorable && onSkip && (
             <button
-              className="mt-3 font-semibold transition-colors hover:text-text-error-hover motion-reduce:transition-none"
+              className="hover:text-text-error-hover mt-3 font-semibold transition-colors motion-reduce:transition-none"
               onClick={onSkip}
             >
               Ignore warning & proceed
@@ -178,7 +172,7 @@ const DisclaimerBlock = ({
               ' Your action provider blocks execution of this action.'}
           </p>
           <a
-            className="mt-3 inline-block font-semibold transition-colors hover:text-text-warning-hover motion-reduce:transition-none"
+            className="hover:text-text-warning-hover mt-3 inline-block font-semibold transition-colors motion-reduce:transition-none"
             href="https://discord.gg/saydialect"
             target="_blank"
             rel="noopener noreferrer"
@@ -193,7 +187,7 @@ const DisclaimerBlock = ({
   return null;
 };
 
-export const ActionLayout = ({
+export const BaseBlinkLayout = ({
   stylePreset = 'default',
   title,
   description,
@@ -208,10 +202,10 @@ export const ActionLayout = ({
   error,
   success,
   supportability,
-}: LayoutProps) => {
+}: InnerLayoutProps) => {
   return (
     <div className={clsx('blink', stylePresetClassMap[stylePreset])}>
-      <div className="w-full cursor-default overflow-hidden rounded-2xl border border-stroke-primary bg-bg-primary shadow-action">
+      <div className="border-stroke-primary bg-bg-primary shadow-action w-full cursor-default overflow-hidden rounded-2xl border">
         {image && (
           <Linkable
             url={websiteUrl}
@@ -232,17 +226,17 @@ export const ActionLayout = ({
               <a
                 href={websiteUrl}
                 target="_blank"
-                className="group inline-flex items-center truncate text-subtext hover:cursor-pointer"
+                className="text-subtext group inline-flex items-center truncate hover:cursor-pointer"
                 rel="noopener noreferrer"
               >
-                <LinkIcon className="mr-2 text-icon-primary transition-colors group-hover:text-icon-primary-hover motion-reduce:transition-none" />
-                <span className="text-text-link transition-colors group-hover:text-text-link-hover group-hover:underline motion-reduce:transition-none">
+                <LinkIcon className="text-icon-primary group-hover:text-icon-primary-hover mr-2 transition-colors motion-reduce:transition-none" />
+                <span className="text-text-link group-hover:text-text-link-hover transition-colors group-hover:underline motion-reduce:transition-none">
                   {websiteText ?? websiteUrl}
                 </span>
               </a>
             )}
             {websiteText && !websiteUrl && (
-              <span className="inline-flex items-center truncate text-subtext text-text-link">
+              <span className="text-subtext text-text-link inline-flex items-center truncate">
                 {websiteText}
               </span>
             )}
@@ -274,10 +268,10 @@ export const ActionLayout = ({
               )}
             </a>
           </div>
-          <span className="mb-0.5 text-text font-semibold text-text-primary">
+          <span className="text-text text-text-primary mb-0.5 font-semibold">
             {title}
           </span>
-          <span className="mb-4 whitespace-pre-wrap text-subtext text-text-secondary">
+          <span className="text-subtext text-text-secondary mb-4 whitespace-pre-wrap">
             {description}
           </span>
           {!supportability.isSupported ? (
@@ -303,12 +297,12 @@ export const ActionLayout = ({
               )}
               <ActionContent form={form} inputs={inputs} buttons={buttons} />
               {success && (
-                <span className="mt-4 flex justify-center text-subtext text-text-success">
+                <span className="text-subtext text-text-success mt-4 flex justify-center">
                   {success}
                 </span>
               )}
               {error && !success && (
-                <span className="mt-4 flex justify-center text-subtext text-text-error">
+                <span className="text-subtext text-text-error mt-4 flex justify-center">
                   {error}
                 </span>
               )}
@@ -324,7 +318,7 @@ const ActionContent = ({
   form,
   inputs,
   buttons,
-}: Pick<LayoutProps, 'form' | 'buttons' | 'inputs'>) => {
+}: Pick<InnerLayoutProps, 'form' | 'buttons' | 'inputs'>) => {
   if (form) {
     return <ActionForm form={form} />;
   }
@@ -371,7 +365,7 @@ const buildDefaultFormValues = (
   );
 };
 
-const ActionForm = ({ form }: Required<Pick<LayoutProps, 'form'>>) => {
+const ActionForm = ({ form }: Required<Pick<InnerLayoutProps, 'form'>>) => {
   const [values, setValues] = useState<Record<string, string | string[]>>(
     buildDefaultFormValues(form.inputs),
   );

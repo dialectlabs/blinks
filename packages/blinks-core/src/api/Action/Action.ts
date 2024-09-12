@@ -1,5 +1,5 @@
-import { isUrlSameOrigin } from '../../shared';
 import { proxify, proxifyImage } from '../../utils/proxify.ts';
+import { isUrlSameOrigin } from '../../utils/security.ts';
 import type { ActionAdapter } from '../ActionConfig.ts';
 import type {
   ActionParameterType,

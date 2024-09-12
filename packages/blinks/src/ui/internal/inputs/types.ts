@@ -2,7 +2,7 @@ import type {
   ActionParameterType,
   SelectableParameterType,
   TypedActionParameter,
-} from '../../api';
+} from '@dialectlabs/blinks-core';
 
 export type InputType = ActionParameterType;
 

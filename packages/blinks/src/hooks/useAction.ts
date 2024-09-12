@@ -1,12 +1,12 @@
 'use client';
-import { useEffect, useState } from 'react';
 import {
   Action,
   type ActionAdapter,
   type ActionSupportStrategy,
   defaultActionSupportStrategy,
-} from '../api';
-import { unfurlUrlToActionApiUrl } from '../utils/url-mapper.ts';
+  unfurlUrlToActionApiUrl,
+} from '@dialectlabs/blinks-core';
+import { useEffect, useState } from 'react';
 import { useActionsRegistryInterval } from './useActionRegistryInterval.ts';
 
 interface UseActionOptions {

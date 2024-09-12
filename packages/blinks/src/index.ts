@@ -1,5 +1,3 @@
-export * from './api';
-export * from './ext';
-export * from './hooks';
+export * from '@dialectlabs/blinks-core';
+
 export * from './ui';
-export * from './utils';
