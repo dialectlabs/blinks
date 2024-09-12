@@ -60,17 +60,16 @@ export const ActionSelect = ({
       description={description}
       rightAdornment={
         button ? (
-          <div className="ml-1.5">
-            <ActionButton
-              {...button}
-              onClick={() => button.onClick({ [name]: value })}
-              disabled={button.disabled || value === '' || !isValid}
-            />
-          </div>
+          <ActionButton
+            {...button}
+            onClick={() => button.onClick({ [name]: value })}
+            disabled={button.disabled || value === '' || !isValid}
+          />
         ) : null
       }
     >
       <select
+        className="mr-1.5 cursor-pointer"
         value={value}
         onChange={extendedChange}
         required={button ? true : required}

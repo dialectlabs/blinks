@@ -551,6 +551,7 @@ export const BlinkContainer = ({
       // form={form ? asFormProps(form) : undefined}
       disclaimer={disclaimer}
       supportability={supportability}
+      id={action.id}
     />
   );
 };

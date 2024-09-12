@@ -61,7 +61,10 @@ export const Checkbox = ({
           />
         </span>
       </div>
-      <label className="text-text text-text-input" id={labelId}>
+      <label
+        className="cursor-[inherit] text-text text-text-input"
+        id={labelId}
+      >
         {label}
       </label>
     </button>

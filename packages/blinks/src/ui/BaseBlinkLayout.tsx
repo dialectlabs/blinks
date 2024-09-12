@@ -58,6 +58,7 @@ export interface InnerLayoutProps {
   inputs?: InputProps[];
   form?: FormProps;
   supportability: ActionSupportability;
+  id?: string;
 }
 
 export interface FormProps {
@@ -202,6 +203,7 @@ export const BaseBlinkLayout = ({
   error,
   success,
   supportability,
+  id,
 }: InnerLayoutProps) => {
   return (
     <div className={clsx('blink', stylePresetClassMap[stylePreset])}>
@@ -295,7 +297,12 @@ export const BaseBlinkLayout = ({
                   }
                 />
               )}
-              <ActionContent form={form} inputs={inputs} buttons={buttons} />
+              <ActionContent
+                key={id}
+                form={form}
+                inputs={inputs}
+                buttons={buttons}
+              />
               {success && (
                 <span className="text-subtext text-text-success mt-4 flex justify-center">
                   {success}
