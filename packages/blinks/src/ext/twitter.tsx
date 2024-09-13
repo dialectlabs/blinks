@@ -14,10 +14,9 @@ import {
   isInterstitial,
   proxify,
   type SecurityLevel,
-  type StylePreset,
 } from '@dialectlabs/blinks-core';
 import { createRoot } from 'react-dom/client';
-import { Blink } from '../ui';
+import { Blink, type StyleTheme } from '../ui';
 
 type ObserverSecurityLevel = SecurityLevel;
 
@@ -246,7 +245,7 @@ function createAction({
   actionRoot.render(
     <div onClick={(e) => e.stopPropagation()}>
       <Blink
-        stylePreset={resolveXStylePreset()}
+        theme={resolveXStylePreset()}
         action={action}
         websiteUrl={originalUrl.toString()}
         websiteText={originalUrl.hostname}
@@ -259,7 +258,7 @@ function createAction({
   return { container, reactRoot: actionRoot };
 }
 
-const resolveXStylePreset = (): StylePreset => {
+const resolveXStylePreset = (): StyleTheme => {
   const colorScheme = document.querySelector('html')?.style.colorScheme;
 
   if (colorScheme) {

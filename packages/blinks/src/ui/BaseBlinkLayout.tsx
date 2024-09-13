@@ -2,8 +2,7 @@ import {
   type ActionSupportability,
   type Disclaimer,
   DisclaimerType,
-  type ExtendedActionState,
-  type StylePreset,
+  type SecurityActionState,
 } from '@dialectlabs/blinks-core';
 import clsx from 'clsx';
 import { type ReactNode, useState } from 'react';
@@ -31,12 +30,12 @@ import type {
   BaseButtonProps,
   BaseInputProps,
 } from './internal/inputs/types.ts';
+import type { StyleTheme } from './types.ts';
 
-type ActionType = ExtendedActionState;
 type ButtonProps = BaseButtonProps;
 type InputProps = BaseInputProps;
 
-const stylePresetClassMap: Record<StylePreset, string> = {
+const themeClassMap: Record<StyleTheme, string> = {
   default: 'dial-light',
   'x-dark': 'x-dark',
   'x-light': 'x-light',
@@ -44,14 +43,14 @@ const stylePresetClassMap: Record<StylePreset, string> = {
 };
 
 export interface InnerLayoutProps {
-  stylePreset?: StylePreset;
+  theme?: StyleTheme;
   image?: string;
   error?: string | null;
   success?: string | null;
   websiteUrl?: string | null;
   websiteText?: string | null;
   disclaimer?: Disclaimer | null;
-  type: ActionType;
+  securityState: SecurityActionState;
   title: string;
   description: string;
   buttons?: ButtonProps[];
@@ -189,13 +188,13 @@ const DisclaimerBlock = ({
 };
 
 export const BaseBlinkLayout = ({
-  stylePreset = 'default',
+  theme = 'default',
   title,
   description,
   image,
   websiteUrl,
   websiteText,
-  type,
+  securityState,
   disclaimer,
   buttons,
   inputs,
@@ -206,7 +205,7 @@ export const BaseBlinkLayout = ({
   id,
 }: InnerLayoutProps) => {
   return (
-    <div className={clsx('blink', stylePresetClassMap[stylePreset])}>
+    <div className={clsx('blink', themeClassMap[theme])}>
       <div className="border-stroke-primary bg-bg-primary shadow-action w-full cursor-default overflow-hidden rounded-2xl border">
         {image && (
           <Linkable
@@ -248,7 +247,7 @@ export const BaseBlinkLayout = ({
               rel="noopener noreferrer"
               className="flex items-center"
             >
-              {type === 'malicious' && (
+              {securityState === 'malicious' && (
                 <Badge
                   variant="error"
                   icon={<ExclamationShieldIcon width={13} height={13} />}
@@ -256,13 +255,13 @@ export const BaseBlinkLayout = ({
                   Blocked
                 </Badge>
               )}
-              {type === 'trusted' && (
+              {securityState === 'trusted' && (
                 <Badge
                   variant="default"
                   icon={<InfoShieldIcon width={13} height={13} />}
                 />
               )}
-              {type === 'unknown' && (
+              {securityState === 'unknown' && (
                 <Badge
                   variant="warning"
                   icon={<InfoShieldIcon width={13} height={13} />}

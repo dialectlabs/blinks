@@ -9,7 +9,7 @@ import {
   SingleValueActionComponent,
 } from '@dialectlabs/blinks-core';
 import { useMemo } from 'react';
-import type { InnerLayoutProps } from './BaseBlinkLayout.tsx';
+import type { InnerLayoutProps } from '../../BaseBlinkLayout.tsx';
 
 const buttonVariantMap: Record<
   ExecutionStatus,

@@ -140,11 +140,11 @@ export interface RegisteredEntity {
   state: 'trusted' | 'malicious';
 }
 
-export type ExtendedActionState = RegisteredEntity['state'] | 'unknown';
+export type SecurityActionState = RegisteredEntity['state'] | 'unknown';
 
 export const mergeActionStates = (
-  ...states: ExtendedActionState[]
-): ExtendedActionState => {
+  ...states: SecurityActionState[]
+): SecurityActionState => {
   if (states.includes('malicious')) {
     return 'malicious';
   }
@@ -158,7 +158,7 @@ export const mergeActionStates = (
 
 export const getExtendedActionState = (
   actionOrUrl: Action | string,
-): ExtendedActionState => {
+): SecurityActionState => {
   return (
     ActionsRegistry.getInstance().lookup(
       typeof actionOrUrl === 'string' ? actionOrUrl : actionOrUrl.url,
@@ -167,7 +167,7 @@ export const getExtendedActionState = (
   );
 };
 
-export const getExtendedWebsiteState = (url: string): ExtendedActionState => {
+export const getExtendedWebsiteState = (url: string): SecurityActionState => {
   return (
     ActionsRegistry.getInstance().lookup(url, 'website')?.state ?? 'unknown'
   );
@@ -175,7 +175,7 @@ export const getExtendedWebsiteState = (url: string): ExtendedActionState => {
 
 export const getExtendedInterstitialState = (
   url: string,
-): ExtendedActionState => {
+): SecurityActionState => {
   return (
     ActionsRegistry.getInstance().lookup(url, 'interstitial')?.state ??
     'unknown'

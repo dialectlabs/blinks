@@ -12,13 +12,13 @@ import {
   type ActionContext,
   type ActionPostResponse,
   type ActionSupportability,
-  type ExtendedActionState,
   FormActionComponent,
   getExtendedActionState,
   getExtendedInterstitialState,
   getExtendedWebsiteState,
   mergeActionStates,
   MultiValueActionComponent,
+  type SecurityActionState,
   SingleValueActionComponent,
 } from './api';
 import { checkSecurity, isInterstitial, type SecurityLevel } from './utils';
@@ -27,9 +27,7 @@ import {
   isSignTransactionError,
 } from './utils/type-guards.ts';
 
-export type StylePreset = 'default' | 'x-dark' | 'x-light' | 'custom';
-
-export type BlinkType = ExtendedActionState;
+export type BlinkSecurityState = SecurityActionState;
 
 export enum DisclaimerType {
   BLOCKED = 'blocked',
@@ -55,9 +53,8 @@ export interface BlinkCaption {
 
 export interface BaseBlinkLayoutProps {
   id?: string;
-  type: BlinkType;
+  securityState: BlinkSecurityState;
   action: Action;
-  stylePreset?: StylePreset;
   websiteUrl?: string | null;
   websiteText?: string | null;
   disclaimer?: Disclaimer | null;
@@ -180,12 +177,12 @@ const executionReducer = (
 
 type ActionStateWithOrigin =
   | {
-      action: ExtendedActionState;
+      action: SecurityActionState;
       origin?: never;
     }
   | {
-      action: ExtendedActionState;
-      origin: ExtendedActionState;
+      action: SecurityActionState;
+      origin: SecurityActionState;
       originType: Source;
     };
 
@@ -238,7 +235,6 @@ export interface BlinkContainerProps {
   websiteText?: string | null;
   callbacks?: Partial<ActionCallbacksConfig>;
   securityLevel?: SecurityLevel | NormalizedSecurityLevel;
-  stylePreset?: StylePreset;
   Layout: ComponentType<BaseBlinkLayoutProps>;
 }
 
@@ -249,7 +245,6 @@ export const BlinkContainer = ({
   websiteText,
   callbacks,
   securityLevel = DEFAULT_SECURITY_LEVEL,
-  stylePreset = 'default',
   Layout,
 }: BlinkContainerProps) => {
   const [action, setAction] = useState(initialAction);
@@ -278,7 +273,7 @@ export const BlinkContainer = ({
       mergeActionStates(
         ...([actionState.action, actionState.origin].filter(
           Boolean,
-        ) as ExtendedActionState[]),
+        ) as SecurityActionState[]),
       ),
     [actionState],
   );
@@ -532,24 +527,14 @@ export const BlinkContainer = ({
 
   return (
     <Layout
-      stylePreset={stylePreset}
-      type={overallState}
+      securityState={overallState}
       websiteUrl={websiteUrl}
       websiteText={websiteText}
       action={action}
       caption={blinkCaption}
-      // error={
-      //   executionState.status !== 'success'
-      //     ? (executionState.errorMessage ?? action.error)
-      //     : null
-      // }
-      // success={executionState.successMessage}
       executionStatus={executionState.status}
       executingAction={executionState.executingAction}
       executeFn={execute}
-      // buttons={buttons.map((button) => asButtonProps(button))}
-      // inputs={inputs.map((input) => asInputProps(input))}
-      // form={form ? asFormProps(form) : undefined}
       disclaimer={disclaimer}
       supportability={supportability}
       id={action.id}

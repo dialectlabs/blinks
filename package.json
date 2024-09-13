@@ -10,8 +10,12 @@
     "url": "https://github.com/dialectlabs/blinks"
   },
   "scripts": {
-    "build": "bun --filter \"*\" build",
-    "dev": "bun --filter \"*\" dev"
+    "build:blinks": "bun --filter \"@dialectlabs/blinks\" build",
+    "build:blinks-core": "bun --filter \"@dialectlabs/blinks-core\" build",
+    "build": "bun build:blinks-core && bun build:blinks",
+    "dev": "bun --filter \"*\" dev",
+    "dev:blinks": "bun --filter \"@dialectlabs/blinks\" dev",
+    "dev:blinks-core": "bun --filter \"@dialectlabs/blinks-core\" dev"
   },
   "workspaces": ["packages/*"],
   "devDependencies": {
