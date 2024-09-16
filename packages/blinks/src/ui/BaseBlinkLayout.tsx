@@ -30,12 +30,12 @@ import type {
   BaseButtonProps,
   BaseInputProps,
 } from './internal/inputs/types.ts';
-import type { StyleTheme } from './types.ts';
+import type { StylePreset } from './types.ts';
 
 type ButtonProps = BaseButtonProps;
 type InputProps = BaseInputProps;
 
-const themeClassMap: Record<StyleTheme, string> = {
+const themeClassMap: Record<StylePreset, string> = {
   default: 'dial-light',
   'x-dark': 'x-dark',
   'x-light': 'x-light',
@@ -43,7 +43,7 @@ const themeClassMap: Record<StyleTheme, string> = {
 };
 
 export interface InnerLayoutProps {
-  theme?: StyleTheme;
+  stylePreset?: StylePreset;
   image?: string;
   error?: string | null;
   success?: string | null;
@@ -188,7 +188,7 @@ const DisclaimerBlock = ({
 };
 
 export const BaseBlinkLayout = ({
-  theme = 'default',
+  stylePreset = 'default',
   title,
   description,
   image,
@@ -205,7 +205,7 @@ export const BaseBlinkLayout = ({
   id,
 }: InnerLayoutProps) => {
   return (
-    <div className={clsx('blink', themeClassMap[theme])}>
+    <div className={clsx('blink', themeClassMap[stylePreset])}>
       <div className="border-stroke-primary bg-bg-primary shadow-action w-full cursor-default overflow-hidden rounded-2xl border">
         {image && (
           <Linkable

@@ -16,7 +16,7 @@ import {
   type SecurityLevel,
 } from '@dialectlabs/blinks-core';
 import { createRoot } from 'react-dom/client';
-import { Blink, type StyleTheme } from '../ui';
+import { Blink, type StylePreset } from '../ui';
 
 type ObserverSecurityLevel = SecurityLevel;
 
@@ -245,7 +245,7 @@ function createAction({
   actionRoot.render(
     <div onClick={(e) => e.stopPropagation()}>
       <Blink
-        theme={resolveXStylePreset()}
+        stylePreset={resolveXStylePreset()}
         action={action}
         websiteUrl={originalUrl.toString()}
         websiteText={originalUrl.hostname}
@@ -258,7 +258,7 @@ function createAction({
   return { container, reactRoot: actionRoot };
 }
 
-const resolveXStylePreset = (): StyleTheme => {
+const resolveXStylePreset = (): StylePreset => {
   const colorScheme = document.querySelector('html')?.style.colorScheme;
 
   if (colorScheme) {

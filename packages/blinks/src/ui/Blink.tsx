@@ -6,28 +6,30 @@ import {
 import { type ComponentType, useCallback } from 'react';
 import { BaseBlinkLayout } from './BaseBlinkLayout.tsx';
 import { useLayoutPropNormalizer } from './internal/hooks/useLayoutPropNormalizer.tsx';
-import type { StyleTheme } from './types.ts';
+import type { StylePreset } from './types.ts';
 
 export interface BlinkProps extends Omit<BlinkContainerProps, 'Layout'> {
-  _Layout?: ComponentType<BaseBlinkLayoutProps & { theme?: StyleTheme }>;
-  theme?: StyleTheme;
+  _Layout?: ComponentType<BaseBlinkLayoutProps & { stylePreset?: StylePreset }>;
+  stylePreset?: StylePreset;
 }
 
 export const Blink = ({
   _Layout: Layout = NormalizedBaseBlinkLayout,
-  theme,
+  stylePreset,
   ...props
 }: BlinkProps) => {
-  const LayoutWithTheme = useCallback(
-    (props: BaseBlinkLayoutProps) => <Layout {...props} theme={theme} />,
-    [Layout, theme],
+  const LayoutWithPreset = useCallback(
+    (props: BaseBlinkLayoutProps) => (
+      <Layout {...props} stylePreset={stylePreset} />
+    ),
+    [Layout, stylePreset],
   );
 
-  return <BlinkContainer {...props} Layout={LayoutWithTheme} />;
+  return <BlinkContainer {...props} Layout={LayoutWithPreset} />;
 };
 
 export const NormalizedBaseBlinkLayout = (
-  props: BaseBlinkLayoutProps & { theme?: StyleTheme },
+  props: BaseBlinkLayoutProps & { stylePreset?: StylePreset },
 ) => {
   const normalizedProps = useLayoutPropNormalizer(props);
 
