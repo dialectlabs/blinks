@@ -4,7 +4,7 @@
 ### Style Presets & Overriding Theme
 
 #### Style Presets
-`Blink` component contains a `theme` prop that accepts the following values:
+`Blink` component contains a `stylePreset` prop that accepts the following values:
 * `default` - [dial.to](https://dial.to)-styled blink (light)
 * `x-dark` - [X](https://x.com/)-styled blink (dark)
 * `x-light` - [X](https://x.com/)-styled blink (light)
@@ -14,7 +14,7 @@
 import '@dialectlabs/blinks/index.css';
 import { Blink } from "@dialectlabs/blinks";
 
-<Blink theme="x-dark" ... />
+<Blink stylePreset="x-dark" ... />
 ```
 
 #### Overriding Theme
