@@ -1,6 +1,6 @@
 {
-  "name": "@dialectlabs/blinks",
-  "version": "0.9.4",
+  "name": "@dialectlabs/blinks-monorepo",
+  "version": "1.0.0",
   "license": "Apache-2.0",
   "private": false,
   "sideEffects": true,
@@ -10,45 +10,17 @@
     "url": "https://github.com/dialectlabs/blinks"
   },
   "scripts": {
-    "build": "tsup-node",
-    "dev": "tsup-node --watch"
+    "build:blinks": "bun --filter \"@dialectlabs/blinks\" build",
+    "build:blinks-core": "bun --filter \"@dialectlabs/blinks-core\" build",
+    "build": "bun build:blinks-core && bun build:blinks",
+    "dev": "bun --filter \"*\" dev",
+    "dev:blinks": "bun --filter \"@dialectlabs/blinks\" dev",
+    "dev:blinks-core": "bun --filter \"@dialectlabs/blinks-core\" dev"
   },
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    "./ext/twitter": {
-      "import": "./dist/ext/twitter.js",
-      "require": "./dist/ext/twitter.cjs",
-      "types": "./dist/ext/twitter.d.ts"
-    },
-    "./hooks": {
-      "import": "./dist/hooks/index.js",
-      "require": "./dist/hooks/index.cjs",
-      "types": "./dist/hooks/index.d.ts"
-    },
-    "./hooks/solana": {
-      "import": "./dist/hooks/solana/index.js",
-      "require": "./dist/hooks/solana/index.cjs",
-      "types": "./dist/hooks/solana/index.d.ts"
-    },
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
-    },
-    "./index.css": "./dist/index.css"
-  },
-  "files": [
-    "dist"
-  ],
+  "workspaces": ["packages/*"],
   "devDependencies": {
-    "@solana/actions-spec": "~2.2.0",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.16.1",
     "@typescript-eslint/parser": "^7.16.1",
-    "autoprefixer": "^10.4.19",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.34.4",
@@ -58,19 +30,6 @@
     "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^4.0.0",
     "prettier-plugin-tailwindcss": "^0.6.5",
-    "tailwindcss": "^3.4.3",
-    "tsup": "^8.2.0",
     "typescript": "^5.5.3"
-  },
-  "peerDependencies": {
-    "@solana/wallet-adapter-react": "^0.15.0",
-    "@solana/wallet-adapter-react-ui": "^0.9.0",
-    "@solana/web3.js": "^1.95.1",
-    "react": ">=18",
-    "react-dom": ">=18"
-  },
-  "dependencies": {
-    "clsx": "^2.1.1",
-    "nanoid": "^5.0.7"
   }
 }
