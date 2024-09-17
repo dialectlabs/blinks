@@ -1,12 +1,11 @@
-'use client';
+import { useEffect, useState } from 'react';
 import {
   Action,
   type ActionAdapter,
   type ActionSupportStrategy,
   defaultActionSupportStrategy,
-  unfurlUrlToActionApiUrl,
-} from '@dialectlabs/blinks-core';
-import { useEffect, useState } from 'react';
+} from '../api';
+import { unfurlUrlToActionApiUrl } from '../utils';
 import { useActionsRegistryInterval } from './useActionRegistryInterval.ts';
 
 interface UseActionOptions {
@@ -30,7 +29,10 @@ function useActionApiUrl(url: string | URL) {
         setApiUrl(apiUrl);
       })
       .catch((e) => {
-        console.error('[@dialectlabs/blinks] Failed to unfurl action URL', e);
+        console.error(
+          '[@dialectlabs/blinks-core] Failed to unfurl action URL',
+          e,
+        );
         setApiUrl(null);
       });
 
@@ -67,7 +69,7 @@ export function useAction({
         setAction(action);
       })
       .catch((e) => {
-        console.error('[@dialectlabs/blinks] Failed to fetch action', e);
+        console.error('[@dialectlabs/blinks-core] Failed to fetch action', e);
         setAction(null);
       })
       .finally(() => {

@@ -22,11 +22,6 @@
       "require": "./dist/ext/twitter.cjs",
       "types": "./dist/ext/twitter.d.ts"
     },
-    "./hooks": {
-      "import": "./dist/hooks/index.js",
-      "require": "./dist/hooks/index.cjs",
-      "types": "./dist/hooks/index.d.ts"
-    },
     "./hooks/solana": {
       "import": "./dist/hooks/solana/index.js",
       "require": "./dist/hooks/solana/index.cjs",
