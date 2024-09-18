@@ -55,6 +55,7 @@ export interface BaseBlinkLayoutProps {
   id?: string;
   securityState: BlinkSecurityState;
   action: Action;
+  component?: AbstractActionComponent;
   websiteUrl?: string | null;
   websiteText?: string | null;
   disclaimer?: Disclaimer | null;
@@ -231,6 +232,7 @@ type NormalizedSecurityLevel = Record<Source, SecurityLevel>;
 
 export interface BlinkContainerProps {
   action: Action;
+  component?: (currentAction: Action) => AbstractActionComponent;
   websiteUrl?: string | null;
   websiteText?: string | null;
   callbacks?: Partial<ActionCallbacksConfig>;
@@ -246,8 +248,15 @@ export const BlinkContainer = ({
   callbacks,
   securityLevel = DEFAULT_SECURITY_LEVEL,
   Layout,
+  component,
 }: BlinkContainerProps) => {
   const [action, setAction] = useState(initialAction);
+  const singleComponent = useMemo(
+    () => component?.(action),
+    [action, component],
+  );
+  const isPartialAction = !!singleComponent;
+
   const normalizedSecurityLevel: NormalizedSecurityLevel = useMemo(() => {
     if (typeof securityLevel === 'string') {
       return {
@@ -317,7 +326,8 @@ export const BlinkContainer = ({
       !liveDataConfig ||
       !liveDataConfig.enabled ||
       executionState.status !== 'idle' ||
-      action.isChained
+      action.isChained ||
+      isPartialAction // todo: attempt to support partial actions
     ) {
       return;
     }
@@ -468,7 +478,10 @@ export const BlinkContainer = ({
           account: account,
         });
 
-        if (!nextAction) {
+        if (
+          !nextAction ||
+          (isPartialAction && nextAction.type !== 'completed') // for now, if a specific action is provided, we don't chain (only to completed)
+        ) {
           dispatch({
             type: ExecutionType.FINISH,
             successMessage: tx.message,
@@ -531,6 +544,7 @@ export const BlinkContainer = ({
       websiteUrl={websiteUrl}
       websiteText={websiteText}
       action={action}
+      component={singleComponent}
       caption={blinkCaption}
       executionStatus={executionState.status}
       executingAction={executionState.executingAction}
