@@ -288,13 +288,13 @@ export const BlinkContainer = ({
   );
 
   // adding ui check as well, to make sure, that on runtime registry lookups, we are not allowing the action to be executed
-  const isPassingSecurityCheck = checkSecurityFromActionState(
-    actionState,
-    normalizedSecurityLevel,
-  );
+  // if partial action - we skip the security check, since we assume the user want's to control the flow
+  const isPassingSecurityCheck = isPartialAction
+    ? true
+    : checkSecurityFromActionState(actionState, normalizedSecurityLevel);
 
   const [executionState, dispatch] = useReducer(executionReducer, {
-    status: 'checking-supportability',
+    status: isPartialAction ? 'idle' : 'checking-supportability',
   });
 
   // in case, where initialAction or websiteUrl changes, we need to reset the action state
@@ -305,7 +305,11 @@ export const BlinkContainer = ({
 
     setAction(initialAction);
     setActionState(getOverallActionState(initialAction, websiteUrl));
-    dispatch({ type: ExecutionType.CHECK_SUPPORTABILITY });
+    dispatch({
+      type: isPartialAction
+        ? ExecutionType.RESET
+        : ExecutionType.CHECK_SUPPORTABILITY,
+    });
     // we want to run this one when initialAction or websiteUrl changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialAction, websiteUrl]);
@@ -318,7 +322,7 @@ export const BlinkContainer = ({
     );
     // we ignore changes to `actionState.action` or callbacks explicitly, since we want this to run once
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [action, websiteUrl]);
+  }, [action.id]); // todo: this needs to be tested
 
   useEffect(() => {
     const liveDataConfig = action.liveData_experimental;
@@ -356,7 +360,7 @@ export const BlinkContainer = ({
     return () => {
       clearTimeout(timeout);
     };
-  }, [action, executionState.status]);
+  }, [action, executionState.status, isPartialAction]);
 
   useEffect(() => {
     const checkSupportability = async (action: Action) => {

@@ -4,8 +4,8 @@ import {
   type BlinkContainerProps,
 } from '@dialectlabs/blinks-core';
 import { type ComponentType, useCallback } from 'react';
-import { BaseBlinkLayout } from './BaseBlinkLayout.tsx';
 import { useLayoutPropNormalizer } from './internal/hooks/useLayoutPropNormalizer.tsx';
+import { BaseBlinkLayout } from './layouts/BaseBlinkLayout.tsx';
 import type { StylePreset } from './types.ts';
 
 export interface BlinkProps extends Omit<BlinkContainerProps, 'Layout'> {

@@ -6,14 +6,14 @@ import {
 } from '@dialectlabs/blinks-core';
 import clsx from 'clsx';
 import { type ReactNode, useState } from 'react';
-import { Badge } from './internal/Badge.tsx';
-import { Snackbar } from './internal/Snackbar.tsx';
+import { Badge } from '../internal/Badge.tsx';
+import { Snackbar } from '../internal/Snackbar.tsx';
 import {
   ConfigIcon,
   ExclamationShieldIcon,
   InfoShieldIcon,
   LinkIcon,
-} from './internal/icons';
+} from '../internal/icons';
 import {
   ActionButton,
   ActionCheckboxGroup,
@@ -25,22 +25,16 @@ import {
   ActionTextArea,
   ActionTextInput,
   ActionUrlInput,
-} from './internal/inputs';
+} from '../internal/inputs';
 import type {
   BaseButtonProps,
   BaseInputProps,
-} from './internal/inputs/types.ts';
-import type { StylePreset } from './types.ts';
+} from '../internal/inputs/types.ts';
+import type { StylePreset } from '../types.ts';
+import { themeClassMap } from './presets.ts';
 
 type ButtonProps = BaseButtonProps;
 type InputProps = BaseInputProps;
-
-const themeClassMap: Record<StylePreset, string> = {
-  default: 'dial-light',
-  'x-dark': 'x-dark',
-  'x-light': 'x-light',
-  custom: 'custom',
-};
 
 export interface InnerLayoutProps {
   stylePreset?: StylePreset;
@@ -320,7 +314,7 @@ export const BaseBlinkLayout = ({
   );
 };
 
-const ActionContent = ({
+export const ActionContent = ({
   form,
   inputs,
   buttons,

@@ -1,7 +1,6 @@
 import {
   type BaseBlinkLayoutProps,
   ButtonActionComponent,
-  type ExecutionStatus,
   FormActionComponent,
   isParameterSelectable,
   isPatternAllowed,
@@ -9,28 +8,8 @@ import {
   SingleValueActionComponent,
 } from '@dialectlabs/blinks-core';
 import { useMemo } from 'react';
-import type { InnerLayoutProps } from '../../BaseBlinkLayout.tsx';
-
-const buttonVariantMap: Record<
-  ExecutionStatus,
-  'default' | 'error' | 'success'
-> = {
-  'checking-supportability': 'default',
-  blocked: 'default',
-  idle: 'default',
-  executing: 'default',
-  success: 'success',
-  error: 'error',
-};
-
-const buttonLabelMap: Record<ExecutionStatus, string | null> = {
-  'checking-supportability': 'Loading',
-  blocked: null,
-  idle: null,
-  executing: 'Executing',
-  success: 'Completed',
-  error: 'Failed',
-};
+import type { InnerLayoutProps } from '../../layouts/BaseBlinkLayout.tsx';
+import { buttonLabelMap, buttonVariantMap } from './ui-mappers.ts';
 
 const SOFT_LIMIT_BUTTONS = 10;
 const SOFT_LIMIT_INPUTS = 3;
