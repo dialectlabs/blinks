@@ -22,7 +22,7 @@ export interface CompactBlinkProps
 }
 
 export const CompactBlink = ({
-  _Layout: Layout = NormalizedBaseBlinkLayout,
+  _Layout: Layout = NormalizedIsolatedBlinkLayout,
   stylePreset,
   ...props
 }: CompactBlinkProps) => {
@@ -38,7 +38,7 @@ export const CompactBlink = ({
   );
 };
 
-export const NormalizedBaseBlinkLayout = (
+export const NormalizedIsolatedBlinkLayout = (
   props: BaseBlinkLayoutProps & {
     stylePreset?: StylePreset;
   },

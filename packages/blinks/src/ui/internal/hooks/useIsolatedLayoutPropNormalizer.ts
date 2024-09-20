@@ -19,6 +19,7 @@ export const useIsolatedLayoutPropNormalizer = ({
   executingAction,
   action,
   component,
+  caption,
   ...props
 }: BaseBlinkLayoutProps): BaseIsolatedLayoutProps | null => {
   const asButtonProps = useCallback(
@@ -122,6 +123,26 @@ export const useIsolatedLayoutPropNormalizer = ({
     return null;
   }, [asButtonProps, asFormProps, asInputProps, component]);
 
+  const normalizedCaption = useMemo(() => {
+    if (!caption) {
+      return {};
+    }
+
+    if (caption.type === 'success') {
+      return {
+        success: caption.text,
+      };
+    }
+
+    if (caption.type === 'error') {
+      return {
+        error: caption.text,
+      };
+    }
+
+    return {};
+  }, [caption]);
+
   if (!elementProps) {
     return null;
   }
@@ -129,5 +150,6 @@ export const useIsolatedLayoutPropNormalizer = ({
   return {
     ...props,
     ...elementProps,
+    ...normalizedCaption,
   };
 };

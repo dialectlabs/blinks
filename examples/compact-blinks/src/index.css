@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.wallet-adapter-dropdown {
+  @apply relative flex w-full;
+}
+
+.wallet-adapter-button-trigger {
+  @apply flex h-[40px] flex-1 items-center justify-center truncate whitespace-nowrap rounded-lg bg-gradient-wallet-button px-6 text-text font-semibold text-inverse hover:opacity-90;
+}
+
+.wallet-adapter-dropdown-list {
+  @apply w-full rounded-lg bg-button-primary p-1.5;
+}
+.wallet-adapter-dropdown-list-item:not([disabled]):hover {
+  background-color: #323335;
+}
+.wallet-adapter-modal-title {
+  @apply text-highlight font-bold;
+}
