@@ -63,12 +63,12 @@ export const IsolatedBlinkLayout = ({
     <div className={clsx('blink w-full', themeClassMap[stylePreset])}>
       <ActionContent key={id} {...element} />
       {success && (
-        <span className="text-subtext text-text-success mt-4 flex justify-center">
+        <span className="text-subtext text-text-success mt-1.5 flex justify-center">
           {success}
         </span>
       )}
       {error && !success && (
-        <span className="text-subtext text-text-error mt-4 flex justify-center">
+        <span className="text-subtext text-text-error mt-1.5 flex justify-center">
           {error}
         </span>
       )}

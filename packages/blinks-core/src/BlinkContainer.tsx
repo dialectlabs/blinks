@@ -330,8 +330,7 @@ export const BlinkContainer = ({
       !liveDataConfig ||
       !liveDataConfig.enabled ||
       executionState.status !== 'idle' ||
-      action.isChained ||
-      isPartialAction // todo: attempt to support partial actions
+      action.isChained
     ) {
       return;
     }
@@ -482,10 +481,7 @@ export const BlinkContainer = ({
           account: account,
         });
 
-        if (
-          !nextAction ||
-          (isPartialAction && nextAction.type !== 'completed') // for now, if a specific action is provided, we don't chain (only to completed)
-        ) {
+        if (!nextAction) {
           dispatch({
             type: ExecutionType.FINISH,
             successMessage: tx.message,
@@ -527,20 +523,16 @@ export const BlinkContainer = ({
   }, [executionState.status, isPassingSecurityCheck, overallState]);
 
   const blinkCaption: BlinkCaption | null = useMemo(() => {
-    if (executionState.status === 'error') {
-      return { type: 'error', text: executionState.errorMessage ?? '' };
+    if (executionState.errorMessage) {
+      return { type: 'error', text: executionState.errorMessage };
     }
 
-    if (executionState.status === 'success') {
-      return { type: 'success', text: executionState.successMessage ?? '' };
+    if (executionState.successMessage) {
+      return { type: 'success', text: executionState.successMessage };
     }
 
     return null;
-  }, [
-    executionState.status,
-    executionState.errorMessage,
-    executionState.successMessage,
-  ]);
+  }, [executionState.errorMessage, executionState.successMessage]);
 
   return (
     <Layout
