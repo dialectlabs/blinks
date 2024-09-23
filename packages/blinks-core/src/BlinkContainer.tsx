@@ -320,9 +320,9 @@ export const BlinkContainer = ({
       websiteUrl ?? action.url,
       actionState.action,
     );
-    // we ignore changes to `actionState.action` or callbacks explicitly, since we want this to run once
+    // we run this effect ONLY if the action changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [action.id]); // todo: this needs to be tested
+  }, [action.id]);
 
   useEffect(() => {
     const liveDataConfig = action.liveData_experimental;
