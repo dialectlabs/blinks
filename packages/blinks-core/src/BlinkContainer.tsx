@@ -55,7 +55,7 @@ export interface BaseBlinkLayoutProps {
   id?: string;
   securityState: BlinkSecurityState;
   action: Action;
-  component?: AbstractActionComponent;
+  component?: AbstractActionComponent | null;
   websiteUrl?: string | null;
   websiteText?: string | null;
   disclaimer?: Disclaimer | null;
@@ -232,7 +232,7 @@ type NormalizedSecurityLevel = Record<Source, SecurityLevel>;
 
 export interface BlinkContainerProps {
   action: Action;
-  component?: (currentAction: Action) => AbstractActionComponent;
+  component?: (currentAction: Action) => AbstractActionComponent | null;
   websiteUrl?: string | null;
   websiteText?: string | null;
   callbacks?: Partial<ActionCallbacksConfig>;
@@ -248,14 +248,14 @@ export const BlinkContainer = ({
   callbacks,
   securityLevel = DEFAULT_SECURITY_LEVEL,
   Layout,
-  component,
+  component: componentFn,
 }: BlinkContainerProps) => {
   const [action, setAction] = useState(initialAction);
   const singleComponent = useMemo(
-    () => component?.(action),
-    [action, component],
+    () => componentFn?.(action),
+    [action, componentFn],
   );
-  const isPartialAction = typeof component === 'function';
+  const isPartialAction = typeof componentFn === 'function';
 
   const normalizedSecurityLevel: NormalizedSecurityLevel = useMemo(() => {
     if (typeof securityLevel === 'string') {
@@ -481,7 +481,8 @@ export const BlinkContainer = ({
           account: account,
         });
 
-        if (!nextAction) {
+        // if this is running in partial action mode, then we end the chain, if passed fn returns a null value for the next action
+        if (!nextAction || (isPartialAction && !componentFn?.(nextAction))) {
           dispatch({
             type: ExecutionType.FINISH,
             successMessage: tx.message,

@@ -18,7 +18,7 @@ export interface CompactBlinkProps
     }
   >;
   stylePreset?: StylePreset;
-  component: (currentAction: Action) => AbstractActionComponent;
+  component: (currentAction: Action) => AbstractActionComponent | null;
 }
 
 export const CompactBlink = ({
