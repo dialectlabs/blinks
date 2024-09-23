@@ -8,7 +8,8 @@ import { useLayoutPropNormalizer } from './internal/hooks/useLayoutPropNormalize
 import { BaseBlinkLayout } from './layouts/BaseBlinkLayout.tsx';
 import type { StylePreset } from './types.ts';
 
-export interface BlinkProps extends Omit<BlinkContainerProps, 'Layout'> {
+export interface BlinkProps
+  extends Omit<BlinkContainerProps, 'Layout' | 'component'> {
   _Layout?: ComponentType<BaseBlinkLayoutProps & { stylePreset?: StylePreset }>;
   stylePreset?: StylePreset;
 }
@@ -25,7 +26,13 @@ export const Blink = ({
     [Layout, stylePreset],
   );
 
-  return <BlinkContainer {...props} Layout={LayoutWithPreset} />;
+  return (
+    <BlinkContainer
+      {...props}
+      component={undefined} // explicitly disabled, use `CompactBlink` instead
+      Layout={LayoutWithPreset}
+    />
+  );
 };
 
 export const NormalizedBaseBlinkLayout = (

@@ -255,7 +255,7 @@ export const BlinkContainer = ({
     () => component?.(action),
     [action, component],
   );
-  const isPartialAction = !!singleComponent;
+  const isPartialAction = typeof component === 'function';
 
   const normalizedSecurityLevel: NormalizedSecurityLevel = useMemo(() => {
     if (typeof securityLevel === 'string') {
