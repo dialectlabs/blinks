@@ -55,6 +55,7 @@ export interface BaseBlinkLayoutProps {
   id?: string;
   securityState: BlinkSecurityState;
   action: Action;
+  component?: AbstractActionComponent | null;
   websiteUrl?: string | null;
   websiteText?: string | null;
   disclaimer?: Disclaimer | null;
@@ -231,6 +232,7 @@ type NormalizedSecurityLevel = Record<Source, SecurityLevel>;
 
 export interface BlinkContainerProps {
   action: Action;
+  selector?: (currentAction: Action) => AbstractActionComponent | null;
   websiteUrl?: string | null;
   websiteText?: string | null;
   callbacks?: Partial<ActionCallbacksConfig>;
@@ -246,8 +248,12 @@ export const BlinkContainer = ({
   callbacks,
   securityLevel = DEFAULT_SECURITY_LEVEL,
   Layout,
+  selector,
 }: BlinkContainerProps) => {
   const [action, setAction] = useState(initialAction);
+  const singleComponent = useMemo(() => selector?.(action), [action, selector]);
+  const isPartialAction = typeof selector === 'function';
+
   const normalizedSecurityLevel: NormalizedSecurityLevel = useMemo(() => {
     if (typeof securityLevel === 'string') {
       return {
@@ -279,13 +285,13 @@ export const BlinkContainer = ({
   );
 
   // adding ui check as well, to make sure, that on runtime registry lookups, we are not allowing the action to be executed
-  const isPassingSecurityCheck = checkSecurityFromActionState(
-    actionState,
-    normalizedSecurityLevel,
-  );
+  // if partial action - we skip the security check, since we assume the user want's to control the flow
+  const isPassingSecurityCheck = isPartialAction
+    ? true
+    : checkSecurityFromActionState(actionState, normalizedSecurityLevel);
 
   const [executionState, dispatch] = useReducer(executionReducer, {
-    status: 'checking-supportability',
+    status: isPartialAction ? 'idle' : 'checking-supportability',
   });
 
   // in case, where initialAction or websiteUrl changes, we need to reset the action state
@@ -296,7 +302,11 @@ export const BlinkContainer = ({
 
     setAction(initialAction);
     setActionState(getOverallActionState(initialAction, websiteUrl));
-    dispatch({ type: ExecutionType.CHECK_SUPPORTABILITY });
+    dispatch({
+      type: isPartialAction
+        ? ExecutionType.RESET
+        : ExecutionType.CHECK_SUPPORTABILITY,
+    });
     // we want to run this one when initialAction or websiteUrl changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialAction, websiteUrl]);
@@ -307,9 +317,9 @@ export const BlinkContainer = ({
       websiteUrl ?? action.url,
       actionState.action,
     );
-    // we ignore changes to `actionState.action` or callbacks explicitly, since we want this to run once
+    // we run this effect ONLY if the action changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [action, websiteUrl]);
+  }, [action.id]);
 
   useEffect(() => {
     const liveDataConfig = action.liveData_experimental;
@@ -346,7 +356,7 @@ export const BlinkContainer = ({
     return () => {
       clearTimeout(timeout);
     };
-  }, [action, executionState.status]);
+  }, [action, executionState.status, isPartialAction]);
 
   useEffect(() => {
     const checkSupportability = async (action: Action) => {
@@ -468,7 +478,8 @@ export const BlinkContainer = ({
           account: account,
         });
 
-        if (!nextAction) {
+        // if this is running in partial action mode, then we end the chain, if passed fn returns a null value for the next action
+        if (!nextAction || (isPartialAction && !selector?.(nextAction))) {
           dispatch({
             type: ExecutionType.FINISH,
             successMessage: tx.message,
@@ -510,20 +521,16 @@ export const BlinkContainer = ({
   }, [executionState.status, isPassingSecurityCheck, overallState]);
 
   const blinkCaption: BlinkCaption | null = useMemo(() => {
-    if (executionState.status === 'error') {
-      return { type: 'error', text: executionState.errorMessage ?? '' };
+    if (executionState.errorMessage) {
+      return { type: 'error', text: executionState.errorMessage };
     }
 
-    if (executionState.status === 'success') {
-      return { type: 'success', text: executionState.successMessage ?? '' };
+    if (executionState.successMessage) {
+      return { type: 'success', text: executionState.successMessage };
     }
 
     return null;
-  }, [
-    executionState.status,
-    executionState.errorMessage,
-    executionState.successMessage,
-  ]);
+  }, [executionState.errorMessage, executionState.successMessage]);
 
   return (
     <Layout
@@ -531,6 +538,7 @@ export const BlinkContainer = ({
       websiteUrl={websiteUrl}
       websiteText={websiteText}
       action={action}
+      component={singleComponent}
       caption={blinkCaption}
       executionStatus={executionState.status}
       executingAction={executionState.executingAction}

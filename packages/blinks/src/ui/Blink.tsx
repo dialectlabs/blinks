@@ -4,11 +4,12 @@ import {
   type BlinkContainerProps,
 } from '@dialectlabs/blinks-core';
 import { type ComponentType, useCallback } from 'react';
-import { BaseBlinkLayout } from './BaseBlinkLayout.tsx';
 import { useLayoutPropNormalizer } from './internal/hooks/useLayoutPropNormalizer.tsx';
+import { BaseBlinkLayout } from './layouts/BaseBlinkLayout.tsx';
 import type { StylePreset } from './types.ts';
 
-export interface BlinkProps extends Omit<BlinkContainerProps, 'Layout'> {
+export interface BlinkProps
+  extends Omit<BlinkContainerProps, 'Layout' | 'selector'> {
   _Layout?: ComponentType<BaseBlinkLayoutProps & { stylePreset?: StylePreset }>;
   stylePreset?: StylePreset;
 }
@@ -25,7 +26,13 @@ export const Blink = ({
     [Layout, stylePreset],
   );
 
-  return <BlinkContainer {...props} Layout={LayoutWithPreset} />;
+  return (
+    <BlinkContainer
+      {...props}
+      selector={undefined} // explicitly disabled, use `MiniBlink` instead
+      Layout={LayoutWithPreset}
+    />
+  );
 };
 
 export const NormalizedBaseBlinkLayout = (
