@@ -22,7 +22,7 @@ function App() {
   return (
     <div className="flex h-screen w-screen items-center justify-center">
       <div className="flex min-w-[400px] flex-col items-center">
-        <h1 className="mb-4 text-center text-4xl font-bold">Compact Blinks</h1>
+        <h1 className="mb-4 text-center text-4xl font-bold">Mini Blinks</h1>
         <div className="mb-4 w-full">
           {isLoading || !action ? (
             <span>Loading</span>
