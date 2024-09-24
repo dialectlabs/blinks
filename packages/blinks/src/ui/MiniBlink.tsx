@@ -47,7 +47,7 @@ export const NormalizedIsolatedBlinkLayout = (
 
   if (!normalizedProps) {
     console.warn(
-      '[@dialectlabs/blinks] No `selector` prop provided for CompactBlink',
+      '[@dialectlabs/blinks] No `selector` prop provided for MiniBlink',
     );
     return null;
   }
