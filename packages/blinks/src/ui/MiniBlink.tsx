@@ -10,22 +10,22 @@ import { useIsolatedLayoutPropNormalizer } from './internal/hooks/useIsolatedLay
 import { IsolatedBlinkLayout } from './layouts/IsolatedBlinkLayout.tsx';
 import type { StylePreset } from './types.ts';
 
-export interface CompactBlinkProps
-  extends Omit<BlinkContainerProps, 'Layout' | 'component' | 'securityLevel'> {
+export interface MiniBlinkProps
+  extends Omit<BlinkContainerProps, 'Layout' | 'selector' | 'securityLevel'> {
   _Layout?: ComponentType<
     BaseBlinkLayoutProps & {
       stylePreset?: StylePreset;
     }
   >;
   stylePreset?: StylePreset;
-  component: (currentAction: Action) => AbstractActionComponent | null;
+  selector: (currentAction: Action) => AbstractActionComponent | null;
 }
 
-export const CompactBlink = ({
+export const MiniBlink = ({
   _Layout: Layout = NormalizedIsolatedBlinkLayout,
   stylePreset,
   ...props
-}: CompactBlinkProps) => {
+}: MiniBlinkProps) => {
   const LayoutWithPreset = useCallback(
     (props: BaseBlinkLayoutProps) => (
       <Layout {...props} stylePreset={stylePreset} />

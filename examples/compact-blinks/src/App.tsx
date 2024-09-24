@@ -1,5 +1,5 @@
 import {
-  CompactBlink,
+  MiniBlink,
   useAction,
   useActionsRegistryInterval,
 } from '@dialectlabs/blinks';
@@ -15,7 +15,7 @@ function App() {
     import.meta.env.VITE_PUBLIC_RPC_URL,
   );
   const { action, isLoading } = useAction({
-    url: 'https://dial.to/api/donate',
+    url: 'solana-action:https://dial.to/api/donate',
     adapter,
   });
 
@@ -27,11 +27,9 @@ function App() {
           {isLoading || !action ? (
             <span>Loading</span>
           ) : (
-            <CompactBlink
-              component={(currentAction) =>
-                currentAction.actions.find(
-                  (component) => component.label === 'Donate',
-                )!
+            <MiniBlink
+              selector={(currentAction) =>
+                currentAction.actions.find((a) => a.label === 'Donate')!
               }
               action={action}
             />

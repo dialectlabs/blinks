@@ -9,7 +9,7 @@ import { BaseBlinkLayout } from './layouts/BaseBlinkLayout.tsx';
 import type { StylePreset } from './types.ts';
 
 export interface BlinkProps
-  extends Omit<BlinkContainerProps, 'Layout' | 'component'> {
+  extends Omit<BlinkContainerProps, 'Layout' | 'selector'> {
   _Layout?: ComponentType<BaseBlinkLayoutProps & { stylePreset?: StylePreset }>;
   stylePreset?: StylePreset;
 }
@@ -29,7 +29,7 @@ export const Blink = ({
   return (
     <BlinkContainer
       {...props}
-      component={undefined} // explicitly disabled, use `CompactBlink` instead
+      selector={undefined} // explicitly disabled, use `MiniBlink` instead
       Layout={LayoutWithPreset}
     />
   );
