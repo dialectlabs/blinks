@@ -1,4 +1,4 @@
-import { nanoid } from 'nanoid';
+import { nanoid } from 'nanoid/non-secure';
 import { proxify, proxifyImage } from '../../utils';
 import { isUrlSameOrigin } from '../../utils/security.ts';
 import type { ActionAdapter } from '../ActionConfig.ts';
