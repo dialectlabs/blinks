@@ -10,7 +10,6 @@ import {
   Action,
   type ActionCallbacksConfig,
   type ActionContext,
-  type ActionPostResponse,
   type ActionSupportability,
   FormActionComponent,
   getExtendedActionState,
@@ -26,6 +25,7 @@ import {
   isPostRequestError,
   isSignTransactionError,
 } from './utils/type-guards.ts';
+import { isURL } from './utils/validators.ts';
 
 export type BlinkSecurityState = SecurityActionState;
 
@@ -440,41 +440,32 @@ export const BlinkContainer = ({
         return;
       }
 
-      const tx = await component
+      const response = await component
         .post(account)
         .catch((e: Error) => ({ error: e.message }));
 
-      if (!(tx as ActionPostResponse).transaction || isPostRequestError(tx)) {
+      if (isPostRequestError(response)) {
         dispatch({
           type: ExecutionType.SOFT_RESET,
-          errorMessage: isPostRequestError(tx)
-            ? tx.error
+          errorMessage: isPostRequestError(response)
+            ? response.error
             : 'Transaction data missing',
         });
         return;
       }
 
-      const signResult = await action.adapter.signTransaction(
-        tx.transaction,
-        context,
-      );
-
-      if (!signResult || isSignTransactionError(signResult)) {
-        dispatch({ type: ExecutionType.RESET });
-      } else {
-        await action.adapter.confirmTransaction(signResult.signature, context);
-
-        if (!tx.links?.next) {
+      const chain = async (signature?: string) => {
+        if (!response.links?.next) {
           dispatch({
             type: ExecutionType.FINISH,
-            successMessage: tx.message,
+            successMessage: response.message,
           });
           return;
         }
 
         // chain
-        const nextAction = await action.chain(tx.links.next, {
-          signature: signResult.signature,
+        const nextAction = await action.chain(response.links.next, {
+          signature: signature,
           account: account,
         });
 
@@ -482,13 +473,44 @@ export const BlinkContainer = ({
         if (!nextAction || (isPartialAction && !selector?.(nextAction))) {
           dispatch({
             type: ExecutionType.FINISH,
-            successMessage: tx.message,
+            successMessage: response.message,
           });
           return;
         }
 
         setAction(nextAction);
         dispatch({ type: ExecutionType.RESET });
+      };
+
+      if (response.type === 'transaction' || !response.type) {
+        const signResult = await action.adapter.signTransaction(
+          response.transaction,
+          context,
+        );
+
+        if (!signResult || isSignTransactionError(signResult)) {
+          dispatch({ type: ExecutionType.RESET });
+          return;
+        }
+
+        await action.adapter.confirmTransaction(signResult.signature, context);
+
+        await chain(signResult.signature);
+        return;
+      }
+
+      if (response.type === 'post') {
+        await chain();
+        return;
+      }
+
+      if (response.type === 'external-link') {
+        if (isURL(response.externalLink)) {
+          await action.adapter.openLink(response.externalLink, context);
+        }
+
+        await chain();
+        return;
       }
     } catch (e) {
       dispatch({
