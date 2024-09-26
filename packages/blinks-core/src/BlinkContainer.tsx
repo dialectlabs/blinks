@@ -219,10 +219,19 @@ const checkSecurityFromActionState = (
   state: ActionStateWithOrigin,
   normalizedSecurityLevel: NormalizedSecurityLevel,
 ): boolean => {
-  return checkSecurity(state.action, normalizedSecurityLevel.actions) &&
-    state.origin
-    ? checkSecurity(state.origin, normalizedSecurityLevel[state.originType])
-    : true;
+  const checkAction = checkSecurity(
+    state.action,
+    normalizedSecurityLevel.actions,
+  );
+
+  if (!state.origin) {
+    return checkAction;
+  }
+
+  return (
+    checkAction &&
+    checkSecurity(state.origin, normalizedSecurityLevel[state.originType])
+  );
 };
 
 const DEFAULT_SECURITY_LEVEL: SecurityLevel = 'only-trusted';
