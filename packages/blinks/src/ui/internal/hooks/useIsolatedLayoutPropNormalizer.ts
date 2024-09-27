@@ -35,8 +35,35 @@ export const useIsolatedLayoutPropNormalizer = ({
           buttonVariantMap[
             action.type === 'completed' ? 'success' : executionStatus
           ],
-        onClick: (params?: Record<string, string | string[]>) =>
-          executeFn(it.parentComponent ?? it, params),
+        ctaType:
+          it.type === 'external-link' &&
+          (executionStatus === 'idle' || executionStatus === 'blocked')
+            ? ('link' as const)
+            : ('button' as const),
+        onClick: async (params?: Record<string, string | string[]>) => {
+          const extra = await executeFn(it.parentComponent ?? it, params);
+
+          if (!extra) {
+            return;
+          }
+
+          if (extra.type === 'external-link') {
+            const result = window.confirm(
+              `This action redirects to another website: ${extra.data.externalLink}, the link will open in a new tab of your browser`,
+            );
+
+            if (result) {
+              window.open(
+                extra.data.externalLink,
+                '_blank',
+                'norefferer,noopener',
+              );
+              return extra.onNext();
+            }
+
+            return extra.onCancel?.();
+          }
+        },
       };
     },
     [action.disabled, action.type, executeFn, executingAction, executionStatus],

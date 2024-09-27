@@ -8,6 +8,7 @@ export const ActionButton = ({
   disabled,
   variant,
   onClick,
+  ctaType,
 }: BaseButtonProps) => {
   const ButtonContent = () => {
     if (loading)
@@ -27,7 +28,12 @@ export const ActionButton = ({
   };
 
   return (
-    <Button onClick={() => onClick()} disabled={disabled} variant={variant}>
+    <Button
+      onClick={() => onClick()}
+      disabled={disabled}
+      variant={variant}
+      ctaType={ctaType}
+    >
       <span className="min-w-0 truncate">
         <ButtonContent />
       </span>

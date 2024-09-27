@@ -5,6 +5,7 @@ import type { ActionAdapter } from '../ActionConfig.ts';
 import type {
   ActionParameterType,
   ExtendedActionGetResponse,
+  LinkedActionType,
   NextAction,
   NextActionLink,
   NextActionPostRequest,
@@ -67,7 +68,9 @@ export class Action {
   ) {
     // if no links present or completed, fallback to original solana pay spec (or just using the button as a placeholder)
     if (_data.type === 'completed' || !_data.links?.actions) {
-      this._actions = [new ButtonActionComponent(this, _data.label, _url)];
+      this._actions = [
+        new ButtonActionComponent(this, _data.label, _url, 'transaction'),
+      ];
       return;
     }
 
@@ -77,7 +80,13 @@ export class Action {
         ? action.href
         : urlObj.origin + action.href;
 
-      return componentFactory(this, action.label, href, action.parameters);
+      return componentFactory(
+        this,
+        action.label,
+        href,
+        action.type ?? 'transaction',
+        action.parameters,
+      );
     });
   }
 
@@ -352,25 +361,32 @@ const componentFactory = (
   parent: Action,
   label: string,
   href: string,
+  type: LinkedActionType,
   parameters?: TypedActionParameter[],
 ): AbstractActionComponent => {
   if (!parameters?.length) {
-    return new ButtonActionComponent(parent, label, href);
+    return new ButtonActionComponent(parent, label, href, type);
   }
 
   if (parameters.length > 1) {
-    return new FormActionComponent(parent, label, href, parameters);
+    return new FormActionComponent(parent, label, href, type, parameters);
   }
 
   const [parameter] = parameters;
 
   if (!parameter.type) {
-    return new SingleValueActionComponent(parent, label, href, parameters);
+    return new SingleValueActionComponent(
+      parent,
+      label,
+      href,
+      type,
+      parameters,
+    );
   }
 
   if (MULTI_VALUE_TYPES.includes(parameter.type)) {
-    return new MultiValueActionComponent(parent, label, href, parameters);
+    return new MultiValueActionComponent(parent, label, href, type, parameters);
   }
 
-  return new SingleValueActionComponent(parent, label, href, parameters);
+  return new SingleValueActionComponent(parent, label, href, type, parameters);
 };

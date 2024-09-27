@@ -3,6 +3,7 @@ import type {
   ActionError,
   ActionPostRequest,
   ActionPostResponse,
+  LinkedActionType,
   TypedActionParameter,
 } from '../../actions-spec.ts';
 import { Action } from '../Action.ts';
@@ -12,6 +13,7 @@ export abstract class AbstractActionComponent {
     protected _parent: Action,
     protected _label: string,
     protected _href: string,
+    protected _type: LinkedActionType,
     protected _parameters?: TypedActionParameter[],
   ) {}
 
@@ -25,6 +27,10 @@ export abstract class AbstractActionComponent {
 
   public get parameters() {
     return this._parameters ?? [];
+  }
+
+  public get type() {
+    return this._type;
   }
 
   public abstract get href(): string;

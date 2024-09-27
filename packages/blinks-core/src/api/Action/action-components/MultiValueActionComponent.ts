@@ -1,5 +1,6 @@
 import type {
   ActionPostRequest,
+  LinkedActionType,
   SelectableParameterType,
   TypedActionParameter,
 } from '../../actions-spec.ts';
@@ -14,10 +15,11 @@ export class MultiValueActionComponent extends AbstractActionComponent {
     protected _parent: Action,
     protected _label: string,
     protected _href: string,
+    protected _type: LinkedActionType,
     protected _parameters?: TypedActionParameter[],
     protected _parentComponent?: AbstractActionComponent,
   ) {
-    super(_parent, _label, _href, _parameters);
+    super(_parent, _label, _href, _type, _parameters);
   }
 
   get parentComponent() {
@@ -66,6 +68,7 @@ export class MultiValueActionComponent extends AbstractActionComponent {
       this._parent,
       this._label,
       this._href,
+      this._type,
       undefined,
       this,
     );

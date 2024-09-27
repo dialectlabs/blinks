@@ -1,20 +1,23 @@
 import clsx from 'clsx';
 import type { PropsWithChildren } from 'react';
+import { DeepLinkIcon } from './icons';
 
 export const Button = ({
   onClick,
   disabled,
   variant = 'default',
   children,
+  ctaType = 'button',
 }: {
   onClick: () => void;
   disabled?: boolean;
   variant?: 'success' | 'error' | 'default';
+  ctaType?: 'button' | 'link';
 } & PropsWithChildren) => {
   return (
     <button
       className={clsx(
-        'flex w-full items-center justify-center text-nowrap rounded-button px-4 py-3 text-text font-semibold transition-colors motion-reduce:transition-none',
+        'rounded-button text-text relative flex w-full items-center justify-center text-nowrap px-4 py-3 font-semibold transition-colors motion-reduce:transition-none',
         {
           'bg-button-disabled text-text-button-disabled':
             disabled && variant !== 'success',
@@ -27,6 +30,17 @@ export const Button = ({
       onClick={onClick}
     >
       {children}
+      {ctaType === 'link' && (
+        <span className="absolute right-1 top-1">
+          <DeepLinkIcon
+            className={clsx('h-2.5 w-2.5', {
+              'text-text-button-disabled': disabled && variant !== 'success',
+              'text-text-button': !disabled && variant !== 'success',
+              'text-text-button-success': variant === 'success', // success is likely to be always disabled
+            })}
+          />
+        </span>
+      )}
     </button>
   );
 };

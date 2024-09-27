@@ -10,12 +10,12 @@ import {
   Action,
   type ActionCallbacksConfig,
   type ActionContext,
-  type ActionPostResponse,
   type ActionSupportability,
   FormActionComponent,
   getExtendedActionState,
   getExtendedInterstitialState,
   getExtendedWebsiteState,
+  type LinkedActionType,
   mergeActionStates,
   MultiValueActionComponent,
   type SecurityActionState,
@@ -26,6 +26,7 @@ import {
   isPostRequestError,
   isSignTransactionError,
 } from './utils/type-guards.ts';
+import { isURL } from './utils/validators.ts';
 
 export type BlinkSecurityState = SecurityActionState;
 
@@ -51,6 +52,15 @@ export interface BlinkCaption {
   text: string;
 }
 
+export type ExtraExecutionData = {
+  type: Extract<LinkedActionType, 'external-link'>;
+  data: {
+    externalLink: string;
+  };
+  onNext: () => void;
+  onCancel?: () => void;
+};
+
 export interface BaseBlinkLayoutProps {
   id?: string;
   securityState: BlinkSecurityState;
@@ -63,7 +73,7 @@ export interface BaseBlinkLayoutProps {
   executeFn: (
     component: AbstractActionComponent,
     params?: Record<string, string | string[]>,
-  ) => Promise<void>;
+  ) => Promise<ExtraExecutionData | void>;
   executionStatus: ExecutionStatus;
   executingAction?: AbstractActionComponent | null;
   supportability: ActionSupportability;
@@ -394,7 +404,7 @@ export const BlinkContainer = ({
   const execute = async (
     component: AbstractActionComponent,
     params?: Record<string, string | string[]>,
-  ) => {
+  ): Promise<ExtraExecutionData | void> => {
     if (params) {
       if (component instanceof FormActionComponent) {
         Object.entries(params).forEach(([name, value]) =>
@@ -449,41 +459,32 @@ export const BlinkContainer = ({
         return;
       }
 
-      const tx = await component
+      const response = await component
         .post(account)
         .catch((e: Error) => ({ error: e.message }));
 
-      if (!(tx as ActionPostResponse).transaction || isPostRequestError(tx)) {
+      if (isPostRequestError(response)) {
         dispatch({
           type: ExecutionType.SOFT_RESET,
-          errorMessage: isPostRequestError(tx)
-            ? tx.error
+          errorMessage: isPostRequestError(response)
+            ? response.error
             : 'Transaction data missing',
         });
         return;
       }
 
-      const signResult = await action.adapter.signTransaction(
-        tx.transaction,
-        context,
-      );
-
-      if (!signResult || isSignTransactionError(signResult)) {
-        dispatch({ type: ExecutionType.RESET });
-      } else {
-        await action.adapter.confirmTransaction(signResult.signature, context);
-
-        if (!tx.links?.next) {
+      const chain = async (signature?: string) => {
+        if (!response.links?.next) {
           dispatch({
             type: ExecutionType.FINISH,
-            successMessage: tx.message,
+            successMessage: response.message,
           });
           return;
         }
 
         // chain
-        const nextAction = await action.chain(tx.links.next, {
-          signature: signResult.signature,
+        const nextAction = await action.chain(response.links.next, {
+          signature: signature,
           account: account,
         });
 
@@ -491,13 +492,51 @@ export const BlinkContainer = ({
         if (!nextAction || (isPartialAction && !selector?.(nextAction))) {
           dispatch({
             type: ExecutionType.FINISH,
-            successMessage: tx.message,
+            successMessage: response.message,
           });
           return;
         }
 
         setAction(nextAction);
         dispatch({ type: ExecutionType.RESET });
+      };
+
+      if (response.type === 'transaction' || !response.type) {
+        const signResult = await action.adapter.signTransaction(
+          response.transaction,
+          context,
+        );
+
+        if (!signResult || isSignTransactionError(signResult)) {
+          dispatch({ type: ExecutionType.RESET });
+          return;
+        }
+
+        await action.adapter.confirmTransaction(signResult.signature, context);
+
+        await chain(signResult.signature);
+        return;
+      }
+
+      if (response.type === 'post') {
+        await chain();
+        return;
+      }
+
+      if (response.type === 'external-link') {
+        if (isURL(response.externalLink)) {
+          return {
+            type: 'external-link',
+            data: {
+              externalLink: response.externalLink,
+            },
+            onNext: () => chain(),
+            onCancel: () => chain(),
+          };
+        }
+
+        await chain();
+        return;
       }
     } catch (e) {
       dispatch({
