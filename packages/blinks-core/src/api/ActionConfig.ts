@@ -15,7 +15,7 @@ export interface ActionContext {
 export interface IncomingActionConfig {
   rpcUrl: string;
   adapter: Pick<ActionAdapter, 'connect' | 'signTransaction'> &
-    Partial<Pick<ActionAdapter, 'metadata' | 'openLink'>>;
+    Partial<Pick<ActionAdapter, 'metadata'>>;
 }
 
 /**
@@ -43,7 +43,6 @@ export interface ActionAdapter {
     signature: string,
     context: ActionContext,
   ) => Promise<void>;
-  openLink: (url: string, context: ActionContext) => Promise<void>;
 }
 
 export class ActionConfig implements ActionAdapter {
@@ -123,15 +122,5 @@ export class ActionConfig implements ActionAdapter {
     } catch {
       return null;
     }
-  }
-
-  openLink(url: string, context: ActionContext) {
-    if (this.adapter.openLink) {
-      return this.adapter.openLink(url, context);
-    }
-
-    // Fallback to web api
-    window.open(url, '_blank', 'noopener,noreferrer');
-    return Promise.resolve();
   }
 }

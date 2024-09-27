@@ -15,6 +15,7 @@ import {
   getExtendedActionState,
   getExtendedInterstitialState,
   getExtendedWebsiteState,
+  type LinkedActionType,
   mergeActionStates,
   MultiValueActionComponent,
   type SecurityActionState,
@@ -51,6 +52,15 @@ export interface BlinkCaption {
   text: string;
 }
 
+export type ExtraExecutionData = {
+  type: Extract<LinkedActionType, 'external-link'>;
+  data: {
+    externalLink: string;
+  };
+  onNext: () => void;
+  onCancel?: () => void;
+};
+
 export interface BaseBlinkLayoutProps {
   id?: string;
   securityState: BlinkSecurityState;
@@ -63,7 +73,7 @@ export interface BaseBlinkLayoutProps {
   executeFn: (
     component: AbstractActionComponent,
     params?: Record<string, string | string[]>,
-  ) => Promise<void>;
+  ) => Promise<ExtraExecutionData | void>;
   executionStatus: ExecutionStatus;
   executingAction?: AbstractActionComponent | null;
   supportability: ActionSupportability;
@@ -385,7 +395,7 @@ export const BlinkContainer = ({
   const execute = async (
     component: AbstractActionComponent,
     params?: Record<string, string | string[]>,
-  ) => {
+  ): Promise<ExtraExecutionData | void> => {
     if (params) {
       if (component instanceof FormActionComponent) {
         Object.entries(params).forEach(([name, value]) =>
@@ -506,7 +516,14 @@ export const BlinkContainer = ({
 
       if (response.type === 'external-link') {
         if (isURL(response.externalLink)) {
-          await action.adapter.openLink(response.externalLink, context);
+          return {
+            type: 'external-link',
+            data: {
+              externalLink: response.externalLink,
+            },
+            onNext: () => chain(),
+            onCancel: () => chain(),
+          };
         }
 
         await chain();
