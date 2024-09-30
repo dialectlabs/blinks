@@ -1,3 +1,4 @@
+import type { SignMessageData } from '@solana/actions-spec';
 import { Connection } from '@solana/web3.js';
 import {
   type Action,
@@ -14,7 +15,7 @@ export interface ActionContext {
 
 export interface IncomingActionConfig {
   rpcUrl: string;
-  adapter: Pick<ActionAdapter, 'connect' | 'signTransaction'> &
+  adapter: Pick<ActionAdapter, 'connect' | 'signTransaction' | 'signMessage'> &
     Partial<Pick<ActionAdapter, 'metadata'>>;
 }
 
@@ -43,6 +44,10 @@ export interface ActionAdapter {
     signature: string,
     context: ActionContext,
   ) => Promise<void>;
+  signMessage: (
+    data: string | SignMessageData,
+    context: ActionContext,
+  ) => Promise<{ signature: string } | { error: string }>;
 }
 
 export class ActionConfig implements ActionAdapter {
@@ -114,6 +119,13 @@ export class ActionConfig implements ActionAdapter {
 
       confirm();
     });
+  }
+
+  async signMessage(
+    data: string | SignMessageData,
+    context: ActionContext,
+  ): Promise<{ signature: string } | { error: string }> {
+    return this.adapter.signMessage(data, context);
   }
 
   async connect(context: ActionContext) {

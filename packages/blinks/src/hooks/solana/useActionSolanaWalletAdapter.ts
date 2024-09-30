@@ -1,8 +1,17 @@
 'use client';
-import { ActionConfig } from '@dialectlabs/blinks-core';
+import {
+  ActionConfig,
+  type ActionContext,
+  createSignMessageText,
+  verifySignMessageData,
+} from '@dialectlabs/blinks-core';
+
+import type { SignMessageData } from '@solana/actions-spec';
+import type { MessageSignerWalletAdapterProps } from '@solana/wallet-adapter-base';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Connection, VersionedTransaction } from '@solana/web3.js';
+import bs58 from 'bs58';
 import { useMemo } from 'react';
 
 /**
@@ -37,8 +46,9 @@ export function useActionSolanaWalletAdapter(
 
         return wallet.publicKey?.toBase58() ?? null;
       },
-      signTransaction: async (txData: string) => {
+      signTransaction: async (txData: string, context: ActionContext) => {
         try {
+          console.log(context.originalUrl, context.action.url);
           const tx = await wallet.sendTransaction(
             VersionedTransaction.deserialize(Buffer.from(txData, 'base64')),
             finalConnection,
@@ -48,8 +58,52 @@ export function useActionSolanaWalletAdapter(
           return { error: 'Signing failed.' };
         }
       },
+      signMessage: async (
+        data: string | SignMessageData,
+        context: ActionContext,
+      ): Promise<
+        | { signature: string }
+        | {
+            error: string;
+          }
+      > => {
+        if (!wallet.signMessage || !wallet.publicKey) {
+          return { error: 'Signing failed.' };
+        }
+        try {
+          if (typeof data === 'string') {
+            return await signText(data, wallet.signMessage);
+          }
+          const verified = verifySignMessageData(
+            data,
+            context,
+            wallet.publicKey.toString(),
+          );
+          console.error(
+            `[@dialectlabs/blinks] Sign message data verification: ${verified}`,
+          );
+          if (!verified) {
+            return { error: 'Invalid sign message data.' };
+          }
+          const messageText = createSignMessageText(data);
+          return await signText(messageText, wallet.signMessage);
+        } catch (e) {
+          return { error: 'Signing failed.' };
+        }
+      },
     });
   }, [finalConnection, wallet, walletModal]);
 
   return { adapter };
+}
+
+async function signText(
+  data: string,
+  signMessage: MessageSignerWalletAdapterProps['signMessage'],
+) {
+  const textEncoder = new TextEncoder();
+  const encoded = textEncoder.encode(data);
+  const signed = await signMessage(encoded);
+  const encodedSignature = bs58.encode(signed);
+  return { signature: encodedSignature };
 }
