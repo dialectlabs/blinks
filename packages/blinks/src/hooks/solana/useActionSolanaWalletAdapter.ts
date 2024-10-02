@@ -75,10 +75,6 @@ export function useActionSolanaWalletAdapter(
           }
           const errors = verifySignMessageData(data, {
             expectedAddress: wallet.publicKey.toString(),
-            expectedDomains: [
-              new URL(context.originalUrl).hostname,
-              new URL(context.action.url).hostname,
-            ],
           } satisfies SignMessageVerificationOptions);
           const verified = errors.length === 0;
           if (!verified) {
