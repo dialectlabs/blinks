@@ -6,6 +6,7 @@ import {
   verifySignMessageData,
 } from '@dialectlabs/blinks-core';
 
+import type { SignMessageVerificationOptions } from '@dialectlabs/blinks-core';
 import type { SignMessageData } from '@solana/actions-spec';
 import type { MessageSignerWalletAdapterProps } from '@solana/wallet-adapter-base';
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -13,7 +14,6 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Connection, VersionedTransaction } from '@solana/web3.js';
 import bs58 from 'bs58';
 import { useMemo } from 'react';
-
 /**
  * Hook to create an action adapter using solana's wallet adapter.
  *
@@ -46,9 +46,8 @@ export function useActionSolanaWalletAdapter(
 
         return wallet.publicKey?.toBase58() ?? null;
       },
-      signTransaction: async (txData: string, context: ActionContext) => {
+      signTransaction: async (txData: string) => {
         try {
-          console.log(context.originalUrl, context.action.url);
           const tx = await wallet.sendTransaction(
             VersionedTransaction.deserialize(Buffer.from(txData, 'base64')),
             finalConnection,
@@ -74,15 +73,18 @@ export function useActionSolanaWalletAdapter(
           if (typeof data === 'string') {
             return await signText(data, wallet.signMessage);
           }
-          const verified = verifySignMessageData(
-            data,
-            context,
-            wallet.publicKey.toString(),
-          );
-          console.error(
-            `[@dialectlabs/blinks] Sign message data verification: ${verified}`,
-          );
+          const errors = verifySignMessageData(data, {
+            expectedAddress: wallet.publicKey.toString(),
+            expectedDomains: [
+              new URL(context.originalUrl).hostname,
+              new URL(context.action.url).hostname,
+            ],
+          } satisfies SignMessageVerificationOptions);
+          const verified = errors.length === 0;
           if (!verified) {
+            console.error(
+              `[@dialectlabs/blinks] Sign message data verification: ${errors.join(', ')}`,
+            );
             return { error: 'Invalid sign message data.' };
           }
           const messageText = createSignMessageText(data);

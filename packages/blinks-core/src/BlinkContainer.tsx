@@ -446,6 +446,8 @@ export const BlinkContainer = ({
 
     dispatch({ type: ExecutionType.INITIATE, executingAction: component });
 
+    console.log(`Website URL: ${websiteUrl}`);
+    console.log(`Component parent URL: ${component.parent.url}`);
     const context: ActionContext = {
       action: component.parent,
       actionType: actionState.action,
@@ -527,10 +529,7 @@ export const BlinkContainer = ({
         );
 
         if (!signResult || isSignMessageError(signResult)) {
-          dispatch({
-            type: ExecutionType.SOFT_RESET,
-            errorMessage: signResult.error,
-          });
+          dispatch({ type: ExecutionType.RESET });
           return;
         }
 

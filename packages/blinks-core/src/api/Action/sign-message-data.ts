@@ -1,50 +1,39 @@
 import type { SignMessageData } from '@solana/actions-spec';
-import type { ActionContext } from '../ActionConfig';
 
-export function verifySignMessageData(
-  input: SignMessageData,
-  context: ActionContext,
-  connectedWallet: string,
-): boolean {
-  return (
-    areMandatoryFieldsPresent(input) &&
-    isDomainAllowed(input.domain, context) &&
-    input.address === connectedWallet
-  );
+export interface SignMessageVerificationOptions {
+  expectedAddress?: string;
+  expectedDomains?: string[];
+  expectedChainIds?: string[];
+  issuedAtThreshold?: number;
 }
 
-function areMandatoryFieldsPresent(input: SignMessageData): boolean {
-  return !!input.address && !!input.domain && !!input.issuedAt && !!input.nonce;
+export enum SignMessageVerificationErrorType {
+  ADDRESS_MISMATCH = 'ADDRESS_MISMATCH',
+  DOMAIN_MISMATCH = 'DOMAIN_MISMATCH',
+  CHAIN_ID_MISMATCH = 'CHAIN_ID_MISMATCH',
+  ISSUED_TOO_FAR_IN_THE_PAST = 'ISSUED_TOO_FAR_IN_THE_PAST',
+  ISSUED_TOO_FAR_IN_THE_FUTURE = 'ISSUED_TOO_FAR_IN_THE_FUTURE',
+  INVALID_DATA = 'INVALID_DATA',
 }
 
-function isDomainAllowed(domain: string, context: ActionContext): boolean {
-  const actionUrl = context.action.url;
-  const originalUrl = context.originalUrl;
+const DOMAIN =
+  '(?<domain>[^\\n]+?) wants you to sign message with your account:\\n';
+const ADDRESS = '(?<address>[^\\n]+)(?:\\n|$)';
+const STATEMENT = '(?:\\n(?<statement>[\\S\\s]*?)(?:\\n|$))';
+const CHAIN_ID = '(?:\\nChain ID: (?<chainId>[^\\n]+))?';
+const NONCE = '\\nNonce: (?<nonce>[^\\n]+)';
+const ISSUED_AT = '\\nIssued At: (?<issuedAt>[^\\n]+)';
+const FIELDS = `${CHAIN_ID}${NONCE}${ISSUED_AT}`;
+const MESSAGE = new RegExp(`^${DOMAIN}${ADDRESS}${STATEMENT}${FIELDS}\\n*$`);
 
-  return (
-    areDomainsEqual(domain, new URL(actionUrl).hostname) ||
-    areDomainsEqual(domain, new URL(originalUrl).hostname)
-  );
-}
-
-function areDomainsEqual(domain1: string, domain2: string): boolean {
-  const normalizedDomain1: string = domain1.trim().replace(/^www\./, '');
-  const normalizedDomain2: string = domain2.trim().replace(/^www\./, '');
-  return normalizedDomain1 === normalizedDomain2;
-}
-
+/**
+ * Create a human-readable message text for the user to sign.
+ *
+ * @param input The data to be signed.
+ * @returns The message text.
+ */
 export function createSignMessageText(input: SignMessageData): string {
-  // ${domain} wants you to sign in with your Solana account:
-  // ${address}
-  //
-  // ${statement}
-  //
-  // Chain ID: ${chain}
-  // Nonce: ${nonce}
-  // Issued At: ${issued-at}
-  // Expiration Time: ${expiration-time}
-
-  let message = `${input.domain} wants you to sign in with your Solana account:\n`;
+  let message = `${input.domain} wants you to sign message with your account:\n`;
   message += `${input.address}`;
 
   if (input.statement) {
@@ -52,6 +41,7 @@ export function createSignMessageText(input: SignMessageData): string {
   }
 
   const fields: string[] = [];
+
   if (input.chainId) {
     fields.push(`Chain ID: ${input.chainId}`);
   }
@@ -66,4 +56,102 @@ export function createSignMessageText(input: SignMessageData): string {
   }
 
   return message;
+}
+
+/**
+ * Parse the sign message text to extract the data to be signed.
+ * @param text The message text to be parsed.
+ */
+export function parseSignMessageText(text: string): SignMessageData | null {
+  const match = MESSAGE.exec(text);
+  if (!match) return null;
+  const groups = match.groups;
+  if (!groups) return null;
+
+  return {
+    domain: groups.domain,
+    address: groups.address,
+    statement: groups.statement,
+    nonce: groups.nonce,
+    chainId: groups.chainId,
+    issuedAt: groups.issuedAt,
+  };
+}
+
+/**
+ * Verify the sign message data before signing.
+ * @param data The data to be signed.
+ * @param opts Options for verification, including the expected address, chainId, issuedAt, and domains.
+ *
+ * @returns An array of errors if the verification fails.
+ */
+export function verifySignMessageData(
+  data: SignMessageData,
+  opts: SignMessageVerificationOptions,
+) {
+  if (
+    !data.address ||
+    !data.domain ||
+    !data.issuedAt ||
+    !data.nonce ||
+    !data.statement
+  ) {
+    return [SignMessageVerificationErrorType.INVALID_DATA];
+  }
+
+  try {
+    const {
+      expectedAddress,
+      expectedChainIds,
+      issuedAtThreshold,
+      expectedDomains,
+    } = opts;
+    const errors: SignMessageVerificationErrorType[] = [];
+    const now = Date.now();
+
+    // verify if parsed address is same as the expected address
+    if (expectedAddress && data.address !== expectedAddress) {
+      errors.push(SignMessageVerificationErrorType.ADDRESS_MISMATCH);
+    }
+
+    if (expectedDomains) {
+      const expectedDomainsNormalized = expectedDomains.map(normalizeDomain);
+      const normalizedDomain = normalizeDomain(data.domain);
+
+      if (!expectedDomainsNormalized.includes(normalizedDomain)) {
+        errors.push(SignMessageVerificationErrorType.DOMAIN_MISMATCH);
+      }
+    }
+
+    if (
+      expectedChainIds &&
+      data.chainId &&
+      !expectedChainIds.includes(data.chainId)
+    ) {
+      errors.push(SignMessageVerificationErrorType.CHAIN_ID_MISMATCH);
+    }
+
+    if (issuedAtThreshold !== undefined) {
+      const iat = Date.parse(data.issuedAt);
+      if (Math.abs(iat - now) > issuedAtThreshold) {
+        if (iat < now) {
+          errors.push(
+            SignMessageVerificationErrorType.ISSUED_TOO_FAR_IN_THE_PAST,
+          );
+        } else {
+          errors.push(
+            SignMessageVerificationErrorType.ISSUED_TOO_FAR_IN_THE_FUTURE,
+          );
+        }
+      }
+    }
+
+    return errors;
+  } catch (e) {
+    return [SignMessageVerificationErrorType.INVALID_DATA];
+  }
+}
+
+function normalizeDomain(domain: string): string {
+  return domain.replace(/^www\./, '');
 }
