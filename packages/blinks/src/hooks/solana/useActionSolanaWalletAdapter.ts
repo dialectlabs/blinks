@@ -1,14 +1,12 @@
 'use client';
 import {
   ActionConfig,
-  type ActionContext,
   createSignMessageText,
+  type SignMessageVerificationOptions,
   verifySignMessageData,
 } from '@dialectlabs/blinks-core';
 
-import type { SignMessageVerificationOptions } from '@dialectlabs/blinks-core';
 import type { SignMessageData } from '@solana/actions-spec';
-import type { MessageSignerWalletAdapterProps } from '@solana/wallet-adapter-base';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Connection, VersionedTransaction } from '@solana/web3.js';
@@ -35,6 +33,23 @@ export function useActionSolanaWalletAdapter(
   }, [rpcUrlOrConnection]);
 
   const adapter = useMemo(() => {
+    function verifySignDataValidity(
+      data: string | SignMessageData,
+      opts: SignMessageVerificationOptions,
+    ) {
+      if (typeof data === 'string') {
+        // skip validation for string
+        return true;
+      }
+      const errors = verifySignMessageData(data, opts);
+      if (errors.length > 0) {
+        console.warn(
+          `[@dialectlabs/blinks] Sign message data verification error: ${errors.join(', ')}`,
+        );
+      }
+      return errors.length === 0;
+    }
+
     return new ActionConfig(finalConnection, {
       connect: async () => {
         try {
@@ -59,7 +74,6 @@ export function useActionSolanaWalletAdapter(
       },
       signMessage: async (
         data: string | SignMessageData,
-        context: ActionContext,
       ): Promise<
         | { signature: string }
         | {
@@ -70,21 +84,19 @@ export function useActionSolanaWalletAdapter(
           return { error: 'Signing failed.' };
         }
         try {
-          if (typeof data === 'string') {
-            return await signText(data, wallet.signMessage);
-          }
-          const errors = verifySignMessageData(data, {
+          // Optional data verification before signing
+          const isSignDataValid = verifySignDataValidity(data, {
             expectedAddress: wallet.publicKey.toString(),
-          } satisfies SignMessageVerificationOptions);
-          const verified = errors.length === 0;
-          if (!verified) {
-            console.error(
-              `[@dialectlabs/blinks] Sign message data verification: ${errors.join(', ')}`,
-            );
-            return { error: 'Invalid sign message data.' };
+          });
+          if (!isSignDataValid) {
+            return { error: 'Signing failed.' };
           }
-          const messageText = createSignMessageText(data);
-          return await signText(messageText, wallet.signMessage);
+          const text =
+            typeof data === 'string' ? data : createSignMessageText(data);
+          const encoded = new TextEncoder().encode(text);
+          const signed = await wallet.signMessage(encoded);
+          const encodedSignature = bs58.encode(signed);
+          return { signature: encodedSignature };
         } catch (e) {
           return { error: 'Signing failed.' };
         }
@@ -93,15 +105,4 @@ export function useActionSolanaWalletAdapter(
   }, [finalConnection, wallet, walletModal]);
 
   return { adapter };
-}
-
-async function signText(
-  data: string,
-  signMessage: MessageSignerWalletAdapterProps['signMessage'],
-) {
-  const textEncoder = new TextEncoder();
-  const encoded = textEncoder.encode(data);
-  const signed = await signMessage(encoded);
-  const encodedSignature = bs58.encode(signed);
-  return { signature: encodedSignature };
 }
