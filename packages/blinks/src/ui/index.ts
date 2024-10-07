@@ -1,3 +1,3 @@
 export * from './Blink.tsx';
-export * from './MiniBlink.tsx';
+export * from './Miniblink.tsx';
 export * from './types.ts';

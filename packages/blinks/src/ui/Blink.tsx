@@ -29,7 +29,7 @@ export const Blink = ({
   return (
     <BlinkContainer
       {...props}
-      selector={undefined} // explicitly disabled, use `MiniBlink` instead
+      selector={undefined} // explicitly disabled, use `Miniblink` instead
       Layout={LayoutWithPreset}
     />
   );

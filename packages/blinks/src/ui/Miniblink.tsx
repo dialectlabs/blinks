@@ -10,7 +10,7 @@ import { useIsolatedLayoutPropNormalizer } from './internal/hooks/useIsolatedLay
 import { IsolatedBlinkLayout } from './layouts/IsolatedBlinkLayout.tsx';
 import type { StylePreset } from './types.ts';
 
-export interface MiniBlinkProps
+export interface MiniblinkProps
   extends Omit<BlinkContainerProps, 'Layout' | 'selector' | 'securityLevel'> {
   _Layout?: ComponentType<
     BaseBlinkLayoutProps & {
@@ -21,11 +21,11 @@ export interface MiniBlinkProps
   selector: (currentAction: Action) => AbstractActionComponent | null;
 }
 
-export const MiniBlink = ({
+export const Miniblink = ({
   _Layout: Layout = NormalizedIsolatedBlinkLayout,
   stylePreset,
   ...props
-}: MiniBlinkProps) => {
+}: MiniblinkProps) => {
   const LayoutWithPreset = useCallback(
     (props: BaseBlinkLayoutProps) => (
       <Layout {...props} stylePreset={stylePreset} />
@@ -47,7 +47,7 @@ export const NormalizedIsolatedBlinkLayout = (
 
   if (!normalizedProps) {
     console.warn(
-      '[@dialectlabs/blinks] No `selector` prop provided for MiniBlink',
+      '[@dialectlabs/blinks] No `selector` prop provided for Miniblink',
     );
     return null;
   }

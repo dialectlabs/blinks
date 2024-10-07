@@ -1,5 +1,5 @@
 import {
-  MiniBlink,
+  Miniblink,
   useAction,
   useActionsRegistryInterval,
 } from '@dialectlabs/blinks';
@@ -27,7 +27,7 @@ function App() {
           {isLoading || !action ? (
             <span>Loading</span>
           ) : (
-            <MiniBlink
+            <Miniblink
               selector={(currentAction) =>
                 currentAction.actions.find((a) => a.label === 'Donate')!
               }
