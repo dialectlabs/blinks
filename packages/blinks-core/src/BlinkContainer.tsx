@@ -446,8 +446,6 @@ export const BlinkContainer = ({
 
     dispatch({ type: ExecutionType.INITIATE, executingAction: component });
 
-    console.log(`Website URL: ${websiteUrl}`);
-    console.log(`Component parent URL: ${component.parent.url}`);
     const context: ActionContext = {
       action: component.parent,
       actionType: actionState.action,
