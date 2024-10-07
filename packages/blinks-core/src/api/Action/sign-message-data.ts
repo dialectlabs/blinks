@@ -1,3 +1,4 @@
+// THIS FILE IS COPIED FROM https://github.com/solana-developers/solana-actions/blob/main/packages/solana-actions/src/signMessageData.ts
 import type { SignMessageData as SignMessageDataSpec } from '@solana/actions-spec';
 
 export type SignMessageData = SignMessageDataSpec;
