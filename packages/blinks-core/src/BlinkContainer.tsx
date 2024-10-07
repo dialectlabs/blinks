@@ -24,6 +24,7 @@ import {
 import { checkSecurity, isInterstitial, type SecurityLevel } from './utils';
 import {
   isPostRequestError,
+  isSignMessageError,
   isSignTransactionError,
 } from './utils/type-guards.ts';
 import { isURL } from './utils/validators.ts';
@@ -486,6 +487,7 @@ export const BlinkContainer = ({
         const nextAction = await action.chain(response.links.next, {
           signature: signature,
           account: account,
+          state: response.type === 'message' ? response.state : undefined,
         });
 
         // if this is running in partial action mode, then we end the chain, if passed fn returns a null value for the next action
@@ -516,6 +518,20 @@ export const BlinkContainer = ({
 
         await chain(signResult.signature);
         return;
+      }
+
+      if (response.type === 'message') {
+        const signResult = await action.adapter.signMessage(
+          response.data,
+          context,
+        );
+
+        if (!signResult || isSignMessageError(signResult)) {
+          dispatch({ type: ExecutionType.RESET });
+          return;
+        }
+
+        await chain(signResult.signature);
       }
 
       if (response.type === 'post') {

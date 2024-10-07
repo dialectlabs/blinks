@@ -266,7 +266,7 @@ export const BaseBlinkLayout = ({
           <span className="text-text text-text-primary mb-0.5 font-semibold">
             {title}
           </span>
-          <span className="text-subtext text-text-secondary mb-4 whitespace-pre-wrap">
+          <span className="text-subtext text-text-secondary mb-4 whitespace-pre-wrap break-words">
             {description}
           </span>
           {!supportability.isSupported ? (
