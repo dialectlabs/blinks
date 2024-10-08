@@ -109,6 +109,7 @@ class MyActionAdapter implements ActionAdapter {
       supportedBlockchainIds: [BlockchainIds.SOLANA_MAINNET],
     };
   }
+  async signMessage(data: string | SignMessageData) { ... }
 }
 
 setupTwitterObserver(new MyActionAdapter());
