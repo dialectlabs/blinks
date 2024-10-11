@@ -1,6 +1,19 @@
 # MiniBlink example
 
 ## Running example
-1. `bun i`
-2. Go to `.env` and replace `VITE_PUBLIC_RPC_URL` with your private rpc if you have any
-3. `bun run dev`
+
+install and build dependencies in the repo root
+```
+bun i
+bun run build
+``` 
+
+in `examples/mini-blinks`
+1. configure vars  `.env` file
+```
+VITE_PUBLIC_RPC_URL=${YOUR_RPC_URL}
+```
+2. run the example
+```
+bun run dev
+```
