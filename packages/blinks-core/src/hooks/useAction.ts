@@ -81,11 +81,23 @@ export function useAction({
     return () => {
       ignore = true;
     };
-  }, [actionApiUrl, isRegistryLoaded, supportStrategy]);
+  }, [actionApiUrl, isRegistryLoaded]);
 
   useEffect(() => {
-    action?.setAdapter(adapter);
-  }, [action, adapter]);
+    if (!action) {
+      return;
+    }
+    try {
+      const updated = Action.update(action, {
+        adapter,
+        supportStrategy,
+      });
+      setAction(updated);
+    } catch (e) {
+      console.error('[@dialectlabs/blinks-core] Failed to update action', e);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only update if adapter or supportStrategy changes
+  }, [adapter, supportStrategy]);
 
   return { action, isLoading };
 }

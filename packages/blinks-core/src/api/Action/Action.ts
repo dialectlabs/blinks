@@ -174,10 +174,6 @@ export class Action {
     return this._adapter;
   }
 
-  public setAdapter(adapter: ActionAdapter) {
-    this._adapter = adapter;
-  }
-
   public async isSupported() {
     try {
       return await this._supportStrategy(this);
@@ -330,6 +326,25 @@ export class Action {
         isChained: false,
       },
       id,
+    );
+  }
+
+  static update(
+    action: Action,
+    update: {
+      adapter?: ActionAdapter;
+      supportStrategy?: ActionSupportStrategy;
+    },
+  ) {
+    return new Action(
+      action.url,
+      action._data,
+      action.metadata,
+      update.supportStrategy ?? action._supportStrategy,
+      update.adapter ?? action.adapter,
+      action._chainMetadata,
+      action._id,
+      action._experimental,
     );
   }
 
