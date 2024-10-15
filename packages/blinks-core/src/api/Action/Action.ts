@@ -174,6 +174,15 @@ export class Action {
     return this._adapter;
   }
 
+  /**
+   * Set the adapter for the action.
+   * Not recommended to use in react environments, consider using Action.update() instead that returns a new instance.
+   * @param adapter The adapter to set
+   */
+  public setAdapter(adapter: ActionAdapter) {
+    this._adapter = adapter;
+  }
+
   public async isSupported() {
     try {
       return await this._supportStrategy(this);
