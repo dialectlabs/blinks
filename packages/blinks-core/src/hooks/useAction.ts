@@ -87,6 +87,8 @@ export function useAction({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only update if actionApiUrl changes
   }, [actionApiUrl, isRegistryLoaded]);
 
+  // this effect handles race conditions between fetching the action adapter change
+  // hasFetched dependency is used instead of action dependency to ensure there's no infinite loop
   useEffect(() => {
     if (!action || !hasFetched) {
       return;
