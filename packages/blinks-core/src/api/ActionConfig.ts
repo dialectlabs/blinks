@@ -16,7 +16,7 @@ export interface ActionContext {
 export interface IncomingActionConfig {
   rpcUrl: string;
   adapter: Pick<ActionAdapter, 'connect' | 'signTransaction' | 'signMessage'> &
-    Partial<Pick<ActionAdapter, 'metadata' | 'confirmTransaction'>>;
+    Partial<Pick<ActionAdapter, 'metadata'>>;
 }
 
 /**
@@ -79,11 +79,7 @@ export class ActionConfig implements ActionAdapter {
     return this.adapter.signTransaction(tx, context);
   }
 
-  confirmTransaction(signature: string, context: ActionContext): Promise<void> {
-    if (this.adapter.confirmTransaction) {
-      return this.adapter.confirmTransaction(signature, context);
-    }
-
+  confirmTransaction(signature: string): Promise<void> {
     return new Promise<void>((res, rej) => {
       const start = Date.now();
 
