@@ -53,6 +53,7 @@ export function useAction({
   const { actionApiUrl } = useActionApiUrl(url);
   const [action, setAction] = useState<Action | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasFetched, setHasFetched] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -61,12 +62,14 @@ export function useAction({
     }
 
     let ignore = false;
+    setHasFetched(false);
     Action.fetch(actionApiUrl, undefined, supportStrategy)
       .then((action) => {
         if (ignore) {
           return;
         }
         setAction(action);
+        setHasFetched(true);
       })
       .catch((e) => {
         console.error('[@dialectlabs/blinks-core] Failed to fetch action', e);
@@ -81,11 +84,26 @@ export function useAction({
     return () => {
       ignore = true;
     };
-  }, [actionApiUrl, isRegistryLoaded, supportStrategy]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only update if actionApiUrl changes
+  }, [actionApiUrl, isRegistryLoaded]);
 
+  // this effect handles race conditions between fetching the action adapter change
+  // hasFetched dependency is used instead of action dependency to ensure there's no infinite loop
   useEffect(() => {
-    action?.setAdapter(adapter);
-  }, [action, adapter]);
+    if (!action || !hasFetched) {
+      return;
+    }
+    try {
+      const updated = action.withUpdate({
+        adapter,
+        supportStrategy,
+      });
+      setAction(updated);
+    } catch (e) {
+      console.error('[@dialectlabs/blinks-core] Failed to update action', e);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only update if adapter or supportStrategy changes
+  }, [adapter, supportStrategy, hasFetched]);
 
   return { action, isLoading };
 }
