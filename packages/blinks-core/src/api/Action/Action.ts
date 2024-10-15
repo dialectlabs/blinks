@@ -338,25 +338,6 @@ export class Action {
     );
   }
 
-  static update(
-    action: Action,
-    update: {
-      adapter?: ActionAdapter;
-      supportStrategy?: ActionSupportStrategy;
-    },
-  ) {
-    return new Action(
-      action._url,
-      action._data,
-      action._metadata,
-      update.supportStrategy ?? action._supportStrategy,
-      update.adapter ?? action._adapter,
-      action._chainMetadata,
-      action._id,
-      action._experimental,
-    );
-  }
-
   refresh() {
     return Action._fetch(
       this.url,
@@ -364,6 +345,22 @@ export class Action {
       this._supportStrategy,
       this._chainMetadata,
       this._id,
+    );
+  }
+
+  withUpdate(update: {
+    adapter?: ActionAdapter;
+    supportStrategy?: ActionSupportStrategy;
+  }) {
+    return new Action(
+      this._url,
+      this._data,
+      this._metadata,
+      update.supportStrategy ?? this._supportStrategy,
+      update.adapter ?? this._adapter,
+      this._chainMetadata,
+      this._id,
+      this._experimental,
     );
   }
 }

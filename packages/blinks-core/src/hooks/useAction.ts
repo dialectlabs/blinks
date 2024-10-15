@@ -93,10 +93,8 @@ export function useAction({
     if (!action || !hasFetched) {
       return;
     }
-
-    console.log('Updating action with adapter and support strategy');
     try {
-      const updated = Action.update(action, {
+      const updated = action.withUpdate({
         adapter,
         supportStrategy,
       });
