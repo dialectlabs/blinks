@@ -337,11 +337,11 @@ export class Action {
     },
   ) {
     return new Action(
-      action.url,
+      action._url,
       action._data,
-      action.metadata,
+      action._metadata,
       update.supportStrategy ?? action._supportStrategy,
-      update.adapter ?? action.adapter,
+      update.adapter ?? action._adapter,
       action._chainMetadata,
       action._id,
       action._experimental,
