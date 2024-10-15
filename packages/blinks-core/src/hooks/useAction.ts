@@ -53,6 +53,7 @@ export function useAction({
   const { actionApiUrl } = useActionApiUrl(url);
   const [action, setAction] = useState<Action | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasFetched, setHasFetched] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
@@ -61,12 +62,14 @@ export function useAction({
     }
 
     let ignore = false;
-    Action.fetch(actionApiUrl, adapter, supportStrategy)
+    setHasFetched(false);
+    Action.fetch(actionApiUrl, undefined, supportStrategy)
       .then((action) => {
         if (ignore) {
           return;
         }
         setAction(action);
+        setHasFetched(true);
       })
       .catch((e) => {
         console.error('[@dialectlabs/blinks-core] Failed to fetch action', e);
@@ -81,12 +84,15 @@ export function useAction({
     return () => {
       ignore = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only update if actionApiUrl changes
   }, [actionApiUrl, isRegistryLoaded]);
 
   useEffect(() => {
-    if (!action) {
+    if (!action || !hasFetched) {
       return;
     }
+
+    console.log('Updating action with adapter and support strategy');
     try {
       const updated = Action.update(action, {
         adapter,
@@ -97,7 +103,7 @@ export function useAction({
       console.error('[@dialectlabs/blinks-core] Failed to update action', e);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only update if adapter or supportStrategy changes
-  }, [adapter, supportStrategy]);
+  }, [adapter, supportStrategy, hasFetched]);
 
   return { action, isLoading };
 }
