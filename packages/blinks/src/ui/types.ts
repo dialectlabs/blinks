@@ -1,1 +1,1 @@
-export type StylePreset = 'default' | 'x-dark' | 'x-light' | 'custom';
+export type StylePreset = 'default' | 'x-dark' | 'x-light' | 'custom' | 'youtube-dark' | 'youtube-light';
