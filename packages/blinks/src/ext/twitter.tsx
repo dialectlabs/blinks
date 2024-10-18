@@ -192,7 +192,6 @@ async function handleNewNode(
 
   const action = await Action.fetch(
     actionApiUrl,
-    config,
     options.supportStrategy,
   ).catch(noop);
 
@@ -201,6 +200,7 @@ async function handleNewNode(
   }
 
   const { container: actionContainer, reactRoot } = createAction({
+    config,
     originalUrl: actionUrl,
     action,
     callbacks,
@@ -230,12 +230,14 @@ function createAction({
   action,
   callbacks,
   options,
+  config,
 }: {
   originalUrl: URL;
   action: Action;
   callbacks: Partial<ActionCallbacksConfig>;
   options: NormalizedObserverOptions;
   isInterstitial: boolean;
+  config: ActionAdapter;
 }) {
   const container = document.createElement('div');
   container.className = 'dialect-action-root-container';
@@ -245,6 +247,7 @@ function createAction({
   actionRoot.render(
     <div onClick={(e) => e.stopPropagation()}>
       <Blink
+        adapter={config}
         stylePreset={resolveXStylePreset()}
         action={action}
         websiteUrl={originalUrl.toString()}
