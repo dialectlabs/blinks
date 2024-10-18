@@ -45,7 +45,7 @@ export type ActionSupportability =
 
 export type ActionSupportStrategy = (
   action: Action,
-  adapter?: ActionAdapter,
+  adapter: ActionAdapter,
 ) => Promise<ActionSupportability>;
 
 /**
@@ -78,9 +78,7 @@ export const defaultActionSupportStrategy: ActionSupportStrategy = async (
   }
 
   const supportedActionVersion = MAX_SUPPORTED_ACTION_VERSION;
-  const supportedBlockchainIds = !adapter
-    ? actionBlockchainIds // Assuming action is supported if adapter absent for optimistic compatibility
-    : adapter.metadata.supportedBlockchainIds;
+  const supportedBlockchainIds = adapter.metadata.supportedBlockchainIds;
 
   const versionSupported = isVersionSupported({
     actionVersion,

@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid/non-secure';
 import { proxify, proxifyImage } from '../../utils';
 import { isUrlSameOrigin } from '../../utils/security.ts';
+import type { ActionAdapter } from '../ActionConfig.ts';
 import type {
   ActionParameterType,
   ExtendedActionGetResponse,
@@ -160,9 +161,9 @@ export class Action {
     };
   }
 
-  public async isSupported() {
+  public async isSupported(adapter: ActionAdapter) {
     try {
-      return await this._supportStrategy(this);
+      return await this._supportStrategy(this, adapter);
     } catch (e) {
       console.error(
         `[@dialectlabs/blinks] Failed to check supportability for action ${this.url}`,

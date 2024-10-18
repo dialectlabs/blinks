@@ -390,7 +390,7 @@ export const BlinkContainer = ({
         return;
       }
       try {
-        const supportability = await action.isSupported();
+        const supportability = await action.isSupported(adapter);
         setSupportability(supportability);
       } finally {
         dispatch({
@@ -403,7 +403,13 @@ export const BlinkContainer = ({
     };
 
     checkSupportability(action);
-  }, [action, executionState.status, overallState, isPassingSecurityCheck]);
+  }, [
+    action,
+    adapter,
+    executionState.status,
+    overallState,
+    isPassingSecurityCheck,
+  ]);
 
   const execute = async (
     component: AbstractActionComponent,
