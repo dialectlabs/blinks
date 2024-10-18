@@ -8,6 +8,7 @@ import {
 import {
   AbstractActionComponent,
   Action,
+  type ActionAdapter,
   type ActionCallbacksConfig,
   type ActionContext,
   type ActionSupportability,
@@ -252,6 +253,7 @@ type NormalizedSecurityLevel = Record<Source, SecurityLevel>;
 
 export interface BlinkContainerProps {
   action: Action;
+  adapter: ActionAdapter;
   selector?: (currentAction: Action) => AbstractActionComponent | null;
   websiteUrl?: string | null;
   websiteText?: string | null;
@@ -263,6 +265,7 @@ export interface BlinkContainerProps {
 // overall flow: check-supportability -> idle/block -> executing -> success/error or chain
 export const BlinkContainer = ({
   action: initialAction,
+  adapter,
   websiteUrl,
   websiteText,
   callbacks,
@@ -454,7 +457,7 @@ export const BlinkContainer = ({
     };
 
     try {
-      const account = await action.adapter.connect(context);
+      const account = await adapter.connect(context);
       if (!account) {
         dispatch({ type: ExecutionType.RESET });
         return;
@@ -504,7 +507,7 @@ export const BlinkContainer = ({
       };
 
       if (response.type === 'transaction' || !response.type) {
-        const signResult = await action.adapter.signTransaction(
+        const signResult = await adapter.signTransaction(
           response.transaction,
           context,
         );
@@ -514,17 +517,14 @@ export const BlinkContainer = ({
           return;
         }
 
-        await action.adapter.confirmTransaction(signResult.signature, context);
+        await adapter.confirmTransaction(signResult.signature, context);
 
         await chain(signResult.signature);
         return;
       }
 
       if (response.type === 'message') {
-        const signResult = await action.adapter.signMessage(
-          response.data,
-          context,
-        );
+        const signResult = await adapter.signMessage(response.data, context);
 
         if (!signResult || isSignMessageError(signResult)) {
           dispatch({ type: ExecutionType.RESET });

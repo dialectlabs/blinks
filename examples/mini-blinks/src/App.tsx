@@ -16,7 +16,6 @@ function App() {
   );
   const { action, isLoading } = useAction({
     url: 'solana-action:https://dial.to/api/donate',
-    adapter,
   });
 
   return (
@@ -28,6 +27,7 @@ function App() {
             <span>Loading</span>
           ) : (
             <Miniblink
+              adapter={adapter}
               selector={(currentAction) =>
                 currentAction.actions.find((a) => a.label === 'Donate')!
               }

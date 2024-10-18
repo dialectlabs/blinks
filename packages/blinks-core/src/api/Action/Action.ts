@@ -1,7 +1,6 @@
 import { nanoid } from 'nanoid/non-secure';
 import { proxify, proxifyImage } from '../../utils';
 import { isUrlSameOrigin } from '../../utils/security.ts';
-import type { ActionAdapter } from '../ActionConfig.ts';
 import type {
   ActionParameterType,
   ExtendedActionGetResponse,
@@ -61,7 +60,6 @@ export class Action {
     private readonly _data: NextAction,
     private readonly _metadata: ActionMetadata,
     private readonly _supportStrategy: ActionSupportStrategy,
-    private _adapter?: ActionAdapter,
     private readonly _chainMetadata: ActionChainMetadata = { isChained: false },
     private readonly _id?: string,
     private readonly _experimental?: ExperimentalFeatures,
@@ -162,27 +160,6 @@ export class Action {
     };
   }
 
-  public get adapterUnsafe() {
-    return this._adapter;
-  }
-
-  public get adapter() {
-    if (!this._adapter) {
-      throw new Error('No adapter provided');
-    }
-
-    return this._adapter;
-  }
-
-  /**
-   * Set the adapter for the action.
-   * Not recommended to use in react environments, consider using Action.update() instead that returns a new instance.
-   * @param adapter The adapter to set
-   */
-  public setAdapter(adapter: ActionAdapter) {
-    this._adapter = adapter;
-  }
-
   public async isSupported() {
     try {
       return await this._supportStrategy(this);
@@ -210,7 +187,6 @@ export class Action {
         next.action,
         this.metadata,
         this._supportStrategy,
-        this.adapter,
         {
           isChained: true,
           isInline: true,
@@ -257,7 +233,6 @@ export class Action {
       data,
       metadata,
       this._supportStrategy,
-      this.adapter,
       {
         isChained: true,
         isInline: false,
@@ -272,7 +247,6 @@ export class Action {
     data: NextAction,
     metadata: ActionMetadata,
     supportStrategy: ActionSupportStrategy,
-    adapter?: ActionAdapter,
   ) {
     const id = nanoid();
     return new Action(
@@ -280,7 +254,6 @@ export class Action {
       data,
       metadata,
       supportStrategy,
-      adapter,
       { isChained: false },
       id,
     );
@@ -288,7 +261,6 @@ export class Action {
 
   private static async _fetch(
     apiUrl: string,
-    adapter?: ActionAdapter,
     supportStrategy: ActionSupportStrategy = defaultActionSupportStrategy,
     chainMetadata?: ActionChainMetadata,
     id?: string,
@@ -314,7 +286,6 @@ export class Action {
       { ...data, type: 'action' },
       metadata,
       supportStrategy,
-      adapter,
       chainMetadata,
       id,
       data.dialectExperimental,
@@ -323,13 +294,11 @@ export class Action {
 
   static async fetch(
     apiUrl: string,
-    adapter?: ActionAdapter,
     supportStrategy: ActionSupportStrategy = defaultActionSupportStrategy,
   ) {
     const id = nanoid();
     return Action._fetch(
       apiUrl,
-      adapter,
       supportStrategy,
       {
         isChained: false,
@@ -341,23 +310,18 @@ export class Action {
   refresh() {
     return Action._fetch(
       this.url,
-      this.adapter,
       this._supportStrategy,
       this._chainMetadata,
       this._id,
     );
   }
 
-  withUpdate(update: {
-    adapter?: ActionAdapter;
-    supportStrategy?: ActionSupportStrategy;
-  }) {
+  withUpdate(update: { supportStrategy?: ActionSupportStrategy }) {
     return new Action(
       this._url,
       this._data,
       this._metadata,
       update.supportStrategy ?? this._supportStrategy,
-      update.adapter ?? this._adapter,
       this._chainMetadata,
       this._id,
       this._experimental,

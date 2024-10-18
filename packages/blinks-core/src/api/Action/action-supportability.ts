@@ -1,5 +1,6 @@
 import { BlockchainIds, getShortBlockchainName } from '../../utils/caip-2.ts';
 import { ACTIONS_SPEC_VERSION } from '../../utils/dependency-versions.ts';
+import type { ActionAdapter } from '../ActionConfig.ts';
 import type { Action } from './Action.ts';
 
 /**
@@ -44,18 +45,21 @@ export type ActionSupportability =
 
 export type ActionSupportStrategy = (
   action: Action,
+  adapter?: ActionAdapter,
 ) => Promise<ActionSupportability>;
 
 /**
  * Default implementation for checking if an action is supported.
  * Checks if the action version and the action blockchain IDs are supported by blink.
  * @param action Action.
+ * @param adapter Action adapter.
  *
  * @see {isVersionSupported}
  * @see {isBlockchainSupported}
  */
 export const defaultActionSupportStrategy: ActionSupportStrategy = async (
   action,
+  adapter,
 ) => {
   const { version: actionVersion, blockchainIds: actionBlockchainIds } =
     action.metadata;
@@ -74,9 +78,9 @@ export const defaultActionSupportStrategy: ActionSupportStrategy = async (
   }
 
   const supportedActionVersion = MAX_SUPPORTED_ACTION_VERSION;
-  const supportedBlockchainIds = !action.adapterUnsafe
+  const supportedBlockchainIds = !adapter
     ? actionBlockchainIds // Assuming action is supported if adapter absent for optimistic compatibility
-    : action.adapterUnsafe.metadata.supportedBlockchainIds;
+    : adapter.metadata.supportedBlockchainIds;
 
   const versionSupported = isVersionSupported({
     actionVersion,
