@@ -22,14 +22,14 @@ type ObserverSecurityLevel = SecurityLevel;
 
 const noop = () => {};
 
-export interface ObserverOptions {
+export interface ObserverOptionsYT {
   securityLevel:
     | ObserverSecurityLevel
     | Record<'websites' | 'interstitials' | 'actions', ObserverSecurityLevel>;
   supportStrategy: ActionSupportStrategy;
 }
 
-interface NormalizedObserverOptions {
+interface NormalizedObserverOptionsYT {
   securityLevel: Record<
     'websites' | 'interstitials' | 'actions',
     ObserverSecurityLevel
@@ -37,14 +37,14 @@ interface NormalizedObserverOptions {
   supportStrategy: ActionSupportStrategy;
 }
 
-const DEFAULT_OPTIONS: ObserverOptions = {
+const DEFAULT_OPTIONS: ObserverOptionsYT = {
   securityLevel: 'only-trusted',
   supportStrategy: defaultActionSupportStrategy,
 };
 
 const normalizeOptions = (
-  options: Partial<ObserverOptions>,
-): NormalizedObserverOptions => {
+  options: Partial<ObserverOptionsYT>,
+): NormalizedObserverOptionsYT => {
   return {
     ...DEFAULT_OPTIONS,
     ...options,
@@ -73,7 +73,7 @@ const normalizeOptions = (
 export function setupYouTubeObserver(
   config: ActionAdapter,
   callbacks: Partial<ActionCallbacksConfig> = {},
-  options: Partial<ObserverOptions> = DEFAULT_OPTIONS,
+  options: Partial<ObserverOptionsYT> = DEFAULT_OPTIONS,
 ) {
   const mergedOptions = normalizeOptions(options);
   const youtubeCommentsSection = document.querySelector('ytd-comments#comments');
@@ -110,7 +110,7 @@ async function handleNewYouTubeNode(
   node: Element,
   config: ActionAdapter,
   callbacks: Partial<ActionCallbacksConfig>,
-  options: NormalizedObserverOptions,
+  options: NormalizedObserverOptionsYT,
 ) {
   if (!node || node.nodeName !== 'YTD-COMMENT-THREAD-RENDERER') {
     return;
@@ -135,36 +135,44 @@ async function processYouTubeLink(
   commentNode: Element,
   config: ActionAdapter,
   callbacks: Partial<ActionCallbacksConfig>,
-  options: NormalizedObserverOptions,
+  options: NormalizedObserverOptionsYT,
 ) {
   const interstitialData = isInterstitial(originalUrl);
 
   let actionApiUrl: string | null;
   if (interstitialData.isInterstitial) {
     const interstitialState = getExtendedInterstitialState(originalUrl.toString());
-    if (!checkSecurity(interstitialState, options.securityLevel.interstitials)) {
-      return;
-    }
+    // if (!checkSecurity(interstitialState, options.securityLevel.interstitials)) {
+    //   return;
+    // }
     actionApiUrl = interstitialData.decodedActionUrl;
+
   } else {
     const websiteState = getExtendedWebsiteState(originalUrl.toString());
-    if (!checkSecurity(websiteState, options.securityLevel.websites)) {
-      return;
-    }
-
+    // if (!checkSecurity(websiteState, options.securityLevel.websites)) {
+    //   return;
+    // }
+ 
+    console.log('website action url', originalUrl);
+ 
     const actionsJsonUrl = originalUrl.origin + '/actions.json';
     const actionsJson = await fetch(proxify(actionsJsonUrl)).then(
       (res) => res.json() as Promise<ActionsJsonConfig>,
     );
 
+    console.log(`actionsJSON for ${originalUrl.origin} ---`, actionsJson);
     const actionsUrlMapper = new ActionsURLMapper(actionsJson);
+
+    console.log(`actionsUrlMapper for ${originalUrl.origin} ---`, actionsUrlMapper);
     actionApiUrl = actionsUrlMapper.mapUrl(originalUrl);
+
+    console.log(`actionApiUrl for ${originalUrl.origin} ---`, actionApiUrl);
   }
 
   const state = actionApiUrl ? getExtendedActionState(actionApiUrl) : null;
   if (
     !actionApiUrl ||
-    !state ||
+    !state || 
     !checkSecurity(state, options.securityLevel.actions)
   ) {
     return;
@@ -219,9 +227,10 @@ function createYouTubeAction({
   originalUrl: URL;
   action: Action;
   callbacks: Partial<ActionCallbacksConfig>;
-  options: NormalizedObserverOptions;
+  options: NormalizedObserverOptionsYT;
   isInterstitial: boolean;
 }) {
+  console.log('create youtube action', originalUrl, action, callbacks, options);
   const container = document.createElement('div');
   container.className = 'dialect-action-root-container';
 
