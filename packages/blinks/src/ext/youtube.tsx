@@ -140,33 +140,27 @@ async function processYouTubeLink(
   const interstitialData = isInterstitial(originalUrl);
 
   let actionApiUrl: string | null;
+
   if (interstitialData.isInterstitial) {
     const interstitialState = getExtendedInterstitialState(originalUrl.toString());
-    // if (!checkSecurity(interstitialState, options.securityLevel.interstitials)) {
-    //   return;
-    // }
+    if (!checkSecurity(interstitialState, options.securityLevel.interstitials)) {
+      return;
+    }
     actionApiUrl = interstitialData.decodedActionUrl;
 
   } else {
     const websiteState = getExtendedWebsiteState(originalUrl.toString());
-    // if (!checkSecurity(websiteState, options.securityLevel.websites)) {
-    //   return;
-    // }
- 
-    console.log('website action url', originalUrl);
+    if (!checkSecurity(websiteState, options.securityLevel.websites)) {
+      return;
+    }
  
     const actionsJsonUrl = originalUrl.origin + '/actions.json';
     const actionsJson = await fetch(proxify(actionsJsonUrl)).then(
       (res) => res.json() as Promise<ActionsJsonConfig>,
     );
 
-    console.log(`actionsJSON for ${originalUrl.origin} ---`, actionsJson);
     const actionsUrlMapper = new ActionsURLMapper(actionsJson);
-
-    console.log(`actionsUrlMapper for ${originalUrl.origin} ---`, actionsUrlMapper);
     actionApiUrl = actionsUrlMapper.mapUrl(originalUrl);
-
-    console.log(`actionApiUrl for ${originalUrl.origin} ---`, actionApiUrl);
   }
 
   const state = actionApiUrl ? getExtendedActionState(actionApiUrl) : null;
@@ -230,7 +224,7 @@ function createYouTubeAction({
   options: NormalizedObserverOptionsYT;
   isInterstitial: boolean;
 }) {
-  console.log('create youtube action', originalUrl, action, callbacks, options);
+
   const container = document.createElement('div');
   container.className = 'dialect-action-root-container';
 

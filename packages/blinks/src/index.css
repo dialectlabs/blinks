@@ -6,6 +6,11 @@
   .blink {
     container-type: inline-size;
   }
+  /* Restricting the Width only for Youtube - can be done either ways */
+  /* Can also change depending on the platform */
+  .blink.youtube-dark, .blink.youtube-light {
+    max-width: 400px;
+  }
 
   .blink input[type="date"]::-webkit-inner-spin-button, input[type="date"]::-webkit-calendar-picker-indicator, input[type="datetime-local"]::-webkit-inner-spin-button, input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     /*
@@ -178,7 +183,7 @@
   }
 
   /* Css for Youtube - Dark */
-  .youtube-dark{
+  .youtube-dark {
     --blink-bg-primary: #202327;
     --blink-bg-secondary: #262a2d;
     --blink-button: #f01d5d;
@@ -232,7 +237,7 @@
   }
   
   /* Css for Youtube - Light */
-  .youtube-light{
+  .youtube-light {
   --blink-bg-primary: #ffffff;
   --blink-bg-secondary: #262a2d;
   --blink-button: #f01d5d;

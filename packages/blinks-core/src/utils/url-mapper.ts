@@ -19,21 +19,16 @@ export class ActionsURLMapper {
   }
 
   public mapUrl(url: string | URL): string | null {
-    // Ensure the input is a URL object
+    console.log("Looking for URL: ", url);
     const urlObj = typeof url === 'string' ? new URL(url) : url;
-    const queryParams = urlObj.search; // Extract the query parameters from the URL
+    const queryParams = urlObj.search;
+    const fullPath = `${urlObj.origin}${urlObj.pathname}`;
 
     for (const action of this.config.rules) {
-      // Handle direct mapping without wildcards
-      if (this.isExactMatch(action.pathPattern, urlObj)) {
-        return `${action.apiPath}${queryParams}`;
-      }
-
-      // Match the pattern with the URL
-      const match = this.matchPattern(action.pathPattern, urlObj);
+      const normalizedPattern = this.normalizePattern(action.pathPattern, urlObj.origin);
+      const match = this.matchPattern(normalizedPattern, fullPath);
 
       if (match) {
-        // Construct the mapped URL if there's a match
         return this.constructMappedUrl(
           action.apiPath,
           match,
@@ -43,28 +38,23 @@ export class ActionsURLMapper {
       }
     }
 
-    // If no match is found, return null
     return null;
   }
 
-  // Helper method to check for exact match
-  private isExactMatch(pattern: string, urlObj: URL): boolean {
-    return pattern === `${urlObj.origin}${urlObj.pathname}`;
+  private normalizePattern(pattern: string, origin: string): string {
+    return pattern.startsWith('http') ? pattern : `${origin}${pattern}`;
   }
 
-  // Helper method to match the URL with the pattern
-  private matchPattern(pattern: string, urlObj: URL): RegExpMatchArray | null {
-    const fullPattern = new RegExp(
-      `^${pattern.replace(/\*\*/g, '(.*)').replace(/\/(\*)/g, '/([^/]+)')}$`,
-    );
+  private matchPattern(pattern: string, fullPath: string): RegExpMatchArray | null {
+    const regexPattern = pattern
+      .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+      .replace(/\*\*/g, '(.*)')
+      .replace(/\*/g, '([^/]+)');
 
-    const urlToMatch = pattern.startsWith('http')
-      ? urlObj.toString()
-      : urlObj.pathname;
-    return urlToMatch.match(fullPattern);
+    const fullPattern = new RegExp(`^${regexPattern}$`);
+    return fullPath.match(fullPattern);
   }
 
-  // Helper method to construct the mapped URL
   private constructMappedUrl(
     apiPath: string,
     match: RegExpMatchArray,
@@ -72,13 +62,23 @@ export class ActionsURLMapper {
     origin: string,
   ): string {
     let mappedPath = apiPath;
-    match.slice(1).forEach((group) => {
+    
+    // Replace wildcards with captured groups
+    match.slice(1).forEach((group, index) => {
       mappedPath = mappedPath.replace(/\*+/, group);
     });
+
+    // If there are remaining wildcards, remove them
+    mappedPath = mappedPath.replace(/\*+/g, '');
 
     if (apiPath.startsWith('http')) {
       const mappedUrl = new URL(mappedPath);
       return `${mappedUrl.origin}${mappedUrl.pathname}${queryParams}`;
+    }
+
+    // Handle cases where apiPath doesn't start with a slash
+    if (!mappedPath.startsWith('/')) {
+      mappedPath = '/' + mappedPath;
     }
 
     return `${origin}${mappedPath}${queryParams}`;
