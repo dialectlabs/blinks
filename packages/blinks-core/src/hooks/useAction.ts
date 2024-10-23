@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
   Action,
-  type ActionAdapter,
   type ActionSupportStrategy,
   defaultActionSupportStrategy,
 } from '../api';
@@ -10,7 +9,6 @@ import { useActionsRegistryInterval } from './useActionRegistryInterval.ts';
 
 interface UseActionOptions {
   url: string | URL;
-  adapter: ActionAdapter;
   securityRegistryRefreshInterval?: number;
   supportStrategy?: ActionSupportStrategy;
 }
@@ -46,7 +44,6 @@ function useActionApiUrl(url: string | URL) {
 
 export function useAction({
   url,
-  adapter,
   supportStrategy = defaultActionSupportStrategy,
 }: UseActionOptions) {
   const { isRegistryLoaded } = useActionsRegistryInterval();
@@ -63,7 +60,7 @@ export function useAction({
 
     let ignore = false;
     setHasFetched(false);
-    Action.fetch(actionApiUrl, undefined, supportStrategy)
+    Action.fetch(actionApiUrl, supportStrategy)
       .then((action) => {
         if (ignore) {
           return;
@@ -87,7 +84,7 @@ export function useAction({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only update if actionApiUrl changes
   }, [actionApiUrl, isRegistryLoaded]);
 
-  // this effect handles race conditions between fetching the action adapter change
+  // this effect handles race conditions between fetching the action support strategy changes
   // hasFetched dependency is used instead of action dependency to ensure there's no infinite loop
   useEffect(() => {
     if (!action || !hasFetched) {
@@ -95,15 +92,14 @@ export function useAction({
     }
     try {
       const updated = action.withUpdate({
-        adapter,
         supportStrategy,
       });
       setAction(updated);
     } catch (e) {
       console.error('[@dialectlabs/blinks-core] Failed to update action', e);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only update if adapter or supportStrategy changes
-  }, [adapter, supportStrategy, hasFetched]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only update if supportStrategy changes
+  }, [supportStrategy, hasFetched]);
 
   return { action, isLoading };
 }
