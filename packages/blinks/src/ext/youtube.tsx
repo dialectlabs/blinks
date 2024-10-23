@@ -193,6 +193,8 @@ import {
     const containerWrapper = document.createElement('div');
     containerWrapper.className = 'dialect-wrapper';
     containerWrapper.style.marginTop = '12px';
+    containerWrapper.style.marginBottom = '12px';
+    containerWrapper.style.maxWidth = '400px';
     containerWrapper.appendChild(actionContainer);
   
     commentNode.appendChild(containerWrapper);
