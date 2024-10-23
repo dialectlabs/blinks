@@ -84,7 +84,7 @@ export function useAction({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only update if actionApiUrl changes
   }, [actionApiUrl, isRegistryLoaded]);
 
-  // this effect handles race conditions between fetching the action adapter change
+  // this effect handles race conditions between fetching the action support strategy changes
   // hasFetched dependency is used instead of action dependency to ensure there's no infinite loop
   useEffect(() => {
     if (!action || !hasFetched) {
@@ -98,7 +98,7 @@ export function useAction({
     } catch (e) {
       console.error('[@dialectlabs/blinks-core] Failed to update action', e);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only update if adapter or supportStrategy changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only update if supportStrategy changes
   }, [supportStrategy, hasFetched]);
 
   return { action, isLoading };
