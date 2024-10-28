@@ -104,9 +104,12 @@ export async function unfurlUrlToActionApiUrl(
   // case 3: if the URL is a website URL which has action.json
 
   const actionsJsonUrl = url.origin + '/actions.json';
-  const actionsJson = await fetch(proxify(actionsJsonUrl)).then(
-    (res) => res.json() as Promise<ActionsJsonConfig>,
-  );
+  const { url: proxyUrl, headers: proxyHeaders } = proxify(actionsJsonUrl);
+  const actionsJson = await fetch(proxyUrl, {
+    headers: {
+      ...proxyHeaders,
+    },
+  }).then((res) => res.json() as Promise<ActionsJsonConfig>);
 
   const actionsUrlMapper = new ActionsURLMapper(actionsJson);
 

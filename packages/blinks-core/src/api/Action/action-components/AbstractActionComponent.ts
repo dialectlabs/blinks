@@ -38,12 +38,13 @@ export abstract class AbstractActionComponent {
   protected abstract buildBody(account: string): ActionPostRequest;
 
   public async post(account: string) {
-    const proxyUrl = proxify(this.href);
+    const { url: proxyUrl, headers: proxyHeaders } = proxify(this.href);
     const response = await fetch(proxyUrl, {
       method: 'POST',
       body: JSON.stringify(this.buildBody(account)),
       headers: {
         'Content-Type': 'application/json',
+        ...proxyHeaders,
       },
     });
 

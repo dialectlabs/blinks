@@ -1,3 +1,5 @@
+import { BLINK_CLIENT_KEY_HEADER, clientKey } from './client-key.ts';
+
 let proxyUrl: string | null = 'https://proxy.dial.to';
 
 export function setProxyUrl(url: string): void {
@@ -19,24 +21,48 @@ export function setProxyUrl(url: string): void {
   proxyUrl = url;
 }
 
-export function proxify(url: string): URL {
+export function proxify(url: string): {
+  url: URL;
+  headers: Record<string, string>;
+} {
   const baseUrl = new URL(url);
   if (shouldIgnoreProxy(baseUrl)) {
-    return baseUrl;
+    return {
+      url: baseUrl,
+      headers: {},
+    };
   }
   const proxifiedUrl = new URL(proxyUrl!);
   proxifiedUrl.searchParams.set('url', url);
-  return proxifiedUrl;
+  return {
+    url: proxifiedUrl,
+    headers: getProxifiedHeaders(),
+  };
 }
 
-export function proxifyImage(url: string): URL {
+export function proxifyImage(url: string): {
+  url: URL;
+  headers: Record<string, string>;
+} {
   const baseUrl = new URL(url);
   if (shouldIgnoreProxy(baseUrl)) {
-    return baseUrl;
+    return {
+      url: baseUrl,
+      headers: {},
+    };
   }
   const proxifiedUrl = new URL(`${proxyUrl!}/image`);
   proxifiedUrl.searchParams.set('url', url);
-  return proxifiedUrl;
+  return {
+    url: proxifiedUrl,
+    headers: getProxifiedHeaders(),
+  };
+}
+
+function getProxifiedHeaders(): Record<string, string> {
+  return {
+    ...(clientKey && { [BLINK_CLIENT_KEY_HEADER]: clientKey }),
+  };
 }
 
 function shouldIgnoreProxy(url: URL): boolean {
