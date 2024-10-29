@@ -1,3 +1,4 @@
+import type { MessageNextActionPostRequest } from '@solana/actions-spec';
 import { nanoid } from 'nanoid/non-secure';
 import { proxify, proxifyImage } from '../../utils';
 import { isUrlSameOrigin } from '../../utils/security.ts';
@@ -179,7 +180,9 @@ export class Action {
 
   public async chain<N extends NextActionLink>(
     next: N,
-    chainData?: N extends PostNextActionLink ? NextActionPostRequest : never,
+    chainData?: N extends PostNextActionLink
+      ? MessageNextActionPostRequest | NextActionPostRequest
+      : never,
   ): Promise<Action | null> {
     const id = nanoid();
 
