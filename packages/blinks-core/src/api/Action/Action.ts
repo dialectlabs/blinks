@@ -165,9 +165,9 @@ export class Action {
     try {
       return await this._supportStrategy(this, adapter);
     } catch (e) {
-      console.error(e);
       console.error(
         `[@dialectlabs/blinks] Failed to check supportability for action ${this.url}`,
+        e,
       );
       return {
         isSupported: false,
