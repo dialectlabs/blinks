@@ -29,11 +29,12 @@ export class MultiValueActionComponent extends AbstractActionComponent {
   // any, since we don't know the parameter names on the client level
   protected buildBody(account: string): ActionPostRequest<any> {
     if (this._href.indexOf(`{${this.parameter.name}}`) > -1) {
-      return { account };
+      return { account, type: this.type };
     }
 
     return {
       account,
+      type: this.type,
       data: {
         [this.parameter.name]: this.isMultiOptions
           ? this.parameterValue

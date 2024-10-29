@@ -23,7 +23,7 @@ export class ButtonActionComponent extends AbstractActionComponent {
   }
 
   protected buildBody(account: string): ActionPostRequest {
-    return { account };
+    return { account, type: this.type };
   }
 
   get href(): string {
