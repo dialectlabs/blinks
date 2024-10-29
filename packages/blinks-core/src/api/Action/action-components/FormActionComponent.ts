@@ -40,6 +40,7 @@ export class FormActionComponent extends AbstractActionComponent {
     if (bodyParams.length > 0) {
       return {
         account,
+        type: this.type,
         data: Object.fromEntries(
           paramNames
             .filter((name) => bodyParams.includes(name))
@@ -48,7 +49,7 @@ export class FormActionComponent extends AbstractActionComponent {
       };
     }
 
-    return { account };
+    return { account, type: this.type };
   }
 
   get href(): string {

@@ -31,11 +31,12 @@ export class SingleValueActionComponent extends AbstractActionComponent {
       this._href.indexOf(`{${this.parameter.name}}`) > -1 ||
       this.parameterValue === null
     ) {
-      return { account };
+      return { account, type: this.type };
     }
 
     return {
       account,
+      type: this.type,
       data: {
         [this.parameter.name]: this.parameterValue,
       },

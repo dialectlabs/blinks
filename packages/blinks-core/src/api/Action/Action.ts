@@ -129,7 +129,7 @@ export class Action {
     if (this._data.icon.startsWith('data:')) {
       return this._data.icon;
     }
-    return proxifyImage(this._data.icon).toString();
+    return proxifyImage(this._data.icon).url.toString();
   }
 
   public get title() {
@@ -167,6 +167,7 @@ export class Action {
     } catch (e) {
       console.error(
         `[@dialectlabs/blinks] Failed to check supportability for action ${this.url}`,
+        e,
       );
       return {
         isSupported: false,
@@ -209,13 +210,14 @@ export class Action {
       ? next.href
       : baseUrlObj.origin + next.href;
 
-    const proxyUrl = proxify(href);
+    const { url: proxyUrl, headers: proxyHeaders } = proxify(href);
     const response = await fetch(proxyUrl, {
       method: 'POST',
       body: JSON.stringify(chainData),
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
+        ...proxyHeaders,
       },
     });
 
@@ -266,10 +268,11 @@ export class Action {
     chainMetadata?: ActionChainMetadata,
     id?: string,
   ) {
-    const proxyUrl = proxify(apiUrl);
+    const { url: proxyUrl, headers: proxyHeaders } = proxify(apiUrl);
     const response = await fetch(proxyUrl, {
       headers: {
         Accept: 'application/json',
+        ...proxyHeaders,
       },
     });
 
