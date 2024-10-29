@@ -129,7 +129,7 @@ export class Action {
     if (this._data.icon.startsWith('data:')) {
       return this._data.icon;
     }
-    return proxifyImage(this._data.icon).toString();
+    return proxifyImage(this._data.icon).url.toString();
   }
 
   public get title() {
@@ -165,6 +165,7 @@ export class Action {
     try {
       return await this._supportStrategy(this, adapter);
     } catch (e) {
+      console.error(e);
       console.error(
         `[@dialectlabs/blinks] Failed to check supportability for action ${this.url}`,
       );

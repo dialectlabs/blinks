@@ -42,20 +42,17 @@ export function proxify(url: string): {
 
 export function proxifyImage(url: string): {
   url: URL;
-  headers: Record<string, string>;
 } {
   const baseUrl = new URL(url);
   if (shouldIgnoreProxy(baseUrl)) {
     return {
       url: baseUrl,
-      headers: {},
     };
   }
   const proxifiedUrl = new URL(`${proxyUrl!}/image`);
   proxifiedUrl.searchParams.set('url', url);
   return {
     url: proxifiedUrl,
-    headers: getProxifiedHeaders(),
   };
 }
 
