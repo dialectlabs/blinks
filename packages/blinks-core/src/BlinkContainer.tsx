@@ -1,3 +1,7 @@
+import type {
+  MessageNextActionPostRequest,
+  NextActionPostRequest,
+} from '@solana/actions-spec';
 import {
   type ComponentType,
   useEffect,
@@ -492,12 +496,28 @@ export const BlinkContainer = ({
           return;
         }
 
+        if (response.type === 'message' && !signature) {
+          dispatch({
+            type: ExecutionType.SOFT_RESET,
+            errorMessage: 'Missing signature for message',
+          });
+          return;
+        }
+
         // chain
-        const nextAction = await action.chain(response.links.next, {
-          signature: signature,
-          account: account,
-          state: response.type === 'message' ? response.state : undefined,
-        });
+        const chainData: MessageNextActionPostRequest | NextActionPostRequest =
+          response.type === 'message'
+            ? {
+                signature: signature!,
+                account: account,
+                state: response.state,
+                data: response.data,
+              }
+            : {
+                signature: signature,
+                account: account,
+              };
+        const nextAction = await action.chain(response.links.next, chainData);
 
         // if this is running in partial action mode, then we end the chain, if passed fn returns a null value for the next action
         if (!nextAction || (isPartialAction && !selector?.(nextAction))) {
