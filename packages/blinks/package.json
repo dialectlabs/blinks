@@ -1,6 +1,6 @@
 {
   "name": "@dialectlabs/blinks",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "license": "Apache-2.0",
   "private": false,
   "sideEffects": true,
@@ -67,6 +67,6 @@
   },
   "dependencies": {
     "clsx": "^2.1.1",
-    "@dialectlabs/blinks-core": "0.14.0"
+    "@dialectlabs/blinks-core": "0.14.1"
   }
 }
