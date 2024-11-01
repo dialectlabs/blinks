@@ -39,18 +39,17 @@ export function proxifyMetadata(url: string): ProxifiedResult {
 }
 
 function createProxifiedUrl(url: string, endpoint?: string): ProxifiedResult {
-  const baseUrl = new URL(url);
-  if (!proxyUrl || shouldIgnoreProxy(baseUrl)) {
+  const incomingUrl = new URL(url);
+  if (!proxyUrl || shouldIgnoreProxy(incomingUrl)) {
     return {
-      url: baseUrl,
+      url: incomingUrl,
       headers: {},
     };
   }
 
-  const proxifiedUrl = new URL(proxyUrl);
-  if (endpoint) {
-    proxifiedUrl.pathname += `/${endpoint}`;
-  }
+  const proxifiedUrl = endpoint
+    ? new URL(endpoint, proxyUrl)
+    : new URL(proxyUrl);
   proxifiedUrl.searchParams.set('url', url);
 
   return {

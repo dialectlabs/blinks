@@ -16,7 +16,7 @@ export interface BlinkDiscoveryEntry {
   title: string;
   description: string;
   icon?: string;
-  logo: string;
+  logo?: string;
 }
 
 // TODO: handle props, do we really need filter here?

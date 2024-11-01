@@ -15,6 +15,8 @@ interface MetadataRow {
   key: string;
   title: string;
   value: string;
+  icon?: string;
+  url?: string;
 }
 
 export const useMetadata = ({ url, wallet }: UseMetadataArgs) => {
