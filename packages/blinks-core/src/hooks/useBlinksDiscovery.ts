@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BLINK_CLIENT_KEY_HEADER, clientKey } from '../utils/client-key.ts';
 
 interface UseBlinksDiscoveryArgs {
@@ -19,7 +19,7 @@ export interface BlinkDiscoveryEntry {
   logo?: string;
 }
 
-// TODO: handle props, do we really need filter here?
+// TODO: do we really need filter here now for MVP?
 export const useBlinksDiscovery = (props: UseBlinksDiscoveryArgs) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<DiscoveredBlinks>();
@@ -30,6 +30,10 @@ export const useBlinksDiscovery = (props: UseBlinksDiscoveryArgs) => {
       .then(setData)
       .finally(() => setLoading(false));
   };
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   return {
     loading,

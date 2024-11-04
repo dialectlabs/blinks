@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { proxifyMetadata } from '../utils/proxify.ts';
 
 interface UseMetadataArgs {
@@ -23,11 +23,16 @@ export const useMetadata = ({ url, wallet }: UseMetadataArgs) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<BlinkMetadata>();
 
-  const refetch = () => {
+  const refetch = (url: string, wallet?: string) => {
+    setLoading(true);
     fetchMetadata(url, wallet)
       .then(setData)
       .finally(() => setLoading(false));
   };
+
+  useEffect(() => {
+    refetch(url, wallet);
+  }, [url, wallet]);
 
   return {
     loading,
