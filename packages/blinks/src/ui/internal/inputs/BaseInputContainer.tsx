@@ -7,6 +7,7 @@ import {
   type SelectHTMLAttributes,
   type TextareaHTMLAttributes,
 } from 'react';
+import { SimpleMarkdown } from '../SimpleMarkdown.tsx';
 
 interface Props {
   children: ReactElement<
@@ -21,6 +22,19 @@ interface Props {
   standalone?: boolean;
 }
 
+const testMarkdown = `
+# This is a test
+
+This is a test of the emergency broadcast system. This is only a [test](https://example.com).
+
+### this is more headers
+Adding more text here
+
+Adding even more text here
+
+[link](https://example.com)
+`;
+
 export const BaseInputContainer = ({
   children,
   leftAdornment,
@@ -33,7 +47,7 @@ export const BaseInputContainer = ({
     <div>
       <div
         className={clsx(
-          'peer relative flex min-h-10 flex-wrap items-center gap-1.5 gap-y-2 border border-input-stroke p-1.5 transition-colors motion-reduce:transition-none',
+          'border-input-stroke peer relative flex min-h-10 flex-wrap items-center gap-1.5 gap-y-2 border p-1.5 transition-colors motion-reduce:transition-none',
           // focus, invalid, required
           'focus-within:has-[:invalid]:border-input-stroke-error focus-within:has-[:valid]:border-input-stroke-selected focus-within:hover:has-[:invalid]:border-input-stroke-error focus-within:hover:has-[:valid]:border-input-stroke-selected',
           // enabled,
@@ -45,7 +59,7 @@ export const BaseInputContainer = ({
           {leftAdornment && <div>{leftAdornment}</div>}
           {cloneElement(children, {
             className: clsx(
-              'min-h-7 min-w-0 flex-1 truncate bg-input-bg text-text-input outline-none placeholder:text-text-input-placeholder disabled:text-text-input-disabled',
+              'bg-input-bg text-text-input placeholder:text-text-input-placeholder disabled:text-text-input-disabled min-h-7 min-w-0 flex-1 truncate outline-none',
               children.props.className,
             ),
           })}
@@ -58,9 +72,9 @@ export const BaseInputContainer = ({
       </div>
       {footer && <div className="mt-2">{footer}</div>}
       {description && (
-        <span className="mt-2 text-caption font-medium text-text-secondary peer-[:focus-within:has(:invalid)]:text-text-error">
-          {description}
-        </span>
+        <div className="text-caption text-text-secondary peer-[:focus-within:has(:invalid)]:text-text-error mt-2 font-medium">
+          <SimpleMarkdown text={testMarkdown} />
+        </div>
       )}
     </div>
   );

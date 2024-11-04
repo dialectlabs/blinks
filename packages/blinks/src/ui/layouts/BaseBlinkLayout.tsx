@@ -7,6 +7,7 @@ import {
 import clsx from 'clsx';
 import { type ReactNode, useState } from 'react';
 import { Badge } from '../internal/Badge.tsx';
+import { SimpleMarkdown } from '../internal/SimpleMarkdown.tsx';
 import { Snackbar } from '../internal/Snackbar.tsx';
 import {
   ConfigIcon,
@@ -267,7 +268,7 @@ export const BaseBlinkLayout = ({
             {title}
           </span>
           <span className="text-subtext text-text-secondary mb-4 whitespace-pre-wrap break-words">
-            {description}
+            <SimpleMarkdown text={description} />
           </span>
           {!supportability.isSupported ? (
             <NotSupportedBlock message={supportability.message} />

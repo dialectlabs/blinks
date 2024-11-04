@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { useEffect, useMemo, useState } from 'react';
 import { Checkbox } from '../Checkbox.tsx';
+import { SimpleMarkdown } from '../SimpleMarkdown.tsx';
 import { ActionButton } from './ActionButton.tsx';
 import type { BaseInputProps } from './types.ts';
 import { buildDefaultCheckboxGroupDescription } from './utils.ts';
@@ -118,7 +119,7 @@ export const ActionCheckboxGroup = ({
       <div className={clsx(isStandalone && 'px-2')}>
         {label && (
           <div className="mb-1">
-            <label className="block text-text font-semibold text-text-input">
+            <label className="text-text text-text-input block font-semibold">
               {label}
               {required ? '*' : ''}
             </label>
@@ -166,7 +167,7 @@ export const ActionCheckboxGroup = ({
             isStandalone ? 'mb-2 mt-2.5 px-2' : 'mt-3',
           )}
         >
-          {finalDescription}
+          <SimpleMarkdown text={finalDescription} />
         </div>
       )}
     </div>

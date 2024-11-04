@@ -9,6 +9,7 @@ import {
 } from '@dialectlabs/blinks-core';
 import { useMemo } from 'react';
 import type { InnerLayoutProps } from '../../layouts/BaseBlinkLayout.tsx';
+import { confirmLinkTransition } from '../utils.ts';
 import { buttonLabelMap, buttonVariantMap } from './ui-mappers.ts';
 
 const SOFT_LIMIT_BUTTONS = 10;
@@ -78,9 +79,7 @@ export const useLayoutPropNormalizer = ({
         }
 
         if (extra.type === 'external-link') {
-          const result = window.confirm(
-            `This action redirects to another website: ${extra.data.externalLink}, the link will open in a new tab of your browser`,
-          );
+          const result = confirmLinkTransition(extra.data.externalLink);
 
           if (result) {
             window.open(
@@ -169,6 +168,7 @@ export const useLayoutPropNormalizer = ({
     buttons: buttons.map(asButtonProps),
     inputs: inputs.map((i) => asInputProps(i)),
     form: form ? asFormProps(form) : undefined,
+    websiteText: props.websiteText ?? action.url,
     ...normalizedCaption,
   };
 };
