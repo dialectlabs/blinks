@@ -22,19 +22,6 @@ interface Props {
   standalone?: boolean;
 }
 
-const testMarkdown = `
-# This is a test
-
-This is a test of the emergency broadcast system. This is only a [test](https://example.com).
-
-### this is more headers
-Adding more text here
-
-Adding even more text here
-
-[link](https://example.com)
-`;
-
 export const BaseInputContainer = ({
   children,
   leftAdornment,
@@ -72,8 +59,8 @@ export const BaseInputContainer = ({
       </div>
       {footer && <div className="mt-2">{footer}</div>}
       {description && (
-        <div className="text-caption text-text-secondary peer-[:focus-within:has(:invalid)]:text-text-error mt-2 font-medium">
-          <SimpleMarkdown text={testMarkdown} />
+        <div className="text-caption text-text-secondary peer-[:focus-within:has(:invalid)]:text-text-error mt-1.5 font-medium">
+          <SimpleMarkdown text={description} />
         </div>
       )}
     </div>

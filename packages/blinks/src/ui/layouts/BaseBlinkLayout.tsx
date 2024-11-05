@@ -217,22 +217,22 @@ export const BaseBlinkLayout = ({
           </Linkable>
         )}
         <div className="flex flex-col p-5">
-          <div className="mb-2 flex items-center gap-2">
+          <div className="mb-1 flex items-center gap-2">
             {websiteUrl && (
               <a
                 href={websiteUrl}
                 target="_blank"
-                className="text-subtext group inline-flex items-center truncate hover:cursor-pointer"
+                className="text-subtext group flex min-w-0 items-center gap-2 hover:cursor-pointer"
                 rel="noopener noreferrer"
               >
-                <LinkIcon className="text-icon-primary group-hover:text-icon-primary-hover mr-2 transition-colors motion-reduce:transition-none" />
-                <span className="text-text-link group-hover:text-text-link-hover transition-colors group-hover:underline motion-reduce:transition-none">
+                <LinkIcon className="text-icon-primary group-hover:text-icon-primary-hover h-4 min-w-4 transition-colors motion-reduce:transition-none" />
+                <span className="text-text-link group-hover:text-text-link-hover mt-[1px] block min-w-0 truncate transition-colors group-hover:underline motion-reduce:transition-none">
                   {websiteText ?? websiteUrl}
                 </span>
               </a>
             )}
             {websiteText && !websiteUrl && (
-              <span className="text-subtext text-text-link inline-flex items-center truncate">
+              <span className="text-subtext text-text-link min-w-0 truncate">
                 {websiteText}
               </span>
             )}
@@ -240,7 +240,7 @@ export const BaseBlinkLayout = ({
               href="https://docs.dialect.to/documentation/actions/security"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center"
+              className="mb-0.5 flex items-center"
             >
               {securityState === 'malicious' && (
                 <Badge
@@ -264,10 +264,10 @@ export const BaseBlinkLayout = ({
               )}
             </a>
           </div>
-          <span className="text-text text-text-primary mb-0.5 font-semibold">
+          <span className="text-text text-text-primary mb-1.5 break-words font-semibold">
             {title}
           </span>
-          <span className="text-subtext text-text-secondary mb-4 whitespace-pre-wrap break-words">
+          <span className="text-subtext text-text-secondary mb-4 break-words">
             <SimpleMarkdown text={description} />
           </span>
           {!supportability.isSupported ? (
@@ -325,7 +325,7 @@ export const ActionContent = ({
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4">
       {buttons && buttons.length > 0 && (
         <div className="flex flex-wrap items-center gap-2">
           {buttons?.map((it, index) => (

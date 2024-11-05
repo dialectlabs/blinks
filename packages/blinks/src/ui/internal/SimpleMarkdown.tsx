@@ -44,7 +44,7 @@ export const SimpleMarkdown = ({ text }: Props) => {
               return null;
             case RuleType.gfmTask:
               return (
-                <span className="mb-0.5 inline-block">
+                <span className="mb-[0.125em] inline-block">
                   {/* ✅ and ⬜ */}
                   {node.completed ? '\u2705' : '\u2B1C'}
                 </span>
@@ -70,19 +70,17 @@ export const SimpleMarkdown = ({ text }: Props) => {
                 </span>
               );
             case RuleType.heading:
-              return (
-                <h5
-                  key={state.key}
-                  className="first::mt-0 mb-1 mt-1.5 font-bold"
-                >
-                  {renderChildren(node.children, state)}
-                </h5>
-              );
             case RuleType.paragraph:
               return (
-                <p key={state.key} className="mb-0.5">
+                <p key={state.key} className="mb-[0.35em] last:mb-0">
                   {renderChildren(node.children, state)}
                 </p>
+              );
+            case RuleType.blockQuote:
+              return (
+                <blockquote key={state.key} className="mb-[0.35em] last:mb-0">
+                  {renderChildren(node.children, state)}
+                </blockquote>
               );
             default:
               return next();

@@ -62,7 +62,7 @@ export const ActionRadioGroup = ({
       <div className={clsx(isStandalone && 'px-2')}>
         {label && (
           <div className="mb-1">
-            <label className="text-text text-text-input block font-semibold">
+            <label className="text-subtext text-text-input block font-semibold">
               {label}
               {required ? '*' : ''}
             </label>

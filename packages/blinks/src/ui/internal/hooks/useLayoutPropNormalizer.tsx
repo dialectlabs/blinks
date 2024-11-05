@@ -168,7 +168,7 @@ export const useLayoutPropNormalizer = ({
     buttons: buttons.map(asButtonProps),
     inputs: inputs.map((i) => asInputProps(i)),
     form: form ? asFormProps(form) : undefined,
-    websiteText: props.websiteText ?? action.url,
+    websiteText: props.websiteText ?? props.websiteUrl ?? action.url,
     ...normalizedCaption,
   };
 };
