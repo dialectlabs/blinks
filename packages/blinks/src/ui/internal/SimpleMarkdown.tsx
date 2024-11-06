@@ -82,6 +82,12 @@ export const SimpleMarkdown = ({ text }: Props) => {
                   {renderChildren(node.children, state)}
                 </blockquote>
               );
+            case RuleType.codeBlock:
+              return (
+                <pre key={state.key} className="text-wrap">
+                  <code>{node.text}</code>
+                </pre>
+              );
             case RuleType.breakThematic:
               return <hr key={state.key} className="my-[0.5em]" />;
             default:
