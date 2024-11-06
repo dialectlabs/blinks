@@ -19,18 +19,18 @@ interface VariantClassNames {
 const variantClasses: Record<BadgeVariant, VariantClassNames> = {
   error: {
     container: 'group bg-transparent-error',
-    text: 'text-text-error group-hover:text-text-error-hover transition-colors motion-reduce:transition-none',
-    icon: 'text-icon-error group-hover:text-icon-error-hover transition-colors motion-reduce:transition-none',
+    text: 'text-text-error group-hover:text-text-error-hover',
+    icon: 'text-icon-error group-hover:text-icon-error-hover',
   },
   warning: {
     container: 'group bg-transparent-warning',
-    text: 'text-text-warning group-hover:text-text-warning-hover transition-colors motion-reduce:transition-none',
-    icon: 'text-icon-warning group-hover:text-icon-warning-hover transition-colors motion-reduce:transition-none',
+    text: 'text-text-warning group-hover:text-text-warning-hover',
+    icon: 'text-icon-warning group-hover:text-icon-warning-hover',
   },
   default: {
     container: 'group bg-transparent-grey',
-    text: 'text-text-primary group-hover:text-text-primary-hover transition-colors motion-reduce:transition-none',
-    icon: 'text-icon-primary group-hover:text-icon-primary-hover transition-colors motion-reduce:transition-none',
+    text: 'text-text-primary group-hover:text-text-primary-hover',
+    icon: 'text-icon-primary group-hover:text-icon-primary-hover',
   },
 };
 
@@ -45,7 +45,7 @@ export const Badge = ({
     <div
       className={clsx(
         container,
-        'inline-flex items-center justify-center gap-1 rounded-full text-subtext font-semibold leading-none',
+        'text-subtext inline-flex items-center justify-center gap-1 rounded-full font-semibold leading-none',
         className,
         {
           'aspect-square p-1': !children && icon,
@@ -53,8 +53,26 @@ export const Badge = ({
         },
       )}
     >
-      {children && <span className={text}>{children}</span>}
-      {icon && <div className={iconClassNames}>{icon}</div>}
+      {children && (
+        <span
+          className={clsx(
+            text,
+            'mt-0.5 transition-colors motion-reduce:transition-none',
+          )}
+        >
+          {children}
+        </span>
+      )}
+      {icon && (
+        <div
+          className={clsx(
+            iconClassNames,
+            'transition-colors motion-reduce:transition-none',
+          )}
+        >
+          {icon}
+        </div>
+      )}
     </div>
   );
 };

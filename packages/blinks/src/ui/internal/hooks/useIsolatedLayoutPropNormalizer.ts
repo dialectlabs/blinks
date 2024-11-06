@@ -176,6 +176,7 @@ export const useIsolatedLayoutPropNormalizer = ({
 
   return {
     ...props,
+    websiteText: props.websiteText ?? props.websiteUrl ?? action.url,
     ...elementProps,
     ...normalizedCaption,
   };

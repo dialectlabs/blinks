@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Radio } from '../Radio.tsx';
+import { SimpleMarkdown } from '../SimpleMarkdown.tsx';
 import { ActionButton } from './ActionButton.tsx';
 import type { BaseInputProps } from './types.ts';
 
@@ -61,7 +62,7 @@ export const ActionRadioGroup = ({
       <div className={clsx(isStandalone && 'px-2')}>
         {label && (
           <div className="mb-1">
-            <label className="block text-text font-semibold text-text-input">
+            <label className="text-subtext text-text-input block font-semibold">
               {label}
               {required ? '*' : ''}
             </label>
@@ -107,7 +108,7 @@ export const ActionRadioGroup = ({
             isStandalone ? 'mb-2 mt-2.5' : 'mt-3',
           )}
         >
-          {description}
+          <SimpleMarkdown text={description} />
         </span>
       )}
     </div>
