@@ -88,6 +88,28 @@ export const SimpleMarkdown = ({ text }: Props) => {
                   <code>{node.text}</code>
                 </pre>
               );
+            case RuleType.orderedList:
+              return (
+                <ol
+                  key={state.key}
+                  className="list-inside list-decimal [li>&]:ps-4"
+                >
+                  {node.items.map((item, index) => (
+                    <li key={index}>{renderChildren(item, state)}</li>
+                  ))}
+                </ol>
+              );
+            case RuleType.unorderedList:
+              return (
+                <ul
+                  key={state.key}
+                  className="list-inside list-disc [li>&]:ps-4"
+                >
+                  {node.items.map((item, index) => (
+                    <li key={index}>{renderChildren(item, state)}</li>
+                  ))}
+                </ul>
+              );
             case RuleType.breakThematic:
               return <hr key={state.key} className="my-[0.5em]" />;
             default:
