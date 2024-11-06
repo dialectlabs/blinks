@@ -268,7 +268,7 @@ export const BaseBlinkLayout = ({
             {title}
           </span>
           <span className="text-subtext text-text-secondary mb-4 break-words">
-            <SimpleMarkdown text={description} />
+            {description && <SimpleMarkdown text={description} />}
           </span>
           {!supportability.isSupported ? (
             <NotSupportedBlock message={supportability.message} />
