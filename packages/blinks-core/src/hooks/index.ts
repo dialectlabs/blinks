@@ -1,4 +1,12 @@
 export { useAction } from './useAction';
 export { useActionsRegistryInterval } from './useActionRegistryInterval';
-export { useBlinksDiscovery } from './useBlinksDiscovery';
-export { useMetadata } from './useMetadata';
+export {
+  useBlinkList,
+  type BlinkList,
+  type BlinkListEntry,
+} from './useBlinkList.ts';
+export {
+  useMetadata,
+  type BlinkMetadata,
+  type MetadataRow,
+} from './useMetadata';

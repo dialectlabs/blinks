@@ -6,12 +6,12 @@ interface UseMetadataArgs {
   url: string; // metadata url
 }
 
-interface BlinkMetadata {
+export interface BlinkMetadata {
   rows: MetadataRow[];
   extendedDescription?: string;
 }
 
-interface MetadataRow {
+export interface MetadataRow {
   key: string;
   title: string;
   value: string;
@@ -23,7 +23,7 @@ export const useMetadata = ({ url, wallet }: UseMetadataArgs) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<BlinkMetadata>();
 
-  const refetch = (url: string, wallet?: string) => {
+  const refetch = () => {
     setLoading(true);
     fetchMetadata(url, wallet)
       .then(setData)
@@ -31,7 +31,7 @@ export const useMetadata = ({ url, wallet }: UseMetadataArgs) => {
   };
 
   useEffect(() => {
-    refetch(url, wallet);
+    refetch();
   }, [url, wallet]);
 
   return {

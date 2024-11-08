@@ -1,32 +1,27 @@
 import { useEffect, useState } from 'react';
 import { BLINK_CLIENT_KEY_HEADER, clientKey } from '../utils/client-key.ts';
 
-interface UseBlinksDiscoveryArgs {
-  blinkUrl?: string; // filter by blinkUrl
+export interface BlinkList {
+  entries: BlinkListEntry[];
 }
 
-export interface DiscoveredBlinks {
-  entries: BlinkDiscoveryEntry[];
-}
-
-export interface BlinkDiscoveryEntry {
+export interface BlinkListEntry {
   id: string;
-  blinkUrl: string;
-  metadataUrl?: string;
   title: string;
   description: string;
+  blinkUrl: string;
+  metadataUrl?: string;
+  image?: string;
   icon?: string;
-  logo?: string;
 }
 
-// TODO: do we really need filter here now for MVP?
-export const useBlinksDiscovery = (props: UseBlinksDiscoveryArgs) => {
+export const useBlinkList = () => {
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<DiscoveredBlinks>();
+  const [data, setData] = useState<BlinkList>();
 
   const refetch = () => {
     setLoading(true);
-    fetchDiscovery()
+    fetchBlinkList()
       .then(setData)
       .finally(() => setLoading(false));
   };
@@ -38,14 +33,14 @@ export const useBlinksDiscovery = (props: UseBlinksDiscoveryArgs) => {
   return {
     loading,
     refetch,
-    data,
+    data: data?.entries ?? [],
   };
 };
 
-async function fetchDiscovery(): Promise<DiscoveredBlinks> {
+async function fetchBlinkList(): Promise<BlinkList> {
   try {
     const response = await fetch(
-      'https://registry.dial.to/v1/private/discovery/list',
+      'https://registry.dial.to/v1/private/blinks/list',
       {
         method: 'GET',
         headers: {
@@ -56,15 +51,15 @@ async function fetchDiscovery(): Promise<DiscoveredBlinks> {
     );
     if (response.status >= 400) {
       console.error(
-        `[@dialectlabs/blinks] Failed to fetch discovery, response status: ${response.status}`,
+        `[@dialectlabs/blinks] Failed to fetch blink list, response status: ${response.status}`,
       );
       return {
         entries: [],
       };
     }
-    return (await response.json()) as DiscoveredBlinks;
+    return (await response.json()) as BlinkList;
   } catch (e) {
-    console.error(`[@dialectlabs/blinks] Failed to fetch discovery`, e);
+    console.error(`[@dialectlabs/blinks] Failed to fetch blink list`, e);
     return {
       entries: [],
     };
