@@ -2,6 +2,11 @@ import { BLINK_CLIENT_KEY_HEADER, clientKey } from './client-key.ts';
 
 let proxyUrl: string | null = 'https://proxy.dial.to';
 
+export type ProxifiedResult = {
+  readonly url: URL;
+  readonly headers: Record<string, string>;
+};
+
 export function setProxyUrl(url: string): void {
   if (!url) {
     console.warn(
@@ -21,38 +26,35 @@ export function setProxyUrl(url: string): void {
   proxyUrl = url;
 }
 
-export function proxify(url: string): {
-  url: URL;
-  headers: Record<string, string>;
-} {
-  const baseUrl = new URL(url);
-  if (shouldIgnoreProxy(baseUrl)) {
+export function proxify(url: string): ProxifiedResult {
+  return createProxifiedUrl(url);
+}
+
+export function proxifyImage(url: string): ProxifiedResult {
+  return createProxifiedUrl(url, 'image');
+}
+
+export function proxifyMetadata(url: string): ProxifiedResult {
+  return createProxifiedUrl(url, 'metadata');
+}
+
+function createProxifiedUrl(url: string, endpoint?: string): ProxifiedResult {
+  const incomingUrl = new URL(url);
+  if (!proxyUrl || shouldIgnoreProxy(incomingUrl)) {
     return {
-      url: baseUrl,
+      url: incomingUrl,
       headers: {},
     };
   }
-  const proxifiedUrl = new URL(proxyUrl!);
+
+  const proxifiedUrl = endpoint
+    ? new URL(endpoint, proxyUrl)
+    : new URL(proxyUrl);
   proxifiedUrl.searchParams.set('url', url);
+
   return {
     url: proxifiedUrl,
     headers: getProxifiedHeaders(),
-  };
-}
-
-export function proxifyImage(url: string): {
-  url: URL;
-} {
-  const baseUrl = new URL(url);
-  if (shouldIgnoreProxy(baseUrl)) {
-    return {
-      url: baseUrl,
-    };
-  }
-  const proxifiedUrl = new URL(`${proxyUrl!}/image`);
-  proxifiedUrl.searchParams.set('url', url);
-  return {
-    url: proxifiedUrl,
   };
 }
 
@@ -63,11 +65,5 @@ function getProxifiedHeaders(): Record<string, string> {
 }
 
 function shouldIgnoreProxy(url: URL): boolean {
-  if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
-    return true;
-  }
-  if (!proxyUrl) {
-    return true;
-  }
-  return false;
+  return url.hostname === 'localhost' || url.hostname === '127.0.0.1';
 }
