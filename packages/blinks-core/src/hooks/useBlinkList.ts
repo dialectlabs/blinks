@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { BLINK_CLIENT_KEY_HEADER, clientKey } from '../utils/client-key.ts';
 
 export interface BlinkList {
@@ -11,7 +11,7 @@ export interface BlinkListEntry {
   description: string;
   blinkUrl: string;
   metadataUrl?: string;
-  image?: string;
+  image: string;
   icon?: string;
 }
 
@@ -19,16 +19,24 @@ export const useBlinkList = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<BlinkList>();
 
-  const refetch = () => {
+  const refetch = useCallback(() => {
+    const controller = new AbortController();
+
     setLoading(true);
-    fetchBlinkList()
+    fetchBlinkList({ signal: controller.signal })
       .then(setData)
       .finally(() => setLoading(false));
-  };
+
+    return controller;
+  }, []);
 
   useEffect(() => {
-    refetch();
-  }, []);
+    const controller = refetch();
+
+    return () => {
+      controller.abort();
+    };
+  }, [refetch]);
 
   return {
     loading,
@@ -37,7 +45,11 @@ export const useBlinkList = () => {
   };
 };
 
-async function fetchBlinkList(): Promise<BlinkList> {
+async function fetchBlinkList({
+  signal,
+}: {
+  signal?: AbortSignal;
+} = {}): Promise<BlinkList> {
   try {
     const response = await fetch(
       'https://registry.dial.to/v1/private/blinks/list',
@@ -47,6 +59,7 @@ async function fetchBlinkList(): Promise<BlinkList> {
           Accept: 'application/json',
           ...(clientKey && { [BLINK_CLIENT_KEY_HEADER]: clientKey }),
         },
+        signal,
       },
     );
     if (response.status >= 400) {

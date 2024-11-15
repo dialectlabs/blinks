@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { proxifyMetadata } from '../utils/proxify.ts';
 
 interface UseMetadataArgs {
@@ -23,16 +23,24 @@ export const useMetadata = ({ url, wallet }: UseMetadataArgs) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<BlinkMetadata>();
 
-  const refetch = () => {
+  const refetch = useCallback(() => {
+    const controller = new AbortController();
+
     setLoading(true);
-    fetchMetadata(url, wallet)
+    fetchMetadata(url, wallet, { signal: controller.signal })
       .then(setData)
       .finally(() => setLoading(false));
-  };
+
+    return controller;
+  }, [url, wallet]);
 
   useEffect(() => {
-    refetch();
-  }, [url, wallet]);
+    const controller = refetch();
+
+    return () => {
+      controller.abort();
+    };
+  }, [refetch]);
 
   return {
     loading,
@@ -44,6 +52,11 @@ export const useMetadata = ({ url, wallet }: UseMetadataArgs) => {
 async function fetchMetadata(
   url: string,
   wallet?: string,
+  {
+    signal,
+  }: {
+    signal?: AbortSignal;
+  } = {},
 ): Promise<BlinkMetadata> {
   try {
     const urlObj = new URL(url);
@@ -59,6 +72,7 @@ async function fetchMetadata(
         Accept: 'application/json',
         ...proxyHeaders,
       },
+      signal,
     });
     if (response.status >= 400) {
       console.error(
