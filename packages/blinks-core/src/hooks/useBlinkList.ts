@@ -25,7 +25,11 @@ export const useBlinkList = () => {
     setLoading(true);
     fetchBlinkList({ signal: controller.signal })
       .then(setData)
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      });
 
     return controller;
   }, []);

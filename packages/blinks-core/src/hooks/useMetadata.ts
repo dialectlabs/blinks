@@ -29,7 +29,11 @@ export const useMetadata = ({ url, wallet }: UseMetadataArgs) => {
     setLoading(true);
     fetchMetadata(url, wallet, { signal: controller.signal })
       .then(setData)
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      });
 
     return controller;
   }, [url, wallet]);
