@@ -20,25 +20,31 @@ export const useBlinkList = () => {
   const [data, setData] = useState<BlinkList>();
 
   const refetch = useCallback(() => {
-    const controller = new AbortController();
+    let ignore = false;
 
     setLoading(true);
-    fetchBlinkList({ signal: controller.signal })
-      .then(setData)
+    fetchBlinkList()
+      .then((data) => {
+        if (!ignore) {
+          setData(data);
+        }
+      })
       .finally(() => {
-        if (!controller.signal.aborted) {
+        if (!ignore) {
           setLoading(false);
         }
       });
 
-    return controller;
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   useEffect(() => {
-    const controller = refetch();
+    const cancel = refetch();
 
     return () => {
-      controller.abort();
+      cancel();
     };
   }, [refetch]);
 
@@ -49,11 +55,7 @@ export const useBlinkList = () => {
   };
 };
 
-async function fetchBlinkList({
-  signal,
-}: {
-  signal?: AbortSignal;
-} = {}): Promise<BlinkList> {
+async function fetchBlinkList(): Promise<BlinkList> {
   try {
     const response = await fetch(
       'https://registry.dial.to/v1/private/blinks/list',
@@ -63,7 +65,6 @@ async function fetchBlinkList({
           Accept: 'application/json',
           ...(clientKey && { [BLINK_CLIENT_KEY_HEADER]: clientKey }),
         },
-        signal,
       },
     );
     if (response.status >= 400) {

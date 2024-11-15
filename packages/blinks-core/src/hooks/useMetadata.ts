@@ -24,25 +24,31 @@ export const useMetadata = ({ url, wallet }: UseMetadataArgs) => {
   const [data, setData] = useState<BlinkMetadata>();
 
   const refetch = useCallback(() => {
-    const controller = new AbortController();
+    let ignore = false;
 
     setLoading(true);
-    fetchMetadata(url, wallet, { signal: controller.signal })
-      .then(setData)
+    fetchMetadata(url, wallet)
+      .then((data) => {
+        if (!ignore) {
+          setData(data);
+        }
+      })
       .finally(() => {
-        if (!controller.signal.aborted) {
+        if (!ignore) {
           setLoading(false);
         }
       });
 
-    return controller;
+    return () => {
+      ignore = true;
+    };
   }, [url, wallet]);
 
   useEffect(() => {
-    const controller = refetch();
+    const cancel = refetch();
 
     return () => {
-      controller.abort();
+      cancel();
     };
   }, [refetch]);
 
@@ -56,11 +62,6 @@ export const useMetadata = ({ url, wallet }: UseMetadataArgs) => {
 async function fetchMetadata(
   url: string,
   wallet?: string,
-  {
-    signal,
-  }: {
-    signal?: AbortSignal;
-  } = {},
 ): Promise<BlinkMetadata> {
   try {
     const urlObj = new URL(url);
@@ -76,7 +77,6 @@ async function fetchMetadata(
         Accept: 'application/json',
         ...proxyHeaders,
       },
-      signal,
     });
     if (response.status >= 400) {
       console.error(
