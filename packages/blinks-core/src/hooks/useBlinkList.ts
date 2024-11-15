@@ -67,7 +67,7 @@ async function fetchBlinkList(): Promise<BlinkList> {
         },
       },
     );
-    if (response.status >= 400) {
+    if (!response.ok) {
       console.error(
         `[@dialectlabs/blinks] Failed to fetch blink list, response status: ${response.status}`,
       );

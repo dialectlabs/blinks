@@ -78,7 +78,7 @@ async function fetchMetadata(
         ...proxyHeaders,
       },
     });
-    if (response.status >= 400) {
+    if (!response.ok) {
       console.error(
         `[@dialectlabs/blinks] Failed to fetch metadata, response status: ${response.status}`,
       );
