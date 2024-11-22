@@ -5,11 +5,14 @@ export function useActionsRegistryInterval() {
   const [isRegistryLoaded, setRegistryLoaded] = useState(false);
 
   useEffect(() => {
-    ActionsRegistry.getInstance()
-      .init()
-      .then(() => {
-        setRegistryLoaded(true);
-      });
+    const registry = ActionsRegistry.getInstance();
+    registry.init().then(() => {
+      setRegistryLoaded(true);
+    });
+
+    return () => {
+      registry.stopRefresh();
+    };
   }, [isRegistryLoaded]);
 
   return { isRegistryLoaded };

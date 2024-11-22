@@ -10,7 +10,7 @@ export class ActionsRegistry {
   private websitesByHost: Record<string, RegisteredEntity>;
   private interstitialsByHost: Record<string, RegisteredEntity>;
 
-  private initPromise: Promise<ActionsRegistryConfig> | null = null;
+  private intervalId: NodeJS.Timeout | null = null;
 
   private constructor(config?: ActionsRegistryConfig) {
     this.actionsByHost = config
@@ -43,16 +43,25 @@ export class ActionsRegistry {
   }
 
   public async init(): Promise<void> {
-    if (this.initPromise !== null) {
+    if (this.intervalId !== null) {
       return;
     }
     await this.refresh();
-    setInterval(() => this.refresh(), DEFAULT_REFRESH_INTERVAL);
+    this.intervalId = setInterval(
+      () => this.refresh(),
+      DEFAULT_REFRESH_INTERVAL,
+    );
+  }
+
+  public stopRefresh(): void {
+    if (this.intervalId !== null) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
   }
 
   public async refresh(): Promise<void> {
-    this.initPromise = fetchActionsRegistryConfig();
-    const config = await this.initPromise;
+    const config = await fetchActionsRegistryConfig();
     this.actionsByHost = Object.fromEntries(
       config.actions.map((action) => [action.host, action]),
     );

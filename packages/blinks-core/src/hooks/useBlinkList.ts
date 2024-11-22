@@ -55,7 +55,7 @@ export const useBlinkList = () => {
   };
 };
 
-async function fetchBlinkList(): Promise<BlinkList> {
+export async function fetchBlinkList(): Promise<BlinkList> {
   try {
     const response = await fetch(
       'https://registry.dial.to/v1/private/blinks/list',
