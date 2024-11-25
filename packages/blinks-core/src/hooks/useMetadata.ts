@@ -59,7 +59,7 @@ export const useMetadata = ({ url, wallet }: UseMetadataArgs) => {
   };
 };
 
-async function fetchMetadata(
+export async function fetchMetadata(
   url: string,
   wallet?: string,
 ): Promise<BlinkMetadata> {

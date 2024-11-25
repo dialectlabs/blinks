@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Action,
   type ActionSupportStrategy,
@@ -52,25 +52,26 @@ export function useAction({
   const [isLoading, setIsLoading] = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
 
-  useEffect(() => {
-    setIsLoading(true);
-    if (!isRegistryLoaded || !actionApiUrl) {
-      return;
+  const fetchAction = useCallback(() => {
+    if (!actionApiUrl) {
+      return () => {};
     }
 
     let ignore = false;
+    setIsLoading(true);
     setHasFetched(false);
     Action.fetch(actionApiUrl, supportStrategy)
       .then((action) => {
-        if (ignore) {
-          return;
+        if (!ignore) {
+          setAction(action);
+          setHasFetched(true);
         }
-        setAction(action);
-        setHasFetched(true);
       })
       .catch((e) => {
-        console.error('[@dialectlabs/blinks-core] Failed to fetch action', e);
-        setAction(null);
+        if (!ignore) {
+          console.error('[@dialectlabs/blinks-core] Failed to fetch action', e);
+          setAction(null);
+        }
       })
       .finally(() => {
         if (!ignore) {
@@ -81,7 +82,19 @@ export function useAction({
     return () => {
       ignore = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only update if actionApiUrl changes
+  }, [actionApiUrl, supportStrategy]);
+
+  useEffect(() => {
+    if (!isRegistryLoaded) {
+      return;
+    }
+
+    const cleanup = fetchAction();
+
+    return () => {
+      cleanup();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only update if actionApiUrl changes or registry loaded
   }, [actionApiUrl, isRegistryLoaded]);
 
   // this effect handles race conditions between fetching the action support strategy changes
@@ -101,5 +114,5 @@ export function useAction({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only update if supportStrategy changes
   }, [supportStrategy, hasFetched]);
 
-  return { action, isLoading };
+  return { action, isLoading, refresh: fetchAction };
 }
