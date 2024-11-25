@@ -272,7 +272,7 @@ export const BlinkContainer = ({
   adapter,
   websiteUrl,
   websiteText,
-  callbacks,
+  callbacks = {},
   securityLevel = DEFAULT_SECURITY_LEVEL,
   Layout,
   selector,
@@ -339,14 +339,14 @@ export const BlinkContainer = ({
   }, [initialAction, websiteUrl]);
 
   useEffect(() => {
-    callbacks?.onActionMount?.(
-      action,
-      websiteUrl ?? action.url,
+    callbacks.onActionMount?.(
+      initialAction,
+      websiteUrl ?? initialAction.url,
       actionState.action,
     );
-    // we run this effect ONLY if the action changes
+    // we run this effect ONLY once
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [action.id]);
+  }, []);
 
   useEffect(() => {
     const liveDataConfig = action.liveData_experimental;
@@ -454,6 +454,7 @@ export const BlinkContainer = ({
     ) {
       setActionState(newActionState);
       dispatch({ type: ExecutionType.BLOCK });
+      callbacks.onActionCancel?.(action, component, 'security-state-changed');
       return;
     }
 
@@ -470,6 +471,7 @@ export const BlinkContainer = ({
       const account = await adapter.connect(context);
       if (!account) {
         dispatch({ type: ExecutionType.RESET });
+        callbacks?.onActionCancel?.(action, component, 'wallet-not-connected');
         return;
       }
 
@@ -484,6 +486,7 @@ export const BlinkContainer = ({
             ? response.error
             : 'Transaction data missing',
         });
+        callbacks.onActionError?.(action, component, 'post-request-error');
         return;
       }
 
@@ -493,6 +496,7 @@ export const BlinkContainer = ({
             type: ExecutionType.FINISH,
             successMessage: response.message,
           });
+          callbacks.onActionComplete?.(action, component, signature);
           return;
         }
 
@@ -501,6 +505,11 @@ export const BlinkContainer = ({
             type: ExecutionType.SOFT_RESET,
             errorMessage: 'Missing signature for message',
           });
+          callbacks.onActionError?.(
+            action,
+            component,
+            'message-signature-missing',
+          );
           return;
         }
 
@@ -525,11 +534,19 @@ export const BlinkContainer = ({
             type: ExecutionType.FINISH,
             successMessage: response.message,
           });
+          callbacks.onActionComplete?.(action, component, signature);
           return;
         }
 
         setAction(nextAction);
         dispatch({ type: ExecutionType.RESET });
+        callbacks.onActionChain?.(
+          action,
+          nextAction,
+          component,
+          response.type,
+          signature,
+        );
       };
 
       if (response.type === 'transaction' || !response.type) {
@@ -540,10 +557,33 @@ export const BlinkContainer = ({
 
         if (!signResult || isSignTransactionError(signResult)) {
           dispatch({ type: ExecutionType.RESET });
+          callbacks.onActionCancel?.(
+            action,
+            component,
+            'transaction-sign-cancel',
+          );
           return;
         }
 
-        await adapter.confirmTransaction(signResult.signature, context);
+        const confirmationResult = await adapter
+          .confirmTransaction(signResult.signature, context)
+          .then(() => ({ success: true as const }))
+          .catch((e) => ({ success: false as const, message: e.message }));
+
+        if (!confirmationResult.success) {
+          dispatch({
+            type: ExecutionType.SOFT_RESET,
+            errorMessage:
+              confirmationResult.message ?? 'Unknown error, please try again',
+          });
+          callbacks.onActionError?.(
+            action,
+            component,
+            'transaction-confirmation-failed',
+            signResult.signature,
+          );
+          return;
+        }
 
         await chain(signResult.signature);
         return;
@@ -554,6 +594,7 @@ export const BlinkContainer = ({
 
         if (!signResult || isSignMessageError(signResult)) {
           dispatch({ type: ExecutionType.RESET });
+          callbacks.onActionCancel?.(action, component, 'message-sign-cancel');
           return;
         }
 
@@ -585,6 +626,7 @@ export const BlinkContainer = ({
         type: ExecutionType.SOFT_RESET,
         errorMessage: (e as Error).message ?? 'Unknown error, please try again',
       });
+      callbacks.onActionError?.(action, component, 'unknown-error');
     }
   };
 
