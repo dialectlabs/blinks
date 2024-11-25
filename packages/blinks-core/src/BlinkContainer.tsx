@@ -27,6 +27,7 @@ import {
   SingleValueActionComponent,
 } from './api';
 import { checkSecurity, isInterstitial, type SecurityLevel } from './utils';
+import { EMPTY_OBJECT } from './utils/constants.ts';
 import {
   isPostRequestError,
   isSignMessageError,
@@ -272,7 +273,7 @@ export const BlinkContainer = ({
   adapter,
   websiteUrl,
   websiteText,
-  callbacks = {},
+  callbacks = EMPTY_OBJECT,
   securityLevel = DEFAULT_SECURITY_LEVEL,
   Layout,
   selector,
