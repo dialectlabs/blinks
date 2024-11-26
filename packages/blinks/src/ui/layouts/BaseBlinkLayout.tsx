@@ -206,7 +206,7 @@ export const BaseBlinkLayout = ({
         {image && (
           <Linkable
             url={websiteUrl}
-            className="block max-h-[100cqw] overflow-y-hidden px-5 pt-5"
+            className="px-padding pt-padding block max-h-[100cqw] overflow-y-hidden"
           >
             <img
               className={clsx(
@@ -217,8 +217,8 @@ export const BaseBlinkLayout = ({
             />
           </Linkable>
         )}
-        <div className="flex flex-col p-5">
-          <div className="mb-1 flex items-center gap-2">
+        <div className="px-padding pb-padding pt-gap flex flex-col">
+          <div className="mb-1.5 flex items-center gap-2">
             {websiteUrl && (
               <a
                 href={websiteUrl}
@@ -265,10 +265,10 @@ export const BaseBlinkLayout = ({
               )}
             </a>
           </div>
-          <span className="text-text text-text-primary mb-1.5 break-words font-semibold">
+          <span className="text-text text-text-primary mb-1 break-words font-semibold">
             {title}
           </span>
-          <span className="text-subtext text-text-secondary mb-4 break-words">
+          <span className="text-subtext text-text-secondary mb-gap break-words">
             {description && <SimpleMarkdown text={description} />}
           </span>
           {!supportability.isSupported ? (
@@ -277,7 +277,7 @@ export const BaseBlinkLayout = ({
             <>
               {disclaimer && (
                 <DisclaimerBlock
-                  className="mb-4"
+                  className="mb-gap"
                   type={disclaimer.type}
                   ignorable={disclaimer.ignorable}
                   hidden={
@@ -299,12 +299,12 @@ export const BaseBlinkLayout = ({
                 buttons={buttons}
               />
               {success && (
-                <span className="text-subtext text-text-success mt-1.5 flex justify-center">
+                <span className="text-subtext text-text-success mt-gap flex justify-center">
                   {success}
                 </span>
               )}
               {error && !success && (
-                <span className="text-subtext text-text-error mt-1.5 flex justify-center">
+                <span className="text-subtext text-text-error mt-gap flex justify-center">
                   {error}
                 </span>
               )}
@@ -337,9 +337,9 @@ export const ActionContent = ({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="gap-between-inputs flex flex-col">
       {buttons && buttons.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="gap-between-buttons flex flex-wrap items-center">
           {buttons?.map((it, index) => (
             <div
               key={index}
@@ -397,7 +397,7 @@ const ActionForm = ({ form }: Required<Pick<InnerLayoutProps, 'form'>>) => {
   const disabled = Object.values(validity).some((v) => !v);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="gap-between-inputs flex flex-col">
       {form.inputs.map((input) => (
         <ActionInputFactory
           key={input.name}

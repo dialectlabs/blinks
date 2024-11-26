@@ -69,6 +69,12 @@
     --blink-border-radius-rounded-input: 0.5rem;
     --blink-border-radius-rounded-input-standalone: 0.5rem;
 
+    --blink-spacing-padding: 1rem;
+    --blink-spacing-gap: 1rem;
+    --blink-spacing-btwn-buttons: 0.5rem;
+    --blink-spacing-btwn-inputs: 0.75rem;
+    --blink-spacing-input-height: 40px;
+
     --blink-shadow-container: 0px 129.333px 103.467px 0px rgba(0, 0, 0, 0.07), 0px 54.032px 43.226px 0px rgba(0, 0, 0, 0.05), 0px 16.195px 12.956px 0px rgba(0, 0, 0, 0.04), 0px 8.601px 6.881px 0px rgba(0, 0, 0, 0.03), 0px 3.579px 2.863px 0px rgba(0, 0, 0, 0.02);
   }
 
@@ -79,6 +85,13 @@
     --blink-border-radius-rounded-button: 624.9375rem;
     --blink-border-radius-rounded-input: 1.25rem;
     --blink-border-radius-rounded-input-standalone: 1.75rem;
+
+    --blink-spacing-padding: 1rem;
+    --blink-spacing-gap: 1rem;
+    --blink-spacing-btwn-buttons: 0.5rem;
+    --blink-spacing-btwn-inputs: 0.75rem;
+    --blink-spacing-input-height: 40px;
+
   }
 
   .x-dark {
@@ -177,5 +190,13 @@
     --blink-shadow-container: 0px 2px 8px 0px rgba(62, 177, 255, 0.22), 0px 1px 48px 0px rgba(62, 177, 255, 0.24);
   }
 
-  .custom {}
+  .custom {
+
+    /* this will be removed in future versions */
+    --blink-spacing-padding: 1rem;
+    --blink-spacing-gap: 1rem;
+    --blink-spacing-btwn-buttons: 0.5rem;
+    --blink-spacing-btwn-inputs: 0.75rem;
+    --blink-spacing-input-height: 40px;
+  }
 }
