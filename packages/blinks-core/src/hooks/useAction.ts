@@ -16,7 +16,6 @@ interface UseActionOptions {
 function useActionApiUrl(url: string | URL) {
   const [apiUrl, setApiUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState();
 
   useEffect(() => {
     let ignore = false;
@@ -34,17 +33,22 @@ function useActionApiUrl(url: string | URL) {
           '[@dialectlabs/blinks-core] Failed to unfurl action URL',
           e,
         );
-        setApiUrl(null);
-        setError(e);
+        if (!ignore) {
+          setApiUrl(null);
+        }
       })
-      .finally(() => setIsLoading(false));
+      .finally(() => {
+        if (!ignore) {
+          setIsLoading(false);
+        }
+      });
 
     return () => {
       ignore = true;
     };
   }, [url]);
 
-  return { actionApiUrl: apiUrl, isUrlLoading: isLoading, urlError: error };
+  return { actionApiUrl: apiUrl, isUrlLoading: isLoading };
 }
 
 export function useAction({
@@ -52,11 +56,10 @@ export function useAction({
   supportStrategy = defaultActionSupportStrategy,
 }: UseActionOptions) {
   const { isRegistryLoaded } = useActionsRegistryInterval();
-  const { actionApiUrl, isUrlLoading, urlError } = useActionApiUrl(url);
+  const { actionApiUrl, isUrlLoading } = useActionApiUrl(url);
   const [action, setAction] = useState<Action | null>(null);
-  const [isLoading, setIsLoading] = useState(isUrlLoading);
+  const [isLoading, setIsLoading] = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
-  const [error, setError] = useState(urlError);
 
   const fetchAction = useCallback(() => {
     if (!actionApiUrl) {
@@ -77,7 +80,6 @@ export function useAction({
         if (!ignore) {
           console.error('[@dialectlabs/blinks-core] Failed to fetch action', e);
           setAction(null);
-          setError(e);
         }
       })
       .finally(() => {
@@ -123,8 +125,7 @@ export function useAction({
 
   return {
     action,
-    isLoading: isUrlLoading || isLoading,
-    error: urlError || error,
+    isLoading: !isRegistryLoaded || isUrlLoading || isLoading,
     refresh: fetchAction,
   };
 }
