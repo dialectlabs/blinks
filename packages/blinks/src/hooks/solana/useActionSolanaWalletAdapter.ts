@@ -12,6 +12,7 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Connection, VersionedTransaction } from '@solana/web3.js';
 import bs58 from 'bs58';
 import { useMemo } from 'react';
+import { decodeBase64 } from '../../utils/base64';
 /**
  * Hook to create an action adapter using solana's wallet adapter.
  *
@@ -64,7 +65,7 @@ export function useActionSolanaWalletAdapter(
       signTransaction: async (txData: string) => {
         try {
           const tx = await wallet.sendTransaction(
-            VersionedTransaction.deserialize(Buffer.from(txData, 'base64')),
+            VersionedTransaction.deserialize(decodeBase64(txData)),
             finalConnection,
           );
           return { signature: tx };
