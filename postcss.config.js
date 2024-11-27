@@ -4,6 +4,8 @@ const selectorIgnoreList = [
   '.x-dark',
   '.x-light',
   '.dial-light',
+  '.youtube-light',
+  '.youtube-dark',
   '.custom',
 ];
 

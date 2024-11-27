@@ -18,19 +18,24 @@
   "types": "dist/index.d.ts",
   "exports": {
     "./ext/twitter": {
+      "types": "./dist/ext/twitter.d.ts",
       "import": "./dist/ext/twitter.js",
-      "require": "./dist/ext/twitter.cjs",
-      "types": "./dist/ext/twitter.d.ts"
+      "require": "./dist/ext/twitter.cjs"
+    },
+    "./ext/youtube": {
+      "types": "./dist/ext/youtube.d.ts",
+      "import": "./dist/ext/youtube.js",
+      "require": "./dist/ext/youtube.cjs"
     },
     "./hooks/solana": {
+      "types": "./dist/hooks/solana/index.d.ts",
       "import": "./dist/hooks/solana/index.js",
-      "require": "./dist/hooks/solana/index.cjs",
-      "types": "./dist/hooks/solana/index.d.ts"
+      "require": "./dist/hooks/solana/index.cjs"
     },
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     },
     "./index.css": "./dist/index.css"
   },
@@ -61,7 +66,7 @@
     "bs58": "^5.0.0",
     "@solana/wallet-adapter-react": "^0.15.0",
     "@solana/wallet-adapter-react-ui": "^0.9.0",
-    "@solana/web3.js": "^1.95.1",
+    "@solana/web3.js": "^1.95.4",
     "react": ">=18",
     "react-dom": ">=18"
   },

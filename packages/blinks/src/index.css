@@ -72,7 +72,7 @@
     --blink-shadow-container: 0px 129.333px 103.467px 0px rgba(0, 0, 0, 0.07), 0px 54.032px 43.226px 0px rgba(0, 0, 0, 0.05), 0px 16.195px 12.956px 0px rgba(0, 0, 0, 0.04), 0px 8.601px 6.881px 0px rgba(0, 0, 0, 0.03), 0px 3.579px 2.863px 0px rgba(0, 0, 0, 0.02);
   }
 
-  .x-dark, .x-light {
+  .x-dark, .x-light, .youtube-dark, .youtube-light {
     --blink-border-radius-rounded-lg: 0.25rem;
     --blink-border-radius-rounded-xl: 0.5rem;
     --blink-border-radius-rounded-2xl: 1.125rem;
@@ -177,5 +177,114 @@
     --blink-shadow-container: 0px 2px 8px 0px rgba(62, 177, 255, 0.22), 0px 1px 48px 0px rgba(62, 177, 255, 0.24);
   }
 
-  .custom {}
+  /* Css for Youtube - Dark */
+  .youtube-dark {
+    --blink-bg-primary: #202327;
+    --blink-bg-secondary: #262a2d;
+    --blink-button: #f01d5d;
+    --blink-button-disabled: #2f3336;
+    --blink-button-hover: #f56993;
+    --blink-button-success: #00ae661a;
+    --blink-icon-error: #ff6565;
+    --blink-icon-error-hover: #ff7a7a;
+    --blink-icon-primary: #6e767d;
+    --blink-icon-primary-hover: #949ca4;
+    --blink-icon-warning: #ffb545;
+    --blink-icon-warning-hover: #ffc875;
+    --blink-input-bg: #202327;
+    --blink-input-bg-selected: #1d9bf0;
+    --blink-input-bg-disabled: #2f3336;
+    --blink-input-stroke: #3d4144;
+    --blink-input-stroke-disabled: #2f3336;
+    --blink-input-stroke-error: #ff6565;
+    --blink-input-stroke-hover: #6e767d;
+    --blink-input-stroke-selected: #1d9bf0;
+    --blink-stroke-error: #ff6565;
+    --blink-stroke-primary: #f01d5d;
+    --blink-stroke-secondary: #3d4144;
+    --blink-stroke-warning: #ffb545;
+    --blink-text-brand: #35aeff;
+    --blink-text-button: #fff;
+    --blink-text-button-disabled: #768088;
+    --blink-text-button-success: #12dc88;
+    --blink-text-error: #ff6565;
+    --blink-text-error-hover: #ff7a7a;
+    --blink-text-input: #fff;
+    --blink-text-input-disabled: #566470;
+    --blink-text-input-placeholder: #6e767d;
+    --blink-text-link: #6e767d;
+    --blink-text-link-hover: #949ca4;
+    --blink-text-primary: #fff;
+    --blink-text-secondary: #949ca4;
+    --blink-text-success: #12dc88;
+    --blink-text-warning: #ffb545;
+    --blink-text-warning-hover: #ffc875;
+    --blink-transparent-error: #aa00001a;
+    --blink-transparent-grey: #6e767d1a;
+    --blink-transparent-warning: #a966001a;
+    --blink-border-radius-rounded-lg: 0.25rem;
+    --blink-border-radius-rounded-xl: 0.5rem;
+    --blink-border-radius-rounded-2xl: 1.125rem;
+    --blink-border-radius-rounded-button: 600rem;
+    --blink-border-radius-rounded-input: 1.25rem;
+    --blink-border-radius-rounded-input-standalone: 1.75rem;
+    --blink-shadow-container: 0px 2px 8px 0px rgba(59,176,255,.22),0px 1px 48px 0px rgba(29,155,240,.24);
+  }
+  
+  /* Css for Youtube - Light */
+  .youtube-light {
+  --blink-bg-primary: #ffffff;
+  --blink-bg-secondary: #262a2d;
+  --blink-button: #f01d5d;
+  --blink-button-disabled: #f01d5c40;
+  --blink-button-hover: #f05a87;
+  --blink-button-success: #00ae661a;
+  --blink-icon-error: #ff6565;
+  --blink-icon-error-hover: #ff7a7a;
+  --blink-icon-primary: #6e767d;
+  --blink-icon-primary-hover: #949ca4;
+  --blink-icon-warning: #ffb545;
+  --blink-icon-warning-hover: #ffc875;
+  --blink-input-bg: #ffffff;
+  --blink-input-bg-selected: #1d9bf0;
+  --blink-input-bg-disabled: #2f3336;
+  --blink-input-stroke: #3d4144;
+  --blink-input-stroke-disabled: #2f3336;
+  --blink-input-stroke-error: #ff6565;
+  --blink-input-stroke-hover: #6e767d;
+  --blink-input-stroke-selected: #1d9bf0;
+  --blink-stroke-error: #ff6565;
+  --blink-stroke-primary: #f01d5d;
+  --blink-stroke-secondary: #3d4144;
+  --blink-stroke-warning: #ffb545;
+  --blink-text-brand: #35aeff;
+  --blink-text-button: #fff;
+  --blink-text-button-disabled: #768088;
+  --blink-text-button-success: #12dc88;
+  --blink-text-error: #ff6565;
+  --blink-text-error-hover: #ff7a7a;
+  --blink-text-input: #fff;
+  --blink-text-input-disabled: #566470;
+  --blink-text-input-placeholder: #6e767d;
+  --blink-text-link: #6e767d;
+  --blink-text-link-hover: #949ca4;
+  --blink-text-primary: #fff;
+  --blink-text-secondary: #949ca4;
+  --blink-text-success: #12dc88;
+  --blink-text-warning: #ffb545;
+  --blink-text-warning-hover: #ffc875;
+  --blink-transparent-error: #aa00001a;
+  --blink-transparent-grey: #6e767d1a;
+  --blink-transparent-warning: #a966001a;
+  --blink-border-radius-rounded-lg: 0.25rem;
+  --blink-border-radius-rounded-xl: 0.5rem;
+  --blink-border-radius-rounded-2xl: 1.125rem;
+  --blink-border-radius-rounded-button: 600rem;
+  --blink-border-radius-rounded-input: 1.25rem;
+  --blink-border-radius-rounded-input-standalone: 1.75rem;
+  --blink-shadow-container: 0px 2px 8px 0px rgba(59,176,255,.22),0px 1px 48px 0px rgba(29,155,240,.24);
+}
+
+.custom {}
+
 }

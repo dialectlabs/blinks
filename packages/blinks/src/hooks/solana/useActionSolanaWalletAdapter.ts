@@ -63,8 +63,9 @@ export function useActionSolanaWalletAdapter(
       },
       signTransaction: async (txData: string) => {
         try {
+          // Fixes the Buffer error on the base64 conversion
           const tx = await wallet.sendTransaction(
-            VersionedTransaction.deserialize(Buffer.from(txData, 'base64')),
+            VersionedTransaction.deserialize(new Uint8Array(Buffer.from(txData, 'base64'))),
             finalConnection,
           );
           return { signature: tx };
