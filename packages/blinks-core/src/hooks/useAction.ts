@@ -15,10 +15,12 @@ interface UseActionOptions {
 
 function useActionApiUrl(url: string | URL) {
   const [apiUrl, setApiUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     let ignore = false;
 
+    setIsLoading(true);
     unfurlUrlToActionApiUrl(new URL(url))
       .then((apiUrl) => {
         if (ignore) {
@@ -31,7 +33,14 @@ function useActionApiUrl(url: string | URL) {
           '[@dialectlabs/blinks-core] Failed to unfurl action URL',
           e,
         );
-        setApiUrl(null);
+        if (!ignore) {
+          setApiUrl(null);
+        }
+      })
+      .finally(() => {
+        if (!ignore) {
+          setIsLoading(false);
+        }
       });
 
     return () => {
@@ -39,7 +48,7 @@ function useActionApiUrl(url: string | URL) {
     };
   }, [url]);
 
-  return { actionApiUrl: apiUrl };
+  return { actionApiUrl: apiUrl, isUrlLoading: isLoading };
 }
 
 export function useAction({
@@ -47,7 +56,7 @@ export function useAction({
   supportStrategy = defaultActionSupportStrategy,
 }: UseActionOptions) {
   const { isRegistryLoaded } = useActionsRegistryInterval();
-  const { actionApiUrl } = useActionApiUrl(url);
+  const { actionApiUrl, isUrlLoading } = useActionApiUrl(url);
   const [action, setAction] = useState<Action | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
@@ -114,5 +123,9 @@ export function useAction({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only update if supportStrategy changes
   }, [supportStrategy, hasFetched]);
 
-  return { action, isLoading, refresh: fetchAction };
+  return {
+    action,
+    isLoading: !isRegistryLoaded || isUrlLoading || isLoading,
+    refresh: fetchAction,
+  };
 }
