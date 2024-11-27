@@ -15,10 +15,13 @@ interface UseActionOptions {
 
 function useActionApiUrl(url: string | URL) {
   const [apiUrl, setApiUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
 
   useEffect(() => {
     let ignore = false;
 
+    setIsLoading(true);
     unfurlUrlToActionApiUrl(new URL(url))
       .then((apiUrl) => {
         if (ignore) {
@@ -32,14 +35,16 @@ function useActionApiUrl(url: string | URL) {
           e,
         );
         setApiUrl(null);
-      });
+        setError(e);
+      })
+      .finally(() => setIsLoading(false));
 
     return () => {
       ignore = true;
     };
   }, [url]);
 
-  return { actionApiUrl: apiUrl };
+  return { actionApiUrl: apiUrl, isUrlLoading: isLoading, urlError: error };
 }
 
 export function useAction({
@@ -47,10 +52,11 @@ export function useAction({
   supportStrategy = defaultActionSupportStrategy,
 }: UseActionOptions) {
   const { isRegistryLoaded } = useActionsRegistryInterval();
-  const { actionApiUrl } = useActionApiUrl(url);
+  const { actionApiUrl, isUrlLoading, urlError } = useActionApiUrl(url);
   const [action, setAction] = useState<Action | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(isUrlLoading);
   const [hasFetched, setHasFetched] = useState(false);
+  const [error, setError] = useState(urlError);
 
   const fetchAction = useCallback(() => {
     if (!actionApiUrl) {
@@ -71,6 +77,7 @@ export function useAction({
         if (!ignore) {
           console.error('[@dialectlabs/blinks-core] Failed to fetch action', e);
           setAction(null);
+          setError(e);
         }
       })
       .finally(() => {
@@ -114,5 +121,10 @@ export function useAction({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only update if supportStrategy changes
   }, [supportStrategy, hasFetched]);
 
-  return { action, isLoading, refresh: fetchAction };
+  return {
+    action,
+    isLoading: isUrlLoading || isLoading,
+    error: urlError || error,
+    refresh: fetchAction,
+  };
 }
