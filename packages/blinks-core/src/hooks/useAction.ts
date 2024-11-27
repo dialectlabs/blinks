@@ -26,6 +26,7 @@ function useActionApiUrl(url: string | URL) {
         if (ignore) {
           return;
         }
+        setIsLoading(false);
         setApiUrl(apiUrl);
       })
       .catch((e) => {
@@ -72,6 +73,7 @@ export function useAction({
     Action.fetch(actionApiUrl, supportStrategy)
       .then((action) => {
         if (!ignore) {
+          setIsLoading(false);
           setAction(action);
           setHasFetched(true);
         }
