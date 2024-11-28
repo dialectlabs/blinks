@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { BLINK_CLIENT_KEY_HEADER, clientKey } from '../utils/client-key.ts';
 
+export interface UseBlinkListOptions {
+  id: string;
+}
+
 export interface BlinkList {
   entries: BlinkListEntry[];
 }
@@ -11,11 +15,13 @@ export interface BlinkListEntry {
   description: string;
   blinkUrl: string;
   metadataUrl?: string;
+  websiteUrl?: string;
+  websiteText?: string;
   image: string;
   icon?: string;
 }
 
-export const useBlinkList = () => {
+export const useBlinkList = ({ id }: UseBlinkListOptions) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<BlinkList>();
 
@@ -23,7 +29,7 @@ export const useBlinkList = () => {
     let ignore = false;
 
     setLoading(true);
-    fetchBlinkList()
+    fetchBlinkList(id)
       .then((data) => {
         if (!ignore) {
           setData(data);
@@ -38,7 +44,7 @@ export const useBlinkList = () => {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     const cancel = refetch();
@@ -55,10 +61,10 @@ export const useBlinkList = () => {
   };
 };
 
-export async function fetchBlinkList(): Promise<BlinkList> {
+export async function fetchBlinkList(id: string): Promise<BlinkList> {
   try {
     const response = await fetch(
-      'https://registry.dial.to/v1/private/blinks/list',
+      `https://registry.dial.to/v1/private/blink-lists/${id}`,
       {
         method: 'GET',
         headers: {
