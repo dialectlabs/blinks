@@ -15,6 +15,8 @@ export interface BlinkListEntry {
   description: string;
   blinkUrl: string;
   metadataUrl?: string;
+  websiteUrl?: string;
+  websiteText?: string;
   image: string;
   icon?: string;
 }
