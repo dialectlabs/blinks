@@ -312,7 +312,7 @@ export const BaseBlinkLayout = ({
           )}
           <div className="mt-4 flex justify-center">
             <a
-              href="https://docs.dialect.to/documentation/actions/security"
+              href="https://dialect.to"
               target="_blank"
               className="text-subtext text-text-link hover:text-text-link-hover flex items-center gap-1 transition-colors hover:cursor-pointer motion-reduce:transition-none"
               rel="noreferrer"
