@@ -11,6 +11,7 @@ import { SimpleMarkdown } from '../internal/SimpleMarkdown.tsx';
 import { Snackbar } from '../internal/Snackbar.tsx';
 import {
   ConfigIcon,
+  DialectLogo,
   ExclamationShieldIcon,
   InfoShieldIcon,
   LinkIcon,
@@ -309,6 +310,17 @@ export const BaseBlinkLayout = ({
               )}
             </>
           )}
+          <div className="mt-4 flex justify-center">
+            <a
+              href="https://docs.dialect.to/documentation/actions/security"
+              target="_blank"
+              className="text-subtext text-text-link hover:text-text-link-hover flex items-center gap-1 transition-colors hover:cursor-pointer motion-reduce:transition-none"
+              rel="noreferrer"
+            >
+              <span>powered by</span>
+              <DialectLogo />
+            </a>
+          </div>
         </div>
       </div>
     </div>
