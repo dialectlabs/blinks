@@ -14,11 +14,13 @@ export const Button = ({
   variant?: 'success' | 'error' | 'default';
   ctaType?: 'button' | 'link';
 } & PropsWithChildren) => {
+  const isLink = ctaType === 'link';
   return (
     <button
       className={clsx(
-        'rounded-button text-text relative flex w-full items-center justify-center text-nowrap px-5 py-3 font-semibold transition-colors motion-reduce:transition-none',
+        'rounded-button text-text relative flex w-full items-center justify-center text-nowrap px-4 py-3 font-semibold transition-colors motion-reduce:transition-none',
         {
+          'px-5': isLink,
           'bg-button-disabled text-text-button-disabled':
             disabled && variant !== 'success',
           'bg-button text-text-button hover:bg-button-hover':
@@ -30,7 +32,7 @@ export const Button = ({
       onClick={onClick}
     >
       {children}
-      {ctaType === 'link' && (
+      {isLink && (
         <span className="absolute right-2 top-2">
           <DeepLinkIcon
             className={clsx('h-2.5 w-2.5', {
