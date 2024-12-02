@@ -34,11 +34,12 @@ export const BaseInputContainer = ({
     <div>
       <div
         className={clsx(
-          'border-input-stroke peer relative flex min-h-10 flex-wrap items-center gap-1.5 gap-y-2 border p-1.5 transition-colors motion-reduce:transition-none',
+          'border-input-stroke min-h-input-height peer relative box-border flex flex-wrap items-center gap-1.5 gap-y-2 border px-1.5 transition-colors motion-reduce:transition-none',
           // focus, invalid, required
           'focus-within:has-[:invalid]:border-input-stroke-error focus-within:has-[:valid]:border-input-stroke-selected focus-within:hover:has-[:invalid]:border-input-stroke-error focus-within:hover:has-[:valid]:border-input-stroke-selected',
           // enabled,
           'hover:has-[:enabled]:border-input-stroke-hover',
+          { 'py-1.5': !!rightAdornment },
           standalone ? 'rounded-input-standalone' : 'rounded-input',
         )}
       >

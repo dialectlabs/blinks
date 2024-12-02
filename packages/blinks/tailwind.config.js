@@ -69,6 +69,13 @@ export default {
       boxShadow: {
         action: 'var(--blink-shadow-container)',
       },
+      spacing: {
+        padding: 'var(--blink-spacing-padding)',
+        gap: 'var(--blink-spacing-gap)',
+        'between-buttons': 'var(--blink-spacing-btwn-buttons)',
+        'between-inputs': 'var(--blink-spacing-btwn-inputs)',
+        'input-height': 'var(--blink-spacing-input-height)',
+      },
     },
   },
   plugins: [],

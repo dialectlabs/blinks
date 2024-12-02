@@ -18,7 +18,7 @@ export const Button = ({
   return (
     <button
       className={clsx(
-        'rounded-button text-text relative flex w-full items-center justify-center text-nowrap px-4 py-3 font-semibold transition-colors motion-reduce:transition-none',
+        'rounded-button text-text h-input-height relative flex w-full items-center justify-center text-nowrap px-4 py-3 font-semibold transition-colors motion-reduce:transition-none',
         {
           'px-5': isLink,
           'bg-button-disabled text-text-button-disabled':
