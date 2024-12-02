@@ -72,7 +72,7 @@ export const ActionTextArea = ({
       }
     >
       <textarea
-        className="whitespace-normal"
+        className="my-1.5 whitespace-normal"
         placeholder={placeholderWithRequired}
         value={value}
         onChange={extendedChange}

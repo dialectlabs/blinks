@@ -69,7 +69,7 @@
     --blink-border-radius-rounded-input: 0.5rem;
     --blink-border-radius-rounded-input-standalone: 0.5rem;
 
-    --blink-spacing-padding: 1rem;
+    --blink-spacing-padding: 1.25rem;
     --blink-spacing-gap: 1rem;
     --blink-spacing-btwn-buttons: 0.5rem;
     --blink-spacing-btwn-inputs: 0.75rem;
@@ -86,7 +86,7 @@
     --blink-border-radius-rounded-input: 1.25rem;
     --blink-border-radius-rounded-input-standalone: 1.75rem;
 
-    --blink-spacing-padding: 1rem;
+    --blink-spacing-padding: 1.25rem;
     --blink-spacing-gap: 1rem;
     --blink-spacing-btwn-buttons: 0.5rem;
     --blink-spacing-btwn-inputs: 0.75rem;
@@ -193,7 +193,7 @@
   .custom {
 
     /* this will be removed in future versions */
-    --blink-spacing-padding: 1rem;
+    --blink-spacing-padding: 1.25rem;
     --blink-spacing-gap: 1rem;
     --blink-spacing-btwn-buttons: 0.5rem;
     --blink-spacing-btwn-inputs: 0.75rem;
