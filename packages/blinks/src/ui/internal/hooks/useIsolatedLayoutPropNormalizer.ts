@@ -55,7 +55,7 @@ export const useIsolatedLayoutPropNormalizer = ({
             if (result) {
               window.open(
                 extra.data.externalLink,
-                '_blank',
+                '_self',
                 'norefferer,noopener',
               );
               return extra.onNext();
