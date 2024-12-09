@@ -324,7 +324,8 @@ export const BlinkContainer = ({
 
   // in case, where initialAction or websiteUrl changes, we need to reset the action state
   useEffect(() => {
-    if (action === initialAction || action.isChained) {
+    // just in case, to not reset initial action
+    if (action === initialAction) {
       return;
     }
 
