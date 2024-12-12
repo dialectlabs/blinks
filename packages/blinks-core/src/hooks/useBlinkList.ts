@@ -3,6 +3,7 @@ import { BLINK_CLIENT_KEY_HEADER, clientKey } from '../utils/client-key.ts';
 
 export interface UseBlinkListOptions {
   id: string;
+  wallet?: string; // user wallet address
 }
 
 export interface BlinkList {
@@ -21,7 +22,7 @@ export interface BlinkListEntry {
   icon?: string;
 }
 
-export const useBlinkList = ({ id }: UseBlinkListOptions) => {
+export const useBlinkList = ({ id, wallet }: UseBlinkListOptions) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<BlinkList>();
 
@@ -29,7 +30,7 @@ export const useBlinkList = ({ id }: UseBlinkListOptions) => {
     let ignore = false;
 
     setLoading(true);
-    fetchBlinkList(id)
+    fetchBlinkList(id, wallet)
       .then((data) => {
         if (!ignore) {
           setData(data);
@@ -44,7 +45,7 @@ export const useBlinkList = ({ id }: UseBlinkListOptions) => {
     return () => {
       ignore = true;
     };
-  }, [id]);
+  }, [id, wallet]);
 
   useEffect(() => {
     const cancel = refetch();
@@ -61,18 +62,24 @@ export const useBlinkList = ({ id }: UseBlinkListOptions) => {
   };
 };
 
-export async function fetchBlinkList(id: string): Promise<BlinkList> {
+export async function fetchBlinkList(
+  id: string,
+  wallet: string | undefined,
+): Promise<BlinkList> {
   try {
-    const response = await fetch(
+    const urlObj = new URL(
       `https://registry.dial.to/v1/private/blink-lists/${id}`,
-      {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-          ...(clientKey && { [BLINK_CLIENT_KEY_HEADER]: clientKey }),
-        },
-      },
     );
+    if (wallet) {
+      urlObj.searchParams.append('account', wallet);
+    }
+    const response = await fetch(urlObj, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        ...(clientKey && { [BLINK_CLIENT_KEY_HEADER]: clientKey }),
+      },
+    });
     if (!response.ok) {
       console.error(
         `[@dialectlabs/blinks] Failed to fetch blink list, response status: ${response.status}`,
