@@ -15,11 +15,15 @@ export interface BlinkListEntry {
   title: string;
   description: string;
   blinkUrl: string;
-  metadataUrl?: string;
   websiteUrl?: string;
   websiteText?: string;
+  metadataUrl?: string;
   image: string;
   icon?: string;
+  provider: {
+    name?: string;
+    category?: string;
+  };
 }
 
 export const useBlinkList = ({ id, wallet }: UseBlinkListOptions) => {
