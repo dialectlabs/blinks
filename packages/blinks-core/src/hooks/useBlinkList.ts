@@ -20,6 +20,7 @@ export interface BlinkListEntry {
   metadataUrl?: string;
   image: string;
   icon?: string;
+  cta?: string;
   provider: {
     name?: string;
     category?: string;
