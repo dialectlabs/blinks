@@ -1,6 +1,6 @@
 {
   "name": "@dialectlabs/blinks-core",
-  "version": "0.16.5",
+  "version": "0.16.6-beta",
   "license": "Apache-2.0",
   "private": false,
   "sideEffects": true,
