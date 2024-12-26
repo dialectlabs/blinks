@@ -1,43 +1,6 @@
 import clsx from 'clsx';
-import type {
-  BaseButtonProps,
-  BaseInputProps,
-} from '../internal/inputs/types.ts';
-import type { StylePreset } from '../types.ts';
-import {
-  ActionContent,
-  type FormProps,
-  type InnerLayoutProps,
-} from './BaseBlinkLayout.tsx';
+import { ActionContent, type InnerLayoutProps } from './BaseBlinkLayout.tsx';
 import { themeClassMap } from './presets.ts';
-
-type ButtonProps = BaseButtonProps;
-type InputProps = BaseInputProps;
-
-interface CommonIsolatedLayoutProps {
-  stylePreset?: StylePreset;
-  error?: string | null;
-  success?: string | null;
-  websiteUrl?: string | null;
-  websiteText?: string | null;
-  id?: string;
-}
-
-export type BaseIsolatedLayoutProps = CommonIsolatedLayoutProps &
-  (
-    | {
-        elementType: 'form';
-        element: FormProps;
-      }
-    | {
-        elementType: 'button';
-        element: ButtonProps;
-      }
-    | {
-        elementType: 'input';
-        element: InputProps;
-      }
-  );
 
 export const ActionsOnlyBlinkLayout = ({
   stylePreset = 'default',

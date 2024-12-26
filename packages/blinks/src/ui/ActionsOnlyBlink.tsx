@@ -4,7 +4,7 @@ import {
 } from '@dialectlabs/blinks-core';
 import { useCallback } from 'react';
 import type { BlinkProps } from './Blink.tsx';
-import { useLayoutPropNormalizer } from './internal/hooks/useLayoutPropNormalizer.tsx';
+import { useBaseLayoutPropNormalizer } from './hooks';
 import { ActionsOnlyBlinkLayout } from './layouts/ActionsOnlyBlinkLayout.tsx';
 import type { StylePreset } from './types.ts';
 
@@ -32,7 +32,7 @@ export const ActionsOnlyBlink = ({
 export const NormalizedActionsOnlyBlinkLayout = (
   props: BaseBlinkLayoutProps & { stylePreset?: StylePreset },
 ) => {
-  const normalizedProps = useLayoutPropNormalizer(props);
+  const normalizedProps = useBaseLayoutPropNormalizer(props);
 
   return <ActionsOnlyBlinkLayout {...normalizedProps} />;
 };

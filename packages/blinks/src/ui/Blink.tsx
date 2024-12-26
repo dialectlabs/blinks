@@ -4,8 +4,8 @@ import {
   type BlinkContainerProps,
 } from '@dialectlabs/blinks-core';
 import { type ComponentType, useCallback } from 'react';
-import { useLayoutPropNormalizer } from './internal/hooks/useLayoutPropNormalizer.tsx';
-import { BaseBlinkLayout } from './layouts/BaseBlinkLayout.tsx';
+import { useBaseLayoutPropNormalizer } from './hooks';
+import { BaseBlinkLayout } from './layouts';
 import type { StylePreset } from './types.ts';
 
 export interface BlinkProps
@@ -38,7 +38,7 @@ export const Blink = ({
 export const NormalizedBaseBlinkLayout = (
   props: BaseBlinkLayoutProps & { stylePreset?: StylePreset },
 ) => {
-  const normalizedProps = useLayoutPropNormalizer(props);
+  const normalizedProps = useBaseLayoutPropNormalizer(props);
 
   return <BaseBlinkLayout {...normalizedProps} />;
 };
