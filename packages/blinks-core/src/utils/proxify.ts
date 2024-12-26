@@ -38,6 +38,10 @@ export function proxifyMetadata(url: string): ProxifiedResult {
   return createProxifiedUrl(url, 'metadata');
 }
 
+export function isProxified(url: string): boolean {
+  return proxyUrl ? url.startsWith(proxyUrl) : false;
+}
+
 function createProxifiedUrl(url: string, endpoint?: string): ProxifiedResult {
   const incomingUrl = new URL(url);
   if (!proxyUrl || shouldIgnoreProxy(incomingUrl)) {
