@@ -44,6 +44,8 @@ export function useEvmWagmiAdapter({
             return { error: 'No wallet connected' };
           }
           try {
+            // deserialize function relies on wagmi implementation to handle bigints and maps correctly
+            // same way blink api should serialize using the same utility function
             const deserializedTx = deserialize<any>(tx);
             const hash = await sendTransaction(client, {
               ...deserializedTx,
