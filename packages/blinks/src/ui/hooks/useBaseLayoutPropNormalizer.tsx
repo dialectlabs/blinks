@@ -8,15 +8,15 @@ import {
   SingleValueActionComponent,
 } from '@dialectlabs/blinks-core';
 import { useMemo } from 'react';
-import type { InnerLayoutProps } from '../../layouts/BaseBlinkLayout.tsx';
-import { confirmLinkTransition } from '../utils.ts';
+import { confirmLinkTransition } from '../internal/utils.ts';
+import type { InnerLayoutProps } from '../layouts';
 import { buttonLabelMap, buttonVariantMap } from './ui-mappers.ts';
 
 const SOFT_LIMIT_BUTTONS = 10;
 const SOFT_LIMIT_INPUTS = 3;
 const SOFT_LIMIT_FORM_INPUTS = 10;
 
-export const useLayoutPropNormalizer = ({
+export const useBaseLayoutPropNormalizer = ({
   executeFn,
   executionStatus,
   executingAction,

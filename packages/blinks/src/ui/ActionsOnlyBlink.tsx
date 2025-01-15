@@ -1,21 +1,15 @@
 import {
   type BaseBlinkLayoutProps,
   BlinkContainer,
-  type BlinkContainerProps,
 } from '@dialectlabs/blinks-core';
-import { type ComponentType, useCallback } from 'react';
+import { useCallback } from 'react';
+import type { BlinkProps } from './Blink.tsx';
 import { useBaseLayoutPropNormalizer } from './hooks';
-import { BaseBlinkLayout } from './layouts';
+import { ActionsOnlyBlinkLayout } from './layouts/ActionsOnlyBlinkLayout.tsx';
 import type { StylePreset } from './types.ts';
 
-export interface BlinkProps
-  extends Omit<BlinkContainerProps, 'Layout' | 'selector'> {
-  _Layout?: ComponentType<BaseBlinkLayoutProps & { stylePreset?: StylePreset }>;
-  stylePreset?: StylePreset;
-}
-
-export const Blink = ({
-  _Layout: Layout = NormalizedBaseBlinkLayout,
+export const ActionsOnlyBlink = ({
+  _Layout: Layout = NormalizedActionsOnlyBlinkLayout,
   stylePreset,
   ...props
 }: BlinkProps) => {
@@ -35,10 +29,10 @@ export const Blink = ({
   );
 };
 
-export const NormalizedBaseBlinkLayout = (
+export const NormalizedActionsOnlyBlinkLayout = (
   props: BaseBlinkLayoutProps & { stylePreset?: StylePreset },
 ) => {
   const normalizedProps = useBaseLayoutPropNormalizer(props);
 
-  return <BaseBlinkLayout {...normalizedProps} />;
+  return <ActionsOnlyBlinkLayout {...normalizedProps} />;
 };
