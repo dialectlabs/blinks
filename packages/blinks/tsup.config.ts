@@ -16,12 +16,14 @@ export default defineConfig([
       'src/index.css',
       'src/ext/twitter.tsx',
       'src/hooks/solana/index.ts',
+      'src/hooks/evm/index.ts',
     ],
     dts: {
       entry: [
         'src/index.ts',
         'src/ext/twitter.tsx',
         'src/hooks/solana/index.ts',
+        'src/hooks/evm/index.ts',
       ],
     },
   },
