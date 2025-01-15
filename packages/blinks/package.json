@@ -27,6 +27,11 @@
       "require": "./dist/hooks/solana/index.cjs",
       "types": "./dist/hooks/solana/index.d.ts"
     },
+    "./hooks/evm": {
+      "import": "./dist/hooks/evm/index.js",
+      "require": "./dist/hooks/evm/index.cjs",
+      "types": "./dist/hooks/evm/index.d.ts"
+    },
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
