@@ -4,8 +4,8 @@ import { isProxified, proxify, proxifyImage } from '../../utils';
 import { isUrlSameOrigin } from '../../utils/security.ts';
 import type { ActionAdapter } from '../ActionConfig.ts';
 import type {
+  ActionGetResponse,
   ActionParameterType,
-  ExtendedActionGetResponse,
   LinkedActionType,
   NextAction,
   NextActionLink,
@@ -293,7 +293,7 @@ export class Action {
       );
     }
 
-    const data = (await response.json()) as ExtendedActionGetResponse;
+    const data = (await response.json()) as ActionGetResponse;
     const metadata = getActionMetadata(response);
 
     return new Action(
