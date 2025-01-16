@@ -46,7 +46,7 @@
     },
     "packages/blinks": {
       "name": "@dialectlabs/blinks",
-      "version": "0.18.3",
+      "version": "0.18.4-beta.1",
       "dependencies": {
         "@dialectlabs/blinks-core": "packages/blinks-core",
         "bs58": "^6.0.0",
@@ -92,7 +92,7 @@
     },
     "packages/blinks-core": {
       "name": "@dialectlabs/blinks-core",
-      "version": "0.16.5",
+      "version": "0.16.6-beta.1",
       "dependencies": {
         "@solana/web3.js": "^1.95.1",
         "nanoid": "^5.0.7",

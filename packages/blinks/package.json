@@ -73,6 +73,7 @@
   },
   "dependencies": {
     "@dialectlabs/blinks-core": "0.16.6-beta.1",
+    "bs58": "^6.0.0",
     "clsx": "^2.1.1",
     "markdown-to-jsx": "^7.5.0"
   },
