@@ -301,17 +301,17 @@ export const BaseBlinkLayout = ({
                 buttons={buttons}
               />
               {success && (
-                <span className="text-subtext text-text-success mt-between-inputs flex justify-center">
+                <span className="text-subtext text-text-success mt-between-inputs break-words text-center">
                   {success}
                 </span>
               )}
               {error && !success && (
-                <span className="text-subtext text-text-error mt-between-inputs flex justify-center">
+                <span className="text-subtext text-text-error mt-between-inputs break-words text-center">
                   {error}
                 </span>
               )}
               {message && !success && !error && (
-                <span className="text-subtext text-text-secondary mt-between-inputs flex justify-center">
+                <span className="text-subtext text-text-secondary mt-between-inputs break-words text-center">
                   {message}
                 </span>
               )}
