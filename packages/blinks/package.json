@@ -63,8 +63,13 @@
     "typescript": "^5.5.3"
   },
   "peerDependencies": {
+    "@solana/wallet-adapter-react": "^0.15.0",
+    "@solana/wallet-adapter-react-ui": "^0.9.0",
+    "@solana/web3.js": "^1.95.1",
     "react": ">=18",
-    "react-dom": ">=18"
+    "react-dom": ">=18",
+    "viem": "^2.x",
+    "wagmi": "^2.x"
   },
   "dependencies": {
     "@dialectlabs/blinks-core": "0.16.5",
@@ -72,11 +77,21 @@
     "clsx": "^2.1.1",
     "markdown-to-jsx": "^7.5.0"
   },
-  "optionalDependencies": {
-    "@solana/wallet-adapter-react": "^0.15.35",
-    "@solana/wallet-adapter-react-ui": "^0.9.35",
-    "@solana/web3.js": "^1.98.0",
-    "viem": "^2.22.8",
-    "wagmi": "^2.14.7"
+  "peerDependenciesMeta": {
+    "@solana/wallet-adapter-react": {
+      "optional": true
+    },
+    "@solana/wallet-adapter-react-ui": {
+      "optional": true
+    },
+    "@solana/web3.js": {
+      "optional": true
+    },
+    "viem": {
+      "optional": true
+    },
+    "wagmi": {
+      "optional": true
+    }
   }
 }
