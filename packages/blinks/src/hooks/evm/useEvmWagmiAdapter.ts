@@ -10,13 +10,37 @@ import {
   waitForTransactionReceipt,
 } from 'viem/actions';
 
+/**
+ * Parameters for the `useEvmWagmiAdapter` hook.
+ */
 interface EvmWagmiAdapterParams {
-  onConnectWalletRequest: () => Promise<string | null>;
+  /**
+   * Callback function that is called when a request to connect a wallet is made. You should use it to initiate the connection to the wallet, e.g. by opening a modal or a wallet connect QR code.
+   * This function should be a semi-pure function, since it doesn't cause adapter to be recreated. Meaning you SHOULDN'T use any value variables from this function.
+   *
+   * @returns A promise that resolves to a string representing the wallet address if the connection is successful, or null if the connection is successful but no address is provided. The promise should be rejected if the connection fails.
+   */
+  onConnectWalletRequest: () => Promise<string> | Promise<void>;
 }
 
+/**
+ * Hook to create an EVM Wagmi adapter for interacting with blockchain wallets.
+ *
+ * @param {EvmWagmiAdapterParams} params - Parameters for the adapter.
+ * @returns {Object} - Returns an object containing the adapter.
+ * @returns {ActionAdapter} adapter - The adapter object with methods for connecting, signing transactions, signing messages, and confirming transactions.
+ *
+ * The adapter object contains the following methods:
+ * - `connect`: Connects to the wallet and returns the wallet address.
+ * - `signTransaction`: Signs a transaction and returns the transaction hash.
+ * - `signMessage`: Signs a message and returns the signature.
+ * - `confirmTransaction`: Confirms a transaction using the transaction hash.
+ *
+ * The adapter also contains metadata about supported blockchain IDs.
+ */
 export function useEvmWagmiAdapter({
   onConnectWalletRequest,
-}: EvmWagmiAdapterParams) {
+}: EvmWagmiAdapterParams): { adapter: ActionAdapter } {
   const chains = useChains();
   const { address } = useAccount();
   const { data: client } = useConnectorClient();
