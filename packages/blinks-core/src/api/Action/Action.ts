@@ -1,6 +1,6 @@
 import type { MessageNextActionPostRequest } from '@solana/actions-spec';
 import { nanoid } from 'nanoid/non-secure';
-import { proxify, proxifyImage } from '../../utils';
+import { isProxified, proxify, proxifyImage } from '../../utils';
 import { isUrlSameOrigin } from '../../utils/security.ts';
 import type { ActionAdapter } from '../ActionConfig.ts';
 import type {
@@ -110,6 +110,14 @@ export class Action {
     return this._id;
   }
 
+  public get data() {
+    return this._data;
+  }
+
+  public get supportStrategy() {
+    return this._supportStrategy;
+  }
+
   public get isChained() {
     return this._chainMetadata.isChained;
   }
@@ -127,7 +135,7 @@ export class Action {
   }
 
   public get icon() {
-    if (this._data.icon.startsWith('data:')) {
+    if (this._data.icon.startsWith('data:') || isProxified(this._data.icon)) {
       return this._data.icon;
     }
     return proxifyImage(this._data.icon).url.toString();

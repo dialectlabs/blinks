@@ -1,6 +1,6 @@
 {
   "name": "@dialectlabs/blinks",
-  "version": "0.18.3",
+  "version": "0.18.4-beta.1",
   "license": "Apache-2.0",
   "private": false,
   "sideEffects": true,
@@ -72,8 +72,7 @@
     "wagmi": "^2.x"
   },
   "dependencies": {
-    "@dialectlabs/blinks-core": "0.16.5",
-    "bs58": "^6.0.0",
+    "@dialectlabs/blinks-core": "0.16.6-beta.1",
     "clsx": "^2.1.1",
     "markdown-to-jsx": "^7.5.0"
   },

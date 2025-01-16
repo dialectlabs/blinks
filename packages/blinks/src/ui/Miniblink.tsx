@@ -6,7 +6,7 @@ import {
   type BlinkContainerProps,
 } from '@dialectlabs/blinks-core';
 import { type ComponentType, useCallback } from 'react';
-import { useIsolatedLayoutPropNormalizer } from './internal/hooks/useIsolatedLayoutPropNormalizer.ts';
+import { useIsolatedLayoutPropNormalizer } from './hooks/useIsolatedLayoutPropNormalizer.ts';
 import { IsolatedBlinkLayout } from './layouts/IsolatedBlinkLayout.tsx';
 import type { StylePreset } from './types.ts';
 

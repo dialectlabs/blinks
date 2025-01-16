@@ -8,7 +8,7 @@ import {
   SingleValueActionComponent,
 } from '@dialectlabs/blinks-core';
 import { useCallback, useMemo } from 'react';
-import type { BaseIsolatedLayoutProps } from '../../layouts/IsolatedBlinkLayout.tsx';
+import type { BaseIsolatedLayoutProps } from '../layouts/IsolatedBlinkLayout.tsx';
 import { buttonLabelMap, buttonVariantMap } from './ui-mappers.ts';
 
 const SOFT_LIMIT_FORM_INPUTS = 10;
