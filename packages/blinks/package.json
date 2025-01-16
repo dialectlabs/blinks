@@ -27,6 +27,11 @@
       "require": "./dist/hooks/solana/index.cjs",
       "types": "./dist/hooks/solana/index.d.ts"
     },
+    "./hooks/evm": {
+      "import": "./dist/hooks/evm/index.js",
+      "require": "./dist/hooks/evm/index.cjs",
+      "types": "./dist/hooks/evm/index.d.ts"
+    },
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
@@ -58,16 +63,35 @@
     "typescript": "^5.5.3"
   },
   "peerDependencies": {
-    "bs58": "^5.0.0",
     "@solana/wallet-adapter-react": "^0.15.0",
     "@solana/wallet-adapter-react-ui": "^0.9.0",
     "@solana/web3.js": "^1.95.1",
     "react": ">=18",
-    "react-dom": ">=18"
+    "react-dom": ">=18",
+    "viem": "^2.x",
+    "wagmi": "^2.x"
   },
   "dependencies": {
     "@dialectlabs/blinks-core": "0.16.6-beta.1",
+    "bs58": "^6.0.0",
     "clsx": "^2.1.1",
     "markdown-to-jsx": "^7.5.0"
+  },
+  "peerDependenciesMeta": {
+    "@solana/wallet-adapter-react": {
+      "optional": true
+    },
+    "@solana/wallet-adapter-react-ui": {
+      "optional": true
+    },
+    "@solana/web3.js": {
+      "optional": true
+    },
+    "viem": {
+      "optional": true
+    },
+    "wagmi": {
+      "optional": true
+    }
   }
 }

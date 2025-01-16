@@ -6,13 +6,16 @@ export const BlockchainIds = {
   SOLANA_DEVNET: 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1',
   SOLANA_TESTNET: 'solana:4uhcVJyU9pJkvQyS88uRDiswHXSCkY3',
   ETHEREUM_MAINNET: 'eip155:1',
-  MONAD_DEVNET: 'eip155:41454',
+  ETHEREUM_SEPOLIA: 'eip155:11155111',
+  MONAD_DEVNET: 'eip155:20143',
 };
+
 const BlockchainNames: Record<string, string> = {
   [BlockchainIds.SOLANA_MAINNET]: 'Solana Mainnet',
   [BlockchainIds.SOLANA_DEVNET]: 'Solana Devnet',
   [BlockchainIds.SOLANA_TESTNET]: 'Solana Testnet',
   [BlockchainIds.ETHEREUM_MAINNET]: 'Ethereum Mainnet',
+  [BlockchainIds.ETHEREUM_SEPOLIA]: 'Ethereum Sepolia',
   [BlockchainIds.MONAD_DEVNET]: 'Monad Devnet',
 };
 

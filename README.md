@@ -1,14 +1,31 @@
 # @dialectlabs/blinks &mdash; the [Actions](https://github.com/dialectlabs/actions) Interface
 
 ## Usage
+
+### Installation
+
+#### Solana
+
+```bash
+npm add @dialectlabs/blinks @solana/web3.js @solana/wallet-adapter-react @solana/wallet-adapter-react-ui
+```
+
+#### EVM
+
+```bash
+npm add @dialectlabs/blinks viem wagmi
+```
+
 ### Style Presets & Overriding Theme
 
 #### Style Presets
+
 `Blink` component contains a `stylePreset` prop that accepts the following values:
-* `default` - [dial.to](https://dial.to)-styled blink (light)
-* `x-dark` - [X](https://x.com/)-styled blink (dark)
-* `x-light` - [X](https://x.com/)-styled blink (light)
-* `custom` - clean slate, no colors, radii at all, use CSS Variables to style. See [Overriding Theme](#overriding-theme). 
+
+- `default` - [dial.to](https://dial.to)-styled blink (light)
+- `x-dark` - [X](https://x.com/)-styled blink (dark)
+- `x-light` - [X](https://x.com/)-styled blink (light)
+- `custom` - clean slate, no colors, radii at all, use CSS Variables to style. See [Overriding Theme](#overriding-theme).
 
 ```tsx
 import '@dialectlabs/blinks/index.css';
@@ -72,7 +89,8 @@ In your CSS, you can override the following CSS Variables to customize the look 
   --blink-border-radius-rounded-input: 624.9375rem;
 
   /* box-shadow */
-  --blink-shadow-container: 0px 2px 8px 0px rgba(59, 176, 255, 0.22), 0px 1px 48px 0px rgba(29, 155, 240, 0.24);
+  --blink-shadow-container: 0px 2px 8px 0px rgba(59, 176, 255, 0.22),
+    0px 1px 48px 0px rgba(29, 155, 240, 0.24);
 }
 ```
 

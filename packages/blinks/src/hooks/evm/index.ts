@@ -1,0 +1,1 @@
+export { useEvmWagmiAdapter } from './useEvmWagmiAdapter';
