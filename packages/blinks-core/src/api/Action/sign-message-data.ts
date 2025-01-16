@@ -1,7 +1,7 @@
 // THIS FILE IS COPIED FROM https://github.com/solana-developers/solana-actions/blob/main/packages/solana-actions/src/signMessageData.ts
-import type { SignMessageData as SignMessageDataSpec } from '@solana/actions-spec';
+import type { SignMessageData as SignMessageDataSpec } from '../actions-spec';
 
-export type SignMessageData = SignMessageDataSpec;
+type SignMessageData = SignMessageDataSpec;
 
 export interface SignMessageVerificationOptions {
   expectedAddress?: string;

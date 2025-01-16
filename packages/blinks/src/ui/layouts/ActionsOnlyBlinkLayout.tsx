@@ -7,6 +7,7 @@ export const ActionsOnlyBlinkLayout = ({
   id,
   success,
   error,
+  message,
   inputs,
   buttons,
   form,
@@ -22,6 +23,11 @@ export const ActionsOnlyBlinkLayout = ({
       {error && !success && (
         <span className="text-subtext text-text-error mt-1.5 flex justify-center">
           {error}
+        </span>
+      )}
+      {message && !success && !error && (
+        <span className="text-subtext text-text-secondary mt-between-inputs flex justify-center">
+          {message}
         </span>
       )}
     </div>

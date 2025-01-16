@@ -15,6 +15,7 @@ interface CommonIsolatedLayoutProps {
   stylePreset?: StylePreset;
   error?: string | null;
   success?: string | null;
+  message?: string | null;
   websiteUrl?: string | null;
   websiteText?: string | null;
   id?: string;
@@ -41,6 +42,7 @@ export const IsolatedBlinkLayout = ({
   id,
   success,
   error,
+  message,
   ...props
 }: BaseIsolatedLayoutProps) => {
   const element = useMemo(() => {
@@ -70,6 +72,11 @@ export const IsolatedBlinkLayout = ({
       {error && !success && (
         <span className="text-subtext text-text-error mt-1.5 flex justify-center">
           {error}
+        </span>
+      )}
+      {message && !success && !error && (
+        <span className="text-subtext text-text-secondary mt-between-inputs flex justify-center">
+          {message}
         </span>
       )}
     </div>

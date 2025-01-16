@@ -41,6 +41,7 @@ type InputProps = BaseInputProps;
 export interface InnerLayoutProps {
   stylePreset?: StylePreset;
   image?: string;
+  message?: string;
   error?: string | null;
   success?: string | null;
   websiteUrl?: string | null;
@@ -197,6 +198,7 @@ export const BaseBlinkLayout = ({
   form,
   error,
   success,
+  message,
   supportability,
   id,
 }: InnerLayoutProps) => {
@@ -306,6 +308,11 @@ export const BaseBlinkLayout = ({
               {error && !success && (
                 <span className="text-subtext text-text-error mt-between-inputs flex justify-center">
                   {error}
+                </span>
+              )}
+              {message && !success && !error && (
+                <span className="text-subtext text-text-secondary mt-between-inputs flex justify-center">
+                  {message}
                 </span>
               )}
             </>

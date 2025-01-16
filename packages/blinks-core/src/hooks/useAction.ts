@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   Action,
-  type ActionSupportStrategy,
   defaultActionSupportStrategy,
+  type ActionSupportStrategy,
 } from '../api';
 import { unfurlUrlToActionApiUrl } from '../utils';
 import { useActionsRegistryInterval } from './useActionRegistryInterval.ts';

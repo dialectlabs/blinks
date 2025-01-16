@@ -63,7 +63,7 @@ export type ActionType = 'action' | 'completed';
  *
  * note: `type` is optional for backwards compatibility
  */
-export type ActionGetResponse = Omit<Action, 'type'> &
+export type ActionGetResponse = Omit<TypedAction, 'type'> &
   DialectExperimentalFeatures & {
     type?: 'action';
   };
@@ -71,7 +71,7 @@ export type ActionGetResponse = Omit<Action, 'type'> &
 /**
  * A single Solana Action
  */
-export interface Action<T extends ActionType = 'action'> {
+export interface TypedAction<T extends ActionType = 'action'> {
   /** type of Action to present to the user */
   type: T;
   /** image url that represents the source of the action request */
@@ -102,7 +102,7 @@ export type LinkedActionType =
   | 'message'
   | 'post'
   | 'external-link'
-  | 'inline-link'; // added by dialect;
+  | 'inline-link'; // added by dialect. no requests made, just a link to another page
 
 /**
  * Related action on a single endpoint
@@ -150,13 +150,15 @@ export interface ActionParameter<T extends ActionParameterType, M = MinMax<T>> {
   max?: M;
 }
 
-type MinMax<T extends ActionParameterType> = T extends 'date' | 'datetime-local'
+export type MinMax<T extends ActionParameterType> = T extends
+  | 'date'
+  | 'datetime-local'
   ? string
   : T extends 'radio' | 'select'
     ? never
     : number;
 
-type GeneralParameterType =
+export type GeneralParameterType =
   | 'text'
   | 'email'
   | 'url'
@@ -165,7 +167,7 @@ type GeneralParameterType =
   | 'datetime-local'
   | 'textarea';
 
-type SelectableParameterType = 'select' | 'radio' | 'checkbox';
+export type SelectableParameterType = 'select' | 'radio' | 'checkbox';
 
 /**
  * Input field type to present to the user. Normally resembling the respective
@@ -192,21 +194,19 @@ export interface ActionParameterSelectable<T extends ActionParameterType>
   }>;
 }
 
-export type InlineLink = {
+export interface InlineLink extends LinkedAction {
   type: 'inline-link';
-  label: string;
-  link: string;
-};
+}
 
-type OnActionExecuting = Partial<Pick<Action, 'message'>>;
-type OnActionSuccess = Partial<
-  Pick<Action, 'message'> & {
+export type OnActionExecuting = Partial<Pick<TypedAction, 'message'>>;
+export type OnActionSuccess = Partial<
+  Pick<TypedAction, 'message'> & {
     links?: {
       actions: InlineLink[];
     };
   }
 >;
-type OnActionError = Partial<Pick<Action, 'message'>>;
+export type OnActionError = Partial<Pick<TypedAction, 'message'>>;
 
 /** Type of action to determine client side handling */
 export type PostActionType = LinkedActionType;
@@ -226,6 +226,12 @@ export interface ActionPostRequest<T = string> {
   data?: Record<keyof T, string | Array<string>>;
 }
 
+export interface LifecycleData {
+  executing?: OnActionExecuting;
+  success?: OnActionSuccess;
+  error?: OnActionError;
+}
+
 /**
  * Generic response from an Action API request
  */
@@ -235,11 +241,7 @@ export interface ActionResponse {
   links?: {
     next: NextActionLink;
   };
-  lifecycle?: {
-    executing?: OnActionExecuting;
-    success?: OnActionSuccess;
-    error?: OnActionError;
-  };
+  lifecycle?: LifecycleData;
 }
 
 /**
@@ -302,10 +304,10 @@ export interface InlineNextActionLink {
 }
 
 /** The completed action, used to declare the "completed" state within action chaining. */
-export type CompletedAction = Omit<Action<'completed'>, 'links'>;
+export type CompletedAction = Omit<TypedAction<'completed'>, 'links'>;
 
 /** The next action to be performed */
-export type NextAction = Action<'action'> | CompletedAction;
+export type NextAction = TypedAction<'action'> | CompletedAction;
 
 /**
  * Response body payload sent via POST request to obtain the next action
