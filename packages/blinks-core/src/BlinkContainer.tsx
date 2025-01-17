@@ -55,7 +55,7 @@ export type Disclaimer =
     };
 
 export interface BlinkCaption {
-  type: 'success' | 'error';
+  type: 'success' | 'error' | 'default';
   text: string;
 }
 
@@ -98,8 +98,10 @@ export interface ExecutionState {
   status: ExecutionStatus;
   checkingSupportability?: boolean;
   executingAction?: AbstractActionComponent | null;
+  // these messages are added to this state for values during execution
   errorMessage?: string | null;
   successMessage?: string | null;
+  generalMessage?: string | null;
 }
 
 export enum ExecutionType {
@@ -111,6 +113,7 @@ export enum ExecutionType {
   SOFT_RESET = 'SOFT_RESET',
   UNBLOCK = 'UNBLOCK',
   BLOCK = 'BLOCK',
+  PARTIAL_UPDATE = 'PARTIAL_UPDATE',
 }
 
 type ActionValue =
@@ -142,6 +145,10 @@ type ActionValue =
   | {
       type: ExecutionType.SOFT_RESET;
       errorMessage?: string;
+    }
+  | {
+      type: ExecutionType.PARTIAL_UPDATE;
+      message?: string;
     };
 
 const executionReducer = (
@@ -189,6 +196,11 @@ const executionReducer = (
     case ExecutionType.UNBLOCK:
       return {
         status: 'idle',
+      };
+    case ExecutionType.PARTIAL_UPDATE:
+      return {
+        ...state,
+        generalMessage: action.message,
       };
   }
 };
@@ -460,6 +472,25 @@ export const BlinkContainer = ({
       return;
     }
 
+    // before making any state changes, we handle an inline link and complete the action if clicked
+    if (component.type === 'inline-link') {
+      if (isURL(component.href)) {
+        return {
+          type: 'external-link',
+          data: {
+            externalLink: component.href,
+          },
+          onNext: () =>
+            dispatch({
+              type: ExecutionType.FINISH,
+            }),
+          onCancel: () => {},
+        };
+      }
+
+      return;
+    }
+
     dispatch({ type: ExecutionType.INITIATE, executingAction: component });
 
     const context: ActionContext = {
@@ -492,8 +523,15 @@ export const BlinkContainer = ({
         return;
       }
 
+      if (response.lifecycle?.executing) {
+        dispatch({
+          type: ExecutionType.PARTIAL_UPDATE,
+          message: response.lifecycle.executing.message,
+        });
+      }
+
       const chain = async (signature?: string) => {
-        if (!response.links?.next) {
+        if (!response.links?.next && !response.lifecycle?.success) {
           dispatch({
             type: ExecutionType.FINISH,
             successMessage: response.message,
@@ -505,7 +543,9 @@ export const BlinkContainer = ({
         if (response.type === 'message' && !signature) {
           dispatch({
             type: ExecutionType.SOFT_RESET,
-            errorMessage: 'Missing signature for message',
+            errorMessage:
+              response.lifecycle?.error?.message ??
+              'Missing signature for message',
           });
           callbacks.onActionError?.(
             action,
@@ -528,9 +568,16 @@ export const BlinkContainer = ({
                 signature: signature,
                 account: account,
               };
-        const nextAction = await action.chain(response.links.next, chainData);
+        const nextAction = response.links?.next
+          ? await action.chain(
+              response.links.next,
+              chainData,
+              response.lifecycle?.success,
+            )
+          : action.safeInlineChain(response.lifecycle?.success);
 
         // if this is running in partial action mode, then we end the chain, if passed fn returns a null value for the next action
+        // this also ignores the lifecycle.success for now, since still in development
         if (!nextAction || (isPartialAction && !selector?.(nextAction))) {
           dispatch({
             type: ExecutionType.FINISH,
@@ -576,7 +623,9 @@ export const BlinkContainer = ({
           dispatch({
             type: ExecutionType.SOFT_RESET,
             errorMessage:
-              confirmationResult.message ?? 'Unknown error, please try again',
+              response.lifecycle?.error?.message ??
+              confirmationResult.message ??
+              'Unknown error, please try again',
           });
           callbacks.onActionError?.(
             action,
@@ -601,6 +650,7 @@ export const BlinkContainer = ({
         }
 
         await chain(signResult.signature);
+        return;
       }
 
       if (response.type === 'post') {
@@ -655,16 +705,29 @@ export const BlinkContainer = ({
   }, [executionState.status, isPassingSecurityCheck, overallState]);
 
   const blinkCaption: BlinkCaption | null = useMemo(() => {
-    if (executionState.errorMessage) {
-      return { type: 'error', text: executionState.errorMessage };
+    const error = executionState.errorMessage ?? action.error;
+    const generalMessage = executionState.generalMessage ?? action.message;
+
+    if (error) {
+      return { type: 'error', text: error };
     }
 
     if (executionState.successMessage) {
       return { type: 'success', text: executionState.successMessage };
     }
 
+    if (generalMessage) {
+      return { type: 'default', text: generalMessage };
+    }
+
     return null;
-  }, [executionState.errorMessage, executionState.successMessage]);
+  }, [
+    executionState.errorMessage,
+    executionState.successMessage,
+    executionState.generalMessage,
+    action.error,
+    action.message,
+  ]);
 
   return (
     <Layout

@@ -4,12 +4,14 @@ import { isProxified, proxify, proxifyImage } from '../../utils';
 import { isUrlSameOrigin } from '../../utils/security.ts';
 import type { ActionAdapter } from '../ActionConfig.ts';
 import type {
+  ActionGetResponse,
   ActionParameterType,
-  ExtendedActionGetResponse,
+  LinkedAction,
   LinkedActionType,
   NextAction,
   NextActionLink,
   NextActionPostRequest,
+  OnActionSuccess,
   PostNextActionLink,
   TypedActionParameter,
 } from '../actions-spec.ts';
@@ -161,6 +163,10 @@ export class Action {
     return this._data.error?.message ?? null;
   }
 
+  public get message() {
+    return this._data.message ?? null;
+  }
+
   public get metadata(): ActionMetadata {
     // TODO: Remove fallback to baseline version after a few weeks after compatibility is adopted
     return {
@@ -191,13 +197,16 @@ export class Action {
     chainData?: N extends PostNextActionLink
       ? MessageNextActionPostRequest | NextActionPostRequest
       : never,
+    lifecycleData?: OnActionSuccess,
   ): Promise<Action | null> {
     const id = nanoid();
 
     if (next.type === 'inline') {
       return new Action(
         this.url,
-        next.action,
+        lifecycleData
+          ? mergeLifecycleData(next.action, lifecycleData)
+          : next.action,
         this.metadata,
         this._supportStrategy,
         {
@@ -244,12 +253,31 @@ export class Action {
 
     return new Action(
       href,
-      data,
+      lifecycleData ? mergeLifecycleData(data, lifecycleData) : data,
       metadata,
       this._supportStrategy,
       {
         isChained: true,
         isInline: false,
+      },
+      id,
+    );
+  }
+
+  public safeInlineChain(lifecycleData?: OnActionSuccess): Action {
+    if (!lifecycleData) {
+      return this;
+    }
+
+    const id = nanoid();
+    return new Action(
+      this.url,
+      mergeLifecycleData(this._data, lifecycleData),
+      this.metadata,
+      this._supportStrategy,
+      {
+        isChained: true,
+        isInline: true,
       },
       id,
     );
@@ -293,7 +321,7 @@ export class Action {
       );
     }
 
-    const data = (await response.json()) as ExtendedActionGetResponse;
+    const data = (await response.json()) as ActionGetResponse;
     const metadata = getActionMetadata(response);
 
     return new Action(
@@ -389,4 +417,26 @@ const componentFactory = (
   }
 
   return new SingleValueActionComponent(parent, label, href, type, parameters);
+};
+
+const mergeLifecycleData = (
+  action: NextAction,
+  lifecycleData: OnActionSuccess,
+): NextAction => {
+  const links: LinkedAction[] = [];
+
+  if (action.type !== 'completed' && action.links) {
+    links.push(...(action.links.actions ?? []));
+  }
+
+  if (lifecycleData.links?.actions) {
+    links.push(...lifecycleData.links.actions);
+  }
+
+  return {
+    ...action,
+    type: 'action', // if lifecycle data present, we are not in a completed state
+    message: lifecycleData.message ?? action.message,
+    links: links.length > 0 ? { actions: links } : undefined,
+  };
 };

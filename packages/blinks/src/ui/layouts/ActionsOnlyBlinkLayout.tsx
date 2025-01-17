@@ -7,6 +7,7 @@ export const ActionsOnlyBlinkLayout = ({
   id,
   success,
   error,
+  message,
   inputs,
   buttons,
   form,
@@ -15,13 +16,18 @@ export const ActionsOnlyBlinkLayout = ({
     <div className={clsx('blink w-full', themeClassMap[stylePreset])}>
       <ActionContent key={id} form={form} inputs={inputs} buttons={buttons} />
       {success && (
-        <span className="text-subtext text-text-success mt-1.5 flex justify-center">
+        <span className="text-subtext text-text-success mt-between-inputs break-words text-center">
           {success}
         </span>
       )}
       {error && !success && (
-        <span className="text-subtext text-text-error mt-1.5 flex justify-center">
+        <span className="text-subtext text-text-error mt-between-inputs break-words text-center">
           {error}
+        </span>
+      )}
+      {message && !success && !error && (
+        <span className="text-subtext text-text-secondary mt-between-inputs break-words text-center">
+          {message}
         </span>
       )}
     </div>

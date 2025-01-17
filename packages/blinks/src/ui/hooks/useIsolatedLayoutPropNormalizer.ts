@@ -38,7 +38,7 @@ export const useIsolatedLayoutPropNormalizer = ({
             action.type === 'completed' ? 'success' : executionStatus
           ],
         ctaType:
-          it.type === 'external-link' &&
+          (it.type === 'external-link' || it.type === 'inline-link') &&
           (executionStatus === 'idle' || executionStatus === 'blocked')
             ? ('link' as const)
             : ('button' as const),

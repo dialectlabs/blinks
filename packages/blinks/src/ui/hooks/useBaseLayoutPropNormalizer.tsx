@@ -69,7 +69,7 @@ export const useBaseLayoutPropNormalizer = ({
           action.type === 'completed' ? 'success' : executionStatus
         ],
       ctaType:
-        it.type === 'external-link' &&
+        (it.type === 'external-link' || it.type === 'inline-link') &&
         (executionStatus === 'idle' || executionStatus === 'blocked')
           ? ('link' as const)
           : ('button' as const),
@@ -156,6 +156,12 @@ export const useBaseLayoutPropNormalizer = ({
     if (caption.type === 'error') {
       return {
         error: caption.text,
+      };
+    }
+
+    if (caption.type === 'default') {
+      return {
+        message: caption.text,
       };
     }
 

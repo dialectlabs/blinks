@@ -1,10 +1,10 @@
-import type { SignMessageData } from '@solana/actions-spec';
 import { Connection } from '@solana/web3.js';
 import {
   type Action,
   AbstractActionComponent,
   DEFAULT_SUPPORTED_BLOCKCHAIN_IDS,
 } from './Action';
+import type { SignMessageData } from './actions-spec.ts';
 
 export interface ActionContext {
   originalUrl: string;
