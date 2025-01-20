@@ -97,7 +97,7 @@
     },
     "packages/blinks-core": {
       "name": "@dialectlabs/blinks-core",
-      "version": "0.18.0",
+      "version": "0.18.1",
       "dependencies": {
         "nanoid": "^5.0.7",
       },
@@ -125,6 +125,9 @@
         "@solana/web3.js": "^1.95.3",
         "react": ">=18",
       },
+      "optionalPeers": [
+        "@solana/web3.js",
+      ],
     },
   },
   "packages": {
@@ -400,7 +403,7 @@
 
     "@dialectlabs/blinks": ["@dialectlabs/blinks@workspace:packages/blinks", { "dependencies": { "@dialectlabs/blinks-core": "packages/blinks-core", "bs58": "^6.0.0", "clsx": "^2.1.1", "markdown-to-jsx": "^7.5.0" }, "devDependencies": { "@solana/actions-spec": "~2.4.2", "@solana/wallet-adapter-react": "^0.15.0", "@solana/wallet-adapter-react-ui": "^0.9.0", "@solana/web3.js": "^1.95.1", "@types/react": "^18.3.3", "@types/react-dom": "^18.3.0", "@typescript-eslint/eslint-plugin": "^7.16.1", "@typescript-eslint/parser": "^7.16.1", "autoprefixer": "^10.4.19", "eslint": "^8.57.0", "eslint-config-prettier": "^9.1.0", "eslint-plugin-react": "^7.34.4", "eslint-plugin-react-hooks": "^4.6.2", "postcss": "^8.4.39", "postcss-prefix-selector": "^1.16.1", "prettier": "^3.3.3", "prettier-plugin-organize-imports": "^4.0.0", "prettier-plugin-tailwindcss": "^0.6.5", "tailwindcss": "^3.4.3", "tsup": "^8.2.0", "typescript": "^5.5.3", "viem": "^2.x", "wagmi": "^2.x" }, "peerDependencies": { "@solana/wallet-adapter-react": "^0.15.0", "@solana/wallet-adapter-react-ui": "^0.9.0", "@solana/web3.js": "^1.95.3", "react": ">=18", "react-dom": ">=18", "viem": "^2.x", "wagmi": "^2.x" }, "optionalPeers": ["@solana/wallet-adapter-react", "@solana/wallet-adapter-react-ui", "@solana/web3.js", "viem", "wagmi"] }],
 
-    "@dialectlabs/blinks-core": ["@dialectlabs/blinks-core@workspace:packages/blinks-core", { "dependencies": { "nanoid": "^5.0.7" }, "devDependencies": { "@solana/actions-spec": "~2.4.2", "@types/react": "^18.3.3", "@types/react-dom": "^18.3.0", "@typescript-eslint/eslint-plugin": "^7.16.1", "@typescript-eslint/parser": "^7.16.1", "autoprefixer": "^10.4.19", "eslint": "^8.57.0", "eslint-config-prettier": "^9.1.0", "eslint-plugin-react": "^7.34.4", "eslint-plugin-react-hooks": "^4.6.2", "postcss": "^8.4.39", "postcss-prefix-selector": "^1.16.1", "prettier": "^3.3.3", "prettier-plugin-organize-imports": "^4.0.0", "prettier-plugin-tailwindcss": "^0.6.5", "tailwindcss": "^3.4.3", "tsup": "^8.2.0", "typescript": "^5.5.3" }, "peerDependencies": { "@solana/web3.js": "^1.95.3", "react": ">=18" } }],
+    "@dialectlabs/blinks-core": ["@dialectlabs/blinks-core@workspace:packages/blinks-core", { "dependencies": { "nanoid": "^5.0.7" }, "devDependencies": { "@solana/actions-spec": "~2.4.2", "@types/react": "^18.3.3", "@types/react-dom": "^18.3.0", "@typescript-eslint/eslint-plugin": "^7.16.1", "@typescript-eslint/parser": "^7.16.1", "autoprefixer": "^10.4.19", "eslint": "^8.57.0", "eslint-config-prettier": "^9.1.0", "eslint-plugin-react": "^7.34.4", "eslint-plugin-react-hooks": "^4.6.2", "postcss": "^8.4.39", "postcss-prefix-selector": "^1.16.1", "prettier": "^3.3.3", "prettier-plugin-organize-imports": "^4.0.0", "prettier-plugin-tailwindcss": "^0.6.5", "tailwindcss": "^3.4.3", "tsup": "^8.2.0", "typescript": "^5.5.3" }, "peerDependencies": { "@solana/web3.js": "^1.95.3", "react": ">=18" }, "optionalPeers": ["@solana/web3.js"] }],
 
     "@ecies/ciphers": ["@ecies/ciphers@0.2.2", "", { "peerDependencies": { "@noble/ciphers": "^1.0.0" } }, "sha512-ylfGR7PyTd+Rm2PqQowG08BCKA22QuX8NzrL+LxAAvazN10DMwdJ2fWwAzRj05FI/M8vNFGm3cv9Wq/GFWCBLg=="],
 
