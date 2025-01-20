@@ -22,7 +22,7 @@
       "name": "mini-blinks",
       "version": "0.0.0",
       "dependencies": {
-        "@dialectlabs/blinks": "packages/blinks",
+        "@dialectlabs/blinks": "0.20.0",
         "@solana/wallet-adapter-react": "^0.15.0",
         "@solana/wallet-adapter-react-ui": "^0.9.0",
         "@solana/web3.js": "^1.95.1",
@@ -46,7 +46,7 @@
     },
     "packages/blinks": {
       "name": "@dialectlabs/blinks",
-      "version": "0.19.0",
+      "version": "0.20.1",
       "dependencies": {
         "@dialectlabs/blinks-core": "packages/blinks-core",
         "bs58": "^6.0.0",
@@ -81,7 +81,7 @@
       "peerDependencies": {
         "@solana/wallet-adapter-react": "^0.15.0",
         "@solana/wallet-adapter-react-ui": "^0.9.0",
-        "@solana/web3.js": "^1.95.1",
+        "@solana/web3.js": "^1.95.3",
         "react": ">=18",
         "react-dom": ">=18",
         "viem": "^2.x",
@@ -97,9 +97,8 @@
     },
     "packages/blinks-core": {
       "name": "@dialectlabs/blinks-core",
-      "version": "0.17.0",
+      "version": "0.18.0",
       "dependencies": {
-        "@solana/web3.js": "^1.95.1",
         "nanoid": "^5.0.7",
       },
       "devDependencies": {
@@ -123,6 +122,7 @@
         "typescript": "^5.5.3",
       },
       "peerDependencies": {
+        "@solana/web3.js": "^1.95.3",
         "react": ">=18",
       },
     },
@@ -398,9 +398,9 @@
 
     "@coinbase/wallet-sdk": ["@coinbase/wallet-sdk@4.2.3", "", { "dependencies": { "@noble/hashes": "^1.4.0", "clsx": "^1.2.1", "eventemitter3": "^5.0.1", "preact": "^10.24.2" } }, "sha512-BcyHZ/Ec84z0emORzqdXDv4P0oV+tV3a0OirfA8Ko1JGBIAVvB+hzLvZzCDvnuZx7MTK+Dd8Y9Tjlo446BpCIg=="],
 
-    "@dialectlabs/blinks": ["@dialectlabs/blinks@workspace:packages/blinks", { "dependencies": { "@dialectlabs/blinks-core": "packages/blinks-core", "bs58": "^6.0.0", "clsx": "^2.1.1", "markdown-to-jsx": "^7.5.0" }, "devDependencies": { "@solana/actions-spec": "~2.4.2", "@solana/wallet-adapter-react": "^0.15.0", "@solana/wallet-adapter-react-ui": "^0.9.0", "@solana/web3.js": "^1.95.1", "@types/react": "^18.3.3", "@types/react-dom": "^18.3.0", "@typescript-eslint/eslint-plugin": "^7.16.1", "@typescript-eslint/parser": "^7.16.1", "autoprefixer": "^10.4.19", "eslint": "^8.57.0", "eslint-config-prettier": "^9.1.0", "eslint-plugin-react": "^7.34.4", "eslint-plugin-react-hooks": "^4.6.2", "postcss": "^8.4.39", "postcss-prefix-selector": "^1.16.1", "prettier": "^3.3.3", "prettier-plugin-organize-imports": "^4.0.0", "prettier-plugin-tailwindcss": "^0.6.5", "tailwindcss": "^3.4.3", "tsup": "^8.2.0", "typescript": "^5.5.3", "viem": "^2.x", "wagmi": "^2.x" }, "peerDependencies": { "@solana/wallet-adapter-react": "^0.15.0", "@solana/wallet-adapter-react-ui": "^0.9.0", "@solana/web3.js": "^1.95.1", "react": ">=18", "react-dom": ">=18", "viem": "^2.x", "wagmi": "^2.x" }, "optionalPeers": ["@solana/wallet-adapter-react", "@solana/wallet-adapter-react-ui", "@solana/web3.js", "viem", "wagmi"] }],
+    "@dialectlabs/blinks": ["@dialectlabs/blinks@workspace:packages/blinks", { "dependencies": { "@dialectlabs/blinks-core": "packages/blinks-core", "bs58": "^6.0.0", "clsx": "^2.1.1", "markdown-to-jsx": "^7.5.0" }, "devDependencies": { "@solana/actions-spec": "~2.4.2", "@solana/wallet-adapter-react": "^0.15.0", "@solana/wallet-adapter-react-ui": "^0.9.0", "@solana/web3.js": "^1.95.1", "@types/react": "^18.3.3", "@types/react-dom": "^18.3.0", "@typescript-eslint/eslint-plugin": "^7.16.1", "@typescript-eslint/parser": "^7.16.1", "autoprefixer": "^10.4.19", "eslint": "^8.57.0", "eslint-config-prettier": "^9.1.0", "eslint-plugin-react": "^7.34.4", "eslint-plugin-react-hooks": "^4.6.2", "postcss": "^8.4.39", "postcss-prefix-selector": "^1.16.1", "prettier": "^3.3.3", "prettier-plugin-organize-imports": "^4.0.0", "prettier-plugin-tailwindcss": "^0.6.5", "tailwindcss": "^3.4.3", "tsup": "^8.2.0", "typescript": "^5.5.3", "viem": "^2.x", "wagmi": "^2.x" }, "peerDependencies": { "@solana/wallet-adapter-react": "^0.15.0", "@solana/wallet-adapter-react-ui": "^0.9.0", "@solana/web3.js": "^1.95.3", "react": ">=18", "react-dom": ">=18", "viem": "^2.x", "wagmi": "^2.x" }, "optionalPeers": ["@solana/wallet-adapter-react", "@solana/wallet-adapter-react-ui", "@solana/web3.js", "viem", "wagmi"] }],
 
-    "@dialectlabs/blinks-core": ["@dialectlabs/blinks-core@workspace:packages/blinks-core", { "dependencies": { "@solana/web3.js": "^1.95.1", "nanoid": "^5.0.7" }, "devDependencies": { "@solana/actions-spec": "~2.4.2", "@types/react": "^18.3.3", "@types/react-dom": "^18.3.0", "@typescript-eslint/eslint-plugin": "^7.16.1", "@typescript-eslint/parser": "^7.16.1", "autoprefixer": "^10.4.19", "eslint": "^8.57.0", "eslint-config-prettier": "^9.1.0", "eslint-plugin-react": "^7.34.4", "eslint-plugin-react-hooks": "^4.6.2", "postcss": "^8.4.39", "postcss-prefix-selector": "^1.16.1", "prettier": "^3.3.3", "prettier-plugin-organize-imports": "^4.0.0", "prettier-plugin-tailwindcss": "^0.6.5", "tailwindcss": "^3.4.3", "tsup": "^8.2.0", "typescript": "^5.5.3" }, "peerDependencies": { "react": ">=18" } }],
+    "@dialectlabs/blinks-core": ["@dialectlabs/blinks-core@workspace:packages/blinks-core", { "dependencies": { "nanoid": "^5.0.7" }, "devDependencies": { "@solana/actions-spec": "~2.4.2", "@types/react": "^18.3.3", "@types/react-dom": "^18.3.0", "@typescript-eslint/eslint-plugin": "^7.16.1", "@typescript-eslint/parser": "^7.16.1", "autoprefixer": "^10.4.19", "eslint": "^8.57.0", "eslint-config-prettier": "^9.1.0", "eslint-plugin-react": "^7.34.4", "eslint-plugin-react-hooks": "^4.6.2", "postcss": "^8.4.39", "postcss-prefix-selector": "^1.16.1", "prettier": "^3.3.3", "prettier-plugin-organize-imports": "^4.0.0", "prettier-plugin-tailwindcss": "^0.6.5", "tailwindcss": "^3.4.3", "tsup": "^8.2.0", "typescript": "^5.5.3" }, "peerDependencies": { "@solana/web3.js": "^1.95.3", "react": ">=18" } }],
 
     "@ecies/ciphers": ["@ecies/ciphers@0.2.2", "", { "peerDependencies": { "@noble/ciphers": "^1.0.0" } }, "sha512-ylfGR7PyTd+Rm2PqQowG08BCKA22QuX8NzrL+LxAAvazN10DMwdJ2fWwAzRj05FI/M8vNFGm3cv9Wq/GFWCBLg=="],
 
@@ -1706,7 +1706,7 @@
 
     "mimic-fn": ["mimic-fn@2.1.0", "", {}, "sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg=="],
 
-    "mini-blinks": ["mini-blinks@workspace:examples/mini-blinks", { "dependencies": { "@dialectlabs/blinks": "packages/blinks", "@solana/wallet-adapter-react": "^0.15.0", "@solana/wallet-adapter-react-ui": "^0.9.0", "@solana/web3.js": "^1.95.1", "react": "^18.3.1", "react-dom": "^18.3.1" }, "devDependencies": { "@eslint/js": "^9.9.0", "@types/react": "^18.3.3", "@types/react-dom": "^18.3.0", "@vitejs/plugin-react": "^4.3.1", "autoprefixer": "^10.4.20", "globals": "^15.9.0", "postcss": "^8.4.47", "tailwindcss": "^3.4.12", "typescript": "^5.5.3", "typescript-eslint": "^8.0.1", "vite": "^5.4.1", "vite-plugin-node-polyfills": "^0.22.0" } }],
+    "mini-blinks": ["mini-blinks@workspace:examples/mini-blinks", { "dependencies": { "@dialectlabs/blinks": "0.20.0", "@solana/wallet-adapter-react": "^0.15.0", "@solana/wallet-adapter-react-ui": "^0.9.0", "@solana/web3.js": "^1.95.1", "react": "^18.3.1", "react-dom": "^18.3.1" }, "devDependencies": { "@eslint/js": "^9.9.0", "@types/react": "^18.3.3", "@types/react-dom": "^18.3.0", "@vitejs/plugin-react": "^4.3.1", "autoprefixer": "^10.4.20", "globals": "^15.9.0", "postcss": "^8.4.47", "tailwindcss": "^3.4.12", "typescript": "^5.5.3", "typescript-eslint": "^8.0.1", "vite": "^5.4.1", "vite-plugin-node-polyfills": "^0.22.0" } }],
 
     "minimalistic-assert": ["minimalistic-assert@1.0.1", "", {}, "sha512-UtJcAD4yEaGtjPezWuO9wC4nwUnVH/8/Im3yEHQP4b67cXlD/Qr9hdITCU1xDbSEXg2XKNaP8jsReV7vQd00/A=="],
 
@@ -2540,6 +2540,8 @@
 
     "miller-rabin/bn.js": ["bn.js@4.12.0", "", {}, "sha512-c98Bf3tPniI+scsdk237ku1Dc3ujXQTSgyiPUDEOe7tRkhrqridvh8klBv0HCEso1OLOYcHuCv/cS6DNxKH+ZA=="],
 
+    "mini-blinks/@dialectlabs/blinks": ["@dialectlabs/blinks@0.20.0", "", { "dependencies": { "@dialectlabs/blinks-core": "0.17.0", "bs58": "^6.0.0", "clsx": "^2.1.1", "markdown-to-jsx": "^7.5.0" }, "peerDependencies": { "@solana/wallet-adapter-react": "^0.15.0", "@solana/wallet-adapter-react-ui": "^0.9.0", "@solana/web3.js": "^1.95.1", "react": ">=18", "react-dom": ">=18", "viem": "^2.x", "wagmi": "^2.x" }, "optionalPeers": ["@solana/wallet-adapter-react", "@solana/wallet-adapter-react-ui", "@solana/web3.js", "viem", "wagmi"] }, "sha512-RuTMumkC8fTS2RNPnzB62aYDm8/K43lE1WOBdcyq92zuq3cClmLUn+SxpnYq2cj4TIHGYuMfFaTzxEGkwX1VnQ=="],
+
     "mini-blinks/postcss": ["postcss@8.4.47", "", { "dependencies": { "nanoid": "^3.3.7", "picocolors": "^1.1.0", "source-map-js": "^1.2.1" } }, "sha512-56rxCq7G/XfB4EkXq9Egn5GCqugWvDFjafDOThIdMBsI15iqPqR5r15TfSr1YPYeEI19YeaXMCbY6u88Y76GLQ=="],
 
     "node-stdlib-browser/buffer": ["buffer@5.7.1", "", { "dependencies": { "base64-js": "^1.3.1", "ieee754": "^1.1.13" } }, "sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ=="],
@@ -2769,6 +2771,8 @@
     "metro/debug/ms": ["ms@2.0.0", "", {}, "sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A=="],
 
     "metro/hermes-parser/hermes-estree": ["hermes-estree@0.20.1", "", {}, "sha512-SQpZK4BzR48kuOg0v4pb3EAGNclzIlqMj3Opu/mu7bbAoFw6oig6cEt/RAi0zTFW/iW6Iz9X9ggGuZTAZ/yZHg=="],
+
+    "mini-blinks/@dialectlabs/blinks/@dialectlabs/blinks-core": ["@dialectlabs/blinks-core@0.17.0", "", { "dependencies": { "@solana/web3.js": "^1.95.1", "nanoid": "^5.0.7" }, "peerDependencies": { "react": ">=18" } }, "sha512-T010NPINuoo82e2vK5AACwL6/HumhVpFT3LrV3Qcd+mMHfX/iXufCTdFclQ2LzehCpae+ozBAh6RvBV8GGMjzA=="],
 
     "mini-blinks/postcss/nanoid": ["nanoid@3.3.7", "", { "bin": { "nanoid": "bin/nanoid.cjs" } }, "sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g=="],
 
