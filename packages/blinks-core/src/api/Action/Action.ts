@@ -1,6 +1,12 @@
 import type { MessageNextActionPostRequest } from '@solana/actions-spec';
 import { nanoid } from 'nanoid/non-secure';
-import { isProxified, proxify, proxifyImage } from '../../utils';
+import {
+  type Supportability,
+  getBlinkSupportabilityMetadata,
+  isProxified,
+  proxify,
+  proxifyImage,
+} from '../../utils';
 import { isUrlSameOrigin } from '../../utils/security.ts';
 import type { ActionAdapter } from '../ActionConfig.ts';
 import type {
@@ -33,11 +39,6 @@ const MULTI_VALUE_TYPES: ActionParameterType[] = ['checkbox'];
 
 const EXPERIMENTAL_LIVE_DATA_DEFAULT_DELAY_MS = 1000;
 
-interface ActionMetadata {
-  blockchainIds?: string[];
-  version?: string;
-}
-
 type ActionChainMetadata =
   | {
       isChained: true;
@@ -62,7 +63,7 @@ export class Action {
   private constructor(
     private readonly _url: string,
     private readonly _data: NextAction,
-    private readonly _metadata: ActionMetadata,
+    private readonly _metadata: Supportability,
     private readonly _supportStrategy: ActionSupportStrategy,
     private readonly _chainMetadata: ActionChainMetadata = { isChained: false },
     private readonly _id?: string,
@@ -167,7 +168,7 @@ export class Action {
     return this._data.message ?? null;
   }
 
-  public get metadata(): ActionMetadata {
+  public get metadata(): Supportability {
     // TODO: Remove fallback to baseline version after a few weeks after compatibility is adopted
     return {
       blockchainIds:
@@ -249,7 +250,7 @@ export class Action {
     }
 
     const data = (await response.json()) as NextAction;
-    const metadata = getActionMetadata(response);
+    const metadata = getBlinkSupportabilityMetadata(response);
 
     return new Action(
       href,
@@ -287,7 +288,7 @@ export class Action {
   static hydrate(
     url: string,
     data: NextAction,
-    metadata: ActionMetadata,
+    metadata: Supportability,
     supportStrategy: ActionSupportStrategy,
   ) {
     const id = nanoid();
@@ -322,7 +323,7 @@ export class Action {
     }
 
     const data = (await response.json()) as ActionGetResponse;
-    const metadata = getActionMetadata(response);
+    const metadata = getBlinkSupportabilityMetadata(response);
 
     return new Action(
       apiUrl,
@@ -371,19 +372,6 @@ export class Action {
     );
   }
 }
-
-const getActionMetadata = (response: Response): ActionMetadata => {
-  const blockchainIds = response.headers
-    .get('x-blockchain-ids')
-    ?.split(',')
-    .map((id) => id.trim());
-  const version = response.headers.get('x-action-version')?.trim();
-
-  return {
-    blockchainIds,
-    version,
-  };
-};
 
 const componentFactory = (
   parent: Action,

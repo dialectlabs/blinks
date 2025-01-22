@@ -4,4 +4,5 @@ export { SOLANA_ACTION_PREFIX } from './constants.ts';
 export * from './interstitial-url.ts';
 export { isProxified, proxify, proxifyImage, setProxyUrl } from './proxify';
 export { checkSecurity, type SecurityLevel } from './security';
+export * from './supportability.ts';
 export * from './url-mapper.ts';

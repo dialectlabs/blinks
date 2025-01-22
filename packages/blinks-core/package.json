@@ -17,6 +17,11 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
+    "./headless": {
+      "import": "./dist/headless/index.js",
+      "require": "./dist/headless/index.cjs",
+      "types": "./dist/headless/index.d.ts"
+    },
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",

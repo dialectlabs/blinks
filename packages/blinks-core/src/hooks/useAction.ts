@@ -4,52 +4,13 @@ import {
   defaultActionSupportStrategy,
   type ActionSupportStrategy,
 } from '../api';
-import { unfurlUrlToActionApiUrl } from '../utils';
+import { useActionApiUrl } from './useActionApiUrl.ts';
 import { useActionsRegistryInterval } from './useActionRegistryInterval.ts';
 
 interface UseActionOptions {
   url: string | URL;
   securityRegistryRefreshInterval?: number;
   supportStrategy?: ActionSupportStrategy;
-}
-
-function useActionApiUrl(url: string | URL) {
-  const [apiUrl, setApiUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    let ignore = false;
-
-    setIsLoading(true);
-    unfurlUrlToActionApiUrl(new URL(url))
-      .then((apiUrl) => {
-        if (ignore) {
-          return;
-        }
-        setIsLoading(false);
-        setApiUrl(apiUrl);
-      })
-      .catch((e) => {
-        console.error(
-          '[@dialectlabs/blinks-core] Failed to unfurl action URL',
-          e,
-        );
-        if (!ignore) {
-          setApiUrl(null);
-        }
-      })
-      .finally(() => {
-        if (!ignore) {
-          setIsLoading(false);
-        }
-      });
-
-    return () => {
-      ignore = true;
-    };
-  }, [url]);
-
-  return { actionApiUrl: apiUrl, isUrlLoading: isLoading };
 }
 
 export function useAction({
