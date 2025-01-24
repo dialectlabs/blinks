@@ -17,10 +17,10 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
-    "./headless": {
-      "import": "./dist/headless/index.js",
-      "require": "./dist/headless/index.cjs",
-      "types": "./dist/headless/index.d.ts"
+    "./api": {
+      "import": "./dist/service-api/index.js",
+      "require": "./dist/service-api/index.cjs",
+      "types": "./dist/service-api/index.d.ts"
     },
     ".": {
       "import": "./dist/index.js",

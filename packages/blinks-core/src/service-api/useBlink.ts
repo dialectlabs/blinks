@@ -5,7 +5,6 @@ import { type Supportability, getBlinkSupportabilityMetadata } from '../utils';
 import { BLINK_CLIENT_KEY_HEADER, clientKey } from '../utils/client-key.ts';
 import type { BlinkContext, BlinkPreview } from './types.ts';
 
-// todo: figure out type naming (in order to avoid future conflicts when merging with non-headless)
 export type Blink = TypedAction & {
   extendedDescription?: string;
   preview: BlinkPreview;

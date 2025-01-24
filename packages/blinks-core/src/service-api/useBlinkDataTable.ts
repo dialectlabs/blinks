@@ -2,19 +2,18 @@ import { useCallback, useEffect, useState } from 'react';
 import { BLINK_CLIENT_KEY_HEADER, clientKey } from '../utils/client-key.ts';
 import type { BlinkContext } from './types.ts';
 
-export type DataRow = {
+export interface DataRow {
   key: string;
   title: string;
   value: string;
   icon?: string;
   url?: string;
-};
+}
 
-// todo: figure out type naming (in order to avoid future conflicts when merging with non-headless)
-export type BlinkDataTable = {
+export interface BlinkDataTable {
   rows: DataRow[];
   context: BlinkContext;
-};
+}
 
 /**
  * This is a new version of the useMetadata hook, which uses Dialect's API to fetch updated models
@@ -92,8 +91,10 @@ export async function fetchBlinkDataTable(
     },
     signal: options.abortController?.signal,
   });
+
   if (!response.ok) {
     throw new Error(`Failed to fetch blink data table, url: ${blinkApiUrl}`);
   }
+
   return response.json();
 }

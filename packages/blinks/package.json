@@ -32,6 +32,11 @@
       "require": "./dist/hooks/evm/index.cjs",
       "types": "./dist/hooks/evm/index.d.ts"
     },
+    "./api": {
+      "import": "./dist/api/index.js",
+      "require": "./dist/api/index.cjs",
+      "types": "./dist/api/index.d.ts"
+    },
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
