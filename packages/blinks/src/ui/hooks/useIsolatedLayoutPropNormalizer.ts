@@ -178,7 +178,10 @@ export const useIsolatedLayoutPropNormalizer = ({
 
   return {
     ...props,
-    websiteText: props.websiteText ?? props.websiteUrl ?? blink.url,
+    websiteText:
+      (props.websiteText === false ? '' : props.websiteText) ??
+      props.websiteUrl ??
+      blink.url,
     ...elementProps,
     ...normalizedCaption,
   };

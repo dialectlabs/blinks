@@ -176,7 +176,11 @@ export const useBaseLayoutPropNormalizer = ({
     buttons: buttons.map(asButtonProps),
     inputs: inputs.map((i) => asInputProps(i)),
     form: form ? asFormProps(form) : undefined,
-    websiteText: props.websiteText ?? props.websiteUrl ?? blink.url,
+    websiteText:
+      (props.websiteText === false ? '' : props.websiteText) ??
+      props.websiteUrl ??
+      blink.url,
+    shouldShowWebsiteLink: props.websiteText !== false,
     ...normalizedCaption,
   };
 };

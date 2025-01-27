@@ -74,7 +74,8 @@ export interface BaseBlinkLayoutProps {
   blink: BlinkInstance;
   component?: AbstractActionComponent | null;
   websiteUrl?: string | null;
-  websiteText?: string | null;
+  // if passed as false, it will completely hide the row with the website url
+  websiteText?: string | false | null;
   disclaimer?: Disclaimer | null;
   caption?: BlinkCaption | null;
   executeFn: (
@@ -273,7 +274,7 @@ export interface BlinkContainerProps {
   adapter: BlinkAdapter;
   selector?: (currentAction: BlinkInstance) => AbstractActionComponent | null;
   websiteUrl?: string | null;
-  websiteText?: string | null;
+  websiteText?: string | false | null;
   callbacks?: Partial<BlinkCallbacksConfig>;
   securityLevel?: SecurityLevel | NormalizedSecurityLevel;
   Layout: ComponentType<BaseBlinkLayoutProps>;
