@@ -1,6 +1,6 @@
 'use client';
 import {
-  BlinkConfig,
+  BlinkSolanaConfig,
   createSignMessageText,
   type SignMessageVerificationOptions,
   verifySignMessageData,
@@ -51,7 +51,7 @@ export function useBlinkSolanaWalletAdapter(
       return errors.length === 0;
     }
 
-    return new BlinkConfig(finalConnection, {
+    return new BlinkSolanaConfig(finalConnection, {
       connect: async () => {
         try {
           await wallet.connect();

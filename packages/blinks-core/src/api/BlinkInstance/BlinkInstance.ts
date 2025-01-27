@@ -8,7 +8,7 @@ import {
   proxifyImage,
 } from '../../utils';
 import { isUrlSameOrigin } from '../../utils/security.ts';
-import type { BlinkAdapter } from '../BlinkConfig.ts';
+import type { BlinkAdapter } from '../BlinkAdapter.ts';
 import type {
   ActionGetResponse,
   ActionParameterType,

@@ -1,7 +1,8 @@
-export * from './Action';
-export * from './Action/blink-supportability.ts';
+export * from './BlinkAdapter.ts';
 export * from './BlinkCallbacks.ts';
-export * from './BlinkConfig.ts';
+export * from './BlinkInstance';
+export * from './BlinkInstance/blink-supportability.ts';
+export * from './BlinkSolanaConfig.ts';
 export * from './BlinksRegistry.ts';
 export * from './solana-pay-spec';
 

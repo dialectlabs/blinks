@@ -1,6 +1,6 @@
 import { BlockchainIds, getShortBlockchainName } from '../../utils/caip-2.ts';
 import { ACTIONS_SPEC_VERSION } from '../../utils/dependency-versions.ts';
-import type { BlinkAdapter } from '../BlinkConfig.ts';
+import type { BlinkAdapter } from '../BlinkAdapter.ts';
 import type { BlinkInstance } from './BlinkInstance.ts';
 
 /**
@@ -73,7 +73,7 @@ export const defaultBlinkSupportStrategy: BlinkSupportStrategy = async (
     return {
       isSupported: false,
       message:
-        'Action compatibility metadata is not set. Please contact the action provider.',
+        'Blink compatibility metadata is not set. Please contact the blink provider.',
     };
   }
 

@@ -1,19 +1,20 @@
-import { BlinkInstance } from './Action';
+import { BlinkInstance } from './BlinkInstance';
 
-export type LookupType = 'action' | 'website' | 'interstitial';
+// NOTE: `action` lookup type is replaced by `blink`, and will be removed in future versions
+export type LookupType = 'action' | 'blink' | 'website' | 'interstitial';
 
 const DEFAULT_REFRESH_INTERVAL = 10 * 60 * 1000; // 10 minutes
 
 export class BlinksRegistry {
   private static instance: BlinksRegistry | null = null;
-  private actionsByHost: Record<string, RegisteredEntity>;
+  private blinksByHost: Record<string, RegisteredEntity>;
   private websitesByHost: Record<string, RegisteredEntity>;
   private interstitialsByHost: Record<string, RegisteredEntity>;
 
   private intervalId: NodeJS.Timeout | null = null;
 
   private constructor(config?: BlinksRegistryConfig) {
-    this.actionsByHost = config
+    this.blinksByHost = config
       ? Object.fromEntries(
           config.actions.map((action) => [action.host, action]),
         )
@@ -62,7 +63,7 @@ export class BlinksRegistry {
 
   public async refresh(): Promise<void> {
     const config = await fetchBlinksRegistryConfig();
-    this.actionsByHost = Object.fromEntries(
+    this.blinksByHost = Object.fromEntries(
       config.actions.map((action) => [action.host, action]),
     );
     this.websitesByHost = Object.fromEntries(
@@ -80,7 +81,7 @@ export class BlinksRegistry {
     url: string | URL,
     type: LookupType = 'action',
   ): RegisteredEntity | null {
-    if (type === 'action') {
+    if (type === 'action' || type === 'blink') {
       return this.lookupBlink(url);
     }
 
@@ -99,7 +100,7 @@ export class BlinksRegistry {
     try {
       const urlObj = new URL(url);
       const host = urlObj.host;
-      return this.actionsByHost[host] ?? null;
+      return this.blinksByHost[host] ?? null;
     } catch (e) {
       console.error(
         `[@dialectlabs/blinks] Failed to lookup action for URL: ${url}`,
@@ -171,7 +172,7 @@ export const getExtendedBlinkState = (
   return (
     BlinksRegistry.getInstance().lookup(
       typeof blinkOrUrl === 'string' ? blinkOrUrl : blinkOrUrl.url,
-      'action',
+      'blink',
     )?.state ?? 'unknown'
   );
 };

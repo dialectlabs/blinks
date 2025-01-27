@@ -1,17 +1,11 @@
 import { Connection } from '@solana/web3.js';
-import {
-  type BlinkInstance,
-  AbstractActionComponent,
-  DEFAULT_SUPPORTED_BLOCKCHAIN_IDS,
-} from './Action';
 import type { SignMessageData } from './actions-spec.ts';
-
-export interface BlinkExecutionContext {
-  originalUrl: string;
-  action: BlinkInstance;
-  actionType: 'trusted' | 'malicious' | 'unknown';
-  triggeredLinkedAction: AbstractActionComponent;
-}
+import type {
+  BlinkAdapter,
+  BlinkAdapterMetadata,
+  BlinkExecutionContext,
+} from './BlinkAdapter.ts';
+import { DEFAULT_SUPPORTED_BLOCKCHAIN_IDS } from './BlinkInstance';
 
 export interface IncomingBlinkConfig {
   rpcUrl: string;
@@ -19,38 +13,7 @@ export interface IncomingBlinkConfig {
     Partial<Pick<BlinkAdapter, 'metadata'>>;
 }
 
-/**
- * Metadata for an blink adapter.
- *
- * @property supportedBlockchainIds List of CAIP-2 blockchain IDs the adapter supports.
- *
- * @see {BlockchainIds}
- */
-export interface BlinkAdapterMetadata {
-  /**
-   * List of CAIP-2 blockchain IDs the adapter supports.
-   */
-  supportedBlockchainIds: string[];
-}
-
-export interface BlinkAdapter {
-  metadata: BlinkAdapterMetadata;
-  connect: (context: BlinkExecutionContext) => Promise<string | null>;
-  signTransaction: (
-    tx: string,
-    context: BlinkExecutionContext,
-  ) => Promise<{ signature: string } | { error: string }>;
-  confirmTransaction: (
-    signature: string,
-    context: BlinkExecutionContext,
-  ) => Promise<void>;
-  signMessage: (
-    data: string | SignMessageData,
-    context: BlinkExecutionContext,
-  ) => Promise<{ signature: string } | { error: string }>;
-}
-
-export class BlinkConfig implements BlinkAdapter {
+export class BlinkSolanaConfig implements BlinkAdapter {
   private static readonly CONFIRM_TIMEOUT_MS = 60000 * 1.2; // 20% extra time
   private static readonly DEFAULT_METADATA: BlinkAdapterMetadata = {
     supportedBlockchainIds: DEFAULT_SUPPORTED_BLOCKCHAIN_IDS,
@@ -72,7 +35,7 @@ export class BlinkConfig implements BlinkAdapter {
   }
 
   get metadata() {
-    return this.adapter.metadata ?? BlinkConfig.DEFAULT_METADATA;
+    return this.adapter.metadata ?? BlinkSolanaConfig.DEFAULT_METADATA;
   }
 
   signTransaction(tx: string, context: BlinkExecutionContext) {
@@ -84,7 +47,7 @@ export class BlinkConfig implements BlinkAdapter {
       const start = Date.now();
 
       const confirm = async () => {
-        if (Date.now() - start >= BlinkConfig.CONFIRM_TIMEOUT_MS) {
+        if (Date.now() - start >= BlinkSolanaConfig.CONFIRM_TIMEOUT_MS) {
           rej(new Error('Unable to confirm transaction: timeout reached'));
           return;
         }
@@ -109,7 +72,7 @@ export class BlinkConfig implements BlinkAdapter {
           }
         } catch (e) {
           console.error(
-            '[@dialectlabs/blinks] Error confirming transaction',
+            '[@dialectlabs/blinks-core] Error confirming transaction',
             e,
           );
         }
@@ -137,4 +100,7 @@ export class BlinkConfig implements BlinkAdapter {
   }
 }
 
-export { BlinkConfig as ActionConfig, type BlinkAdapter as ActionAdapter };
+export {
+  BlinkSolanaConfig as ActionConfig,
+  type IncomingBlinkConfig as IncomingActionConfig,
+};

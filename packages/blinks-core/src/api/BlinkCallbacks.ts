@@ -1,5 +1,5 @@
 import type { LinkedActionType } from '@solana/actions-spec';
-import { AbstractActionComponent, BlinkInstance } from './Action';
+import { AbstractActionComponent, BlinkInstance } from './BlinkInstance';
 
 /**
  * NOTE: methods for this interface WILL BE renamed to `onBlink*` in the nearest future.
