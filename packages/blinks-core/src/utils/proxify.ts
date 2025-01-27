@@ -10,7 +10,7 @@ export type ProxifiedResult = {
 export function setProxyUrl(url: string): void {
   if (!url) {
     console.warn(
-      '[@dialectlabs/blinks] Proxy URL is not set, proxy will be disabled',
+      '[@dialectlabs/blinks-core] Proxy URL is not set, proxy will be disabled',
     );
     proxyUrl = null;
     return;
@@ -19,7 +19,7 @@ export function setProxyUrl(url: string): void {
   try {
     new URL(url);
   } catch (e) {
-    console.warn('[@dialectlabs/blinks] Invalid proxy URL', e);
+    console.warn('[@dialectlabs/blinks-core] Invalid proxy URL', e);
     return;
   }
 
