@@ -2,6 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { BLINK_CLIENT_KEY_HEADER, clientKey } from '../utils/client-key.ts';
 import type { BlinkPreview } from './types.ts';
 
+export type BlinkPreviewResponse = BlinkPreview & {
+  links?: {
+    blink: string;
+    dataTable?: string;
+  };
+};
+
 export const useBlinkPreview = ({
   blinkApiUrl,
 }: {
@@ -57,7 +64,7 @@ export const useBlinkPreview = ({
 export async function fetchBlinkPreview(
   blinkApiUrl: string,
   options: { abortController?: AbortController } = {},
-): Promise<BlinkPreview> {
+): Promise<BlinkPreviewResponse> {
   const url = new URL('https://api.dial.to/v1/blink-preview');
   url.searchParams.append('apiUrl', blinkApiUrl);
 

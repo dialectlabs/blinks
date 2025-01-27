@@ -13,6 +13,10 @@ export interface DataRow {
 export interface BlinkDataTable {
   rows: DataRow[];
   context: BlinkContext;
+  links: {
+    blink: string;
+    preview: string;
+  };
 }
 
 /**

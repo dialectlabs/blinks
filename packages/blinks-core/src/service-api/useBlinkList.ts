@@ -10,9 +10,9 @@ export interface BlinkList {
 
 export type BlinkListEntry = BlinkPreview & {
   id: string;
-  links: {
+  links?: {
     blink: string;
-    dataTable: string;
+    dataTable?: string;
   };
 };
 
