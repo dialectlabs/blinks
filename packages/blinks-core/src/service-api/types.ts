@@ -1,4 +1,4 @@
-export interface Provider {
+export interface BlinkProvider {
   name: string;
   icon?: string;
 }
@@ -7,7 +7,7 @@ export interface BlinkContext {
   url: string;
   websiteUrl?: string;
   category?: string;
-  provider?: Provider;
+  provider?: BlinkProvider;
 }
 
 export interface BlinkPreview {
