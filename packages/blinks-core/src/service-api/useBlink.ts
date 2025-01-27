@@ -28,18 +28,18 @@ export const useBlink = ({ url }: { url?: string | null }) => {
   } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { actionApiUrl, isUrlLoading } = useBlinkApiUrl(url);
+  const { blinkApiUrl, isUrlLoading } = useBlinkApiUrl(url);
 
   const loadBlink = useCallback(
     async ({ abortController }: { abortController?: AbortController } = {}) => {
-      if (!url || !actionApiUrl) {
+      if (!url || !blinkApiUrl) {
         return;
       }
 
       setIsLoading(true);
 
       try {
-        const blinkData = await fetchBlink(actionApiUrl);
+        const blinkData = await fetchBlink(blinkApiUrl);
 
         if (!abortController?.signal.aborted) {
           setBlinkData(blinkData);
@@ -49,14 +49,14 @@ export const useBlink = ({ url }: { url?: string | null }) => {
         if (!abortController?.signal.aborted) {
           console.error(
             '[@dialectlabs/blinks-core] Failed to fetch blink',
-            actionApiUrl,
+            blinkApiUrl,
           );
           setBlinkData(null);
           setIsLoading(false);
         }
       }
     },
-    [url, actionApiUrl],
+    [url, blinkApiUrl],
   );
 
   useEffect(() => {
@@ -72,6 +72,7 @@ export const useBlink = ({ url }: { url?: string | null }) => {
   return {
     // raw blink data
     blink: blinkData?.blink ?? null,
+    blinkApiUrl: blinkApiUrl ?? null,
     // blink metadata, such as blockchain and solana actions version (if specified in blink response)
     metadata: blinkData?.metadata ?? null,
     isLoading: isLoading || isUrlLoading,
