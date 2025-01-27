@@ -3,7 +3,7 @@ import {
   useBlink,
   useBlinksRegistryInterval,
 } from '@dialectlabs/blinks';
-import { useActionSolanaWalletAdapter } from '@dialectlabs/blinks/hooks/solana';
+import { useBlinkSolanaWalletAdapter } from '@dialectlabs/blinks/hooks/solana';
 import '@dialectlabs/blinks/index.css';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import '@solana/wallet-adapter-react-ui/styles.css';
@@ -11,7 +11,7 @@ import '@solana/wallet-adapter-react-ui/styles.css';
 function App() {
   useBlinksRegistryInterval();
 
-  const { adapter } = useActionSolanaWalletAdapter(
+  const { adapter } = useBlinkSolanaWalletAdapter(
     import.meta.env.VITE_PUBLIC_RPC_URL,
   );
   const { action, isLoading } = useBlink({

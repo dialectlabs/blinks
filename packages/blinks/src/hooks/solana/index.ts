@@ -1,1 +1,4 @@
-export { useBlinkSolanaWalletAdapter } from './useBlinkSolanaWalletAdapter.ts';
+export {
+  useActionSolanaWalletAdapter,
+  useBlinkSolanaWalletAdapter,
+} from './useBlinkSolanaWalletAdapter.ts';

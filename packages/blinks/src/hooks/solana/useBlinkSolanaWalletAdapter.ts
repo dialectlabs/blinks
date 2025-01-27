@@ -108,4 +108,5 @@ export function useBlinkSolanaWalletAdapter(
   return { adapter };
 }
 
+// backwards compatibility
 export { useBlinkSolanaWalletAdapter as useActionSolanaWalletAdapter };
