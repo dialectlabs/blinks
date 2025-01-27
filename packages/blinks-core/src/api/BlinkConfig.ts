@@ -1,65 +1,65 @@
 import { Connection } from '@solana/web3.js';
 import {
-  type Action,
+  type BlinkInstance,
   AbstractActionComponent,
   DEFAULT_SUPPORTED_BLOCKCHAIN_IDS,
 } from './Action';
 import type { SignMessageData } from './actions-spec.ts';
 
-export interface ActionContext {
+export interface BlinkExecutionContext {
   originalUrl: string;
-  action: Action;
+  action: BlinkInstance;
   actionType: 'trusted' | 'malicious' | 'unknown';
   triggeredLinkedAction: AbstractActionComponent;
 }
 
-export interface IncomingActionConfig {
+export interface IncomingBlinkConfig {
   rpcUrl: string;
-  adapter: Pick<ActionAdapter, 'connect' | 'signTransaction' | 'signMessage'> &
-    Partial<Pick<ActionAdapter, 'metadata'>>;
+  adapter: Pick<BlinkAdapter, 'connect' | 'signTransaction' | 'signMessage'> &
+    Partial<Pick<BlinkAdapter, 'metadata'>>;
 }
 
 /**
- * Metadata for an action adapter.
+ * Metadata for an blink adapter.
  *
  * @property supportedBlockchainIds List of CAIP-2 blockchain IDs the adapter supports.
  *
  * @see {BlockchainIds}
  */
-export interface ActionAdapterMetadata {
+export interface BlinkAdapterMetadata {
   /**
    * List of CAIP-2 blockchain IDs the adapter supports.
    */
   supportedBlockchainIds: string[];
 }
 
-export interface ActionAdapter {
-  metadata: ActionAdapterMetadata;
-  connect: (context: ActionContext) => Promise<string | null>;
+export interface BlinkAdapter {
+  metadata: BlinkAdapterMetadata;
+  connect: (context: BlinkExecutionContext) => Promise<string | null>;
   signTransaction: (
     tx: string,
-    context: ActionContext,
+    context: BlinkExecutionContext,
   ) => Promise<{ signature: string } | { error: string }>;
   confirmTransaction: (
     signature: string,
-    context: ActionContext,
+    context: BlinkExecutionContext,
   ) => Promise<void>;
   signMessage: (
     data: string | SignMessageData,
-    context: ActionContext,
+    context: BlinkExecutionContext,
   ) => Promise<{ signature: string } | { error: string }>;
 }
 
-export class ActionConfig implements ActionAdapter {
+export class BlinkConfig implements BlinkAdapter {
   private static readonly CONFIRM_TIMEOUT_MS = 60000 * 1.2; // 20% extra time
-  private static readonly DEFAULT_METADATA: ActionAdapterMetadata = {
+  private static readonly DEFAULT_METADATA: BlinkAdapterMetadata = {
     supportedBlockchainIds: DEFAULT_SUPPORTED_BLOCKCHAIN_IDS,
   };
   private connection: Connection;
 
   constructor(
     rpcUrlOrConnection: string | Connection,
-    private adapter: IncomingActionConfig['adapter'],
+    private adapter: IncomingBlinkConfig['adapter'],
   ) {
     if (!rpcUrlOrConnection) {
       throw new Error('rpcUrl or connection is required');
@@ -72,10 +72,10 @@ export class ActionConfig implements ActionAdapter {
   }
 
   get metadata() {
-    return this.adapter.metadata ?? ActionConfig.DEFAULT_METADATA;
+    return this.adapter.metadata ?? BlinkConfig.DEFAULT_METADATA;
   }
 
-  signTransaction(tx: string, context: ActionContext) {
+  signTransaction(tx: string, context: BlinkExecutionContext) {
     return this.adapter.signTransaction(tx, context);
   }
 
@@ -84,7 +84,7 @@ export class ActionConfig implements ActionAdapter {
       const start = Date.now();
 
       const confirm = async () => {
-        if (Date.now() - start >= ActionConfig.CONFIRM_TIMEOUT_MS) {
+        if (Date.now() - start >= BlinkConfig.CONFIRM_TIMEOUT_MS) {
           rej(new Error('Unable to confirm transaction: timeout reached'));
           return;
         }
@@ -123,12 +123,12 @@ export class ActionConfig implements ActionAdapter {
 
   async signMessage(
     data: string | SignMessageData,
-    context: ActionContext,
+    context: BlinkExecutionContext,
   ): Promise<{ signature: string } | { error: string }> {
     return this.adapter.signMessage(data, context);
   }
 
-  async connect(context: ActionContext) {
+  async connect(context: BlinkExecutionContext) {
     try {
       return await this.adapter.connect(context);
     } catch {
@@ -136,3 +136,5 @@ export class ActionConfig implements ActionAdapter {
     }
   }
 }
+
+export { BlinkConfig as ActionConfig, type BlinkAdapter as ActionAdapter };

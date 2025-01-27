@@ -1,7 +1,7 @@
 import {
   Miniblink,
-  useAction,
-  useActionsRegistryInterval,
+  useBlink,
+  useBlinksRegistryInterval,
 } from '@dialectlabs/blinks';
 import { useActionSolanaWalletAdapter } from '@dialectlabs/blinks/hooks/solana';
 import '@dialectlabs/blinks/index.css';
@@ -9,12 +9,12 @@ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import '@solana/wallet-adapter-react-ui/styles.css';
 
 function App() {
-  useActionsRegistryInterval();
+  useBlinksRegistryInterval();
 
   const { adapter } = useActionSolanaWalletAdapter(
     import.meta.env.VITE_PUBLIC_RPC_URL,
   );
-  const { action, isLoading } = useAction({
+  const { action, isLoading } = useBlink({
     url: 'solana-action:https://dial.to/api/donate',
   });
 
@@ -31,7 +31,7 @@ function App() {
               selector={(currentAction) =>
                 currentAction.actions.find((a) => a.label === 'Donate')!
               }
-              action={action}
+              blink={action}
             />
           )}
         </div>

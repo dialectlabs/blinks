@@ -1,6 +1,6 @@
 'use client';
 import {
-  ActionConfig,
+  BlinkConfig,
   createSignMessageText,
   type SignMessageVerificationOptions,
   verifySignMessageData,
@@ -14,14 +14,14 @@ import bs58 from 'bs58';
 import { useMemo } from 'react';
 import { decodeBase64 } from '../../utils/base64';
 /**
- * Hook to create an action adapter using solana's wallet adapter.
+ * Hook to create a blink adapter using solana's wallet adapter.
  *
- * Be sure to call `action.setAdapter` with the to update the adapter, every time the instance updates.
+ * Be sure to call `blink.setAdapter` with the to update the adapter, every time the instance updates.
  *
  * @param rpcUrlOrConnection
- * @see {Action}
+ * @see {BlinkInstance}
  */
-export function useActionSolanaWalletAdapter(
+export function useBlinkSolanaWalletAdapter(
   rpcUrlOrConnection: string | Connection,
 ) {
   const wallet = useWallet();
@@ -51,7 +51,7 @@ export function useActionSolanaWalletAdapter(
       return errors.length === 0;
     }
 
-    return new ActionConfig(finalConnection, {
+    return new BlinkConfig(finalConnection, {
       connect: async () => {
         try {
           await wallet.connect();
@@ -107,3 +107,5 @@ export function useActionSolanaWalletAdapter(
 
   return { adapter };
 }
+
+export { useBlinkSolanaWalletAdapter as useActionSolanaWalletAdapter };

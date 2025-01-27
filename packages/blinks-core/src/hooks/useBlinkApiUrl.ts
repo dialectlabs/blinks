@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { unfurlUrlToActionApiUrl } from '../utils';
+import { unfurlUrlToBlinkApiUrl } from '../utils';
 
-export function useActionApiUrl(url?: URL | string | null) {
+export function useBlinkApiUrl(url?: URL | string | null) {
   const [apiUrl, setApiUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -14,7 +14,7 @@ export function useActionApiUrl(url?: URL | string | null) {
     }
 
     setIsLoading(true);
-    unfurlUrlToActionApiUrl(new URL(url))
+    unfurlUrlToBlinkApiUrl(new URL(url))
       .then((apiUrl) => {
         if (ignore) {
           return;
@@ -24,7 +24,7 @@ export function useActionApiUrl(url?: URL | string | null) {
       })
       .catch((e) => {
         console.error(
-          '[@dialectlabs/blinks-core] Failed to unfurl action URL',
+          '[@dialectlabs/blinks-core] Failed to unfurl blink URL',
           e,
         );
         if (!ignore) {
@@ -42,5 +42,9 @@ export function useActionApiUrl(url?: URL | string | null) {
     };
   }, [url]);
 
-  return { actionApiUrl: apiUrl, isUrlLoading: isLoading };
+  // NOTE: `actionApiUrl` is deprecated and will be removed in the nearest future
+  return { actionApiUrl: apiUrl, blinkApiUrl: apiUrl, isUrlLoading: isLoading };
 }
+
+// backwards compatibility
+export { useBlinkApiUrl as useActionApiUrl };

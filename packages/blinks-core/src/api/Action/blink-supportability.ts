@@ -1,7 +1,7 @@
 import { BlockchainIds, getShortBlockchainName } from '../../utils/caip-2.ts';
 import { ACTIONS_SPEC_VERSION } from '../../utils/dependency-versions.ts';
-import type { ActionAdapter } from '../ActionConfig.ts';
-import type { Action } from './Action.ts';
+import type { BlinkAdapter } from '../BlinkConfig.ts';
+import type { BlinkInstance } from './BlinkInstance.ts';
 
 /**
  * Max spec version the Blink client supports.
@@ -22,7 +22,7 @@ export const BASELINE_ACTION_VERSION = '2.2';
  * Baseline blockchain IDs to be used when not set by action provider.
  * Defaults to Solana mainnet.
  */
-export const BASELINE_ACTION_BLOCKCHAIN_IDS = [BlockchainIds.SOLANA_MAINNET];
+export const BASELINE_BLINK_BLOCKCHAIN_IDS = [BlockchainIds.SOLANA_MAINNET];
 
 type IsVersionSupportedParams = {
   actionVersion: string;
@@ -34,7 +34,7 @@ type IsBlockchainIdSupportedParams = {
   supportedBlockchainIds: string[];
 };
 
-export type ActionSupportability =
+export type BlinkSupportability =
   | {
       isSupported: true;
     }
@@ -43,32 +43,32 @@ export type ActionSupportability =
       message: string;
     };
 
-export type ActionSupportStrategy = (
-  action: Action,
-  adapter: ActionAdapter,
-) => Promise<ActionSupportability>;
+export type BlinkSupportStrategy = (
+  action: BlinkInstance,
+  adapter: BlinkAdapter,
+) => Promise<BlinkSupportability>;
 
 /**
- * Default implementation for checking if an action is supported.
+ * Default implementation for checking if a blink is supported.
  * Checks if the action version and the action blockchain IDs are supported by blink.
- * @param action Action.
- * @param adapter Action adapter.
+ * @param blink BlinkInstance.
+ * @param adapter BlinkAdapter.
  *
  * @see {isVersionSupported}
  * @see {isBlockchainSupported}
  */
-export const defaultActionSupportStrategy: ActionSupportStrategy = async (
-  action,
+export const defaultBlinkSupportStrategy: BlinkSupportStrategy = async (
+  blink,
   adapter,
 ) => {
-  const { version: actionVersion, blockchainIds: actionBlockchainIds } =
-    action.metadata;
+  const { version: actionSpecVersion, blockchainIds: blinkBlockchainIds } =
+    blink.metadata;
 
   // Will be displayed in the future once we remove backward compatibility fallbacks for blockchains and version
   if (
-    !actionVersion ||
-    !actionBlockchainIds ||
-    actionBlockchainIds.length === 0
+    !actionSpecVersion ||
+    !blinkBlockchainIds ||
+    blinkBlockchainIds.length === 0
   ) {
     return {
       isSupported: false,
@@ -81,15 +81,15 @@ export const defaultActionSupportStrategy: ActionSupportStrategy = async (
   const supportedBlockchainIds = adapter.metadata.supportedBlockchainIds;
 
   const versionSupported = isVersionSupported({
-    actionVersion,
+    actionVersion: actionSpecVersion,
     supportedActionVersion,
   });
   const blockchainSupported = isBlockchainSupported({
-    actionBlockchainIds,
+    actionBlockchainIds: blinkBlockchainIds,
     supportedBlockchainIds,
   });
 
-  const notSupportedBlockchainIds = actionBlockchainIds.filter(
+  const notSupportedBlockchainIds = blinkBlockchainIds.filter(
     (id) => !supportedBlockchainIds.includes(id),
   );
 
@@ -104,14 +104,14 @@ export const defaultActionSupportStrategy: ActionSupportStrategy = async (
         : `blockchains ${notSupportedActionBlockchainNames.join(', ')}`;
     return {
       isSupported: false,
-      message: `Action version ${actionVersion} and ${blockchainMessage} are not supported by your Blink client.`,
+      message: `Action version ${actionSpecVersion} and ${blockchainMessage} are not supported by your Blink client.`,
     };
   }
 
   if (!versionSupported) {
     return {
       isSupported: false,
-      message: `Action version ${actionVersion} is not supported by your Blink client.`,
+      message: `Action version ${actionSpecVersion} is not supported by your Blink client.`,
     };
   }
 
@@ -183,3 +183,10 @@ export function isBlockchainSupported({
     sanitizedSupportedBlockchainIds.includes(chain),
   );
 }
+
+export {
+  BASELINE_BLINK_BLOCKCHAIN_IDS as BASELINE_ACTION_BLOCKCHAIN_IDS,
+  defaultBlinkSupportStrategy as defaultActionSupportStrategy,
+  type BlinkSupportability as ActionSupportability,
+  type BlinkSupportStrategy as ActionSupportStrategy,
+};

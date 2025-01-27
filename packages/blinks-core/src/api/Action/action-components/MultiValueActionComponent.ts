@@ -4,7 +4,7 @@ import type {
   SelectableParameterType,
   TypedActionParameter,
 } from '../../actions-spec.ts';
-import { Action } from '../Action.ts';
+import { BlinkInstance } from '../BlinkInstance.ts';
 import { AbstractActionComponent } from './AbstractActionComponent.ts';
 import { ButtonActionComponent } from './ButtonActionComponent.ts';
 
@@ -12,7 +12,7 @@ export class MultiValueActionComponent extends AbstractActionComponent {
   private parameterValue: Array<string> = [];
 
   constructor(
-    protected _parent: Action,
+    protected _parent: BlinkInstance,
     protected _label: string,
     protected _href: string,
     protected _type: LinkedActionType,

@@ -1,8 +1,8 @@
 export * from './Action';
-export * from './Action/action-supportability.ts';
-export * from './ActionCallbacks.ts';
-export * from './ActionConfig';
-export * from './ActionsRegistry.ts';
+export * from './Action/blink-supportability.ts';
+export * from './BlinkCallbacks.ts';
+export * from './BlinkConfig.ts';
+export * from './BlinksRegistry.ts';
 export * from './solana-pay-spec';
 
 export * from './actions-spec';

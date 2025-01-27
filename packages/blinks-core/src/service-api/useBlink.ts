@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { LinkedAction, TypedAction } from '../api';
-import { useActionApiUrl } from '../hooks/useActionApiUrl.ts';
+import { useBlinkApiUrl } from '../hooks';
 import { type Supportability, getBlinkSupportabilityMetadata } from '../utils';
 import { BLINK_CLIENT_KEY_HEADER, clientKey } from '../utils/client-key.ts';
 import type { BlinkContext, BlinkPreview } from './types.ts';
@@ -28,7 +28,7 @@ export const useBlink = ({ url }: { url?: string | null }) => {
   } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { actionApiUrl, isUrlLoading } = useActionApiUrl(url);
+  const { actionApiUrl, isUrlLoading } = useBlinkApiUrl(url);
 
   const loadBlink = useCallback(
     async ({ abortController }: { abortController?: AbortController } = {}) => {

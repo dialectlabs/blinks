@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { ActionsRegistry } from '../api';
+import { BlinksRegistry } from '../api';
 
-export function useActionsRegistryInterval() {
+export function useBlinksRegistryInterval() {
   const [isRegistryLoaded, setRegistryLoaded] = useState(false);
 
   useEffect(() => {
-    const registry = ActionsRegistry.getInstance();
+    const registry = BlinksRegistry.getInstance();
     registry.init().then(() => {
       setRegistryLoaded(true);
     });
@@ -17,3 +17,5 @@ export function useActionsRegistryInterval() {
 
   return { isRegistryLoaded };
 }
+
+export { useBlinksRegistryInterval as useActionsRegistryInterval };

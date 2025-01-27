@@ -1,9 +1,9 @@
-import type { SecurityActionState } from '../api';
+import type { SecurityBlinkState } from '../api';
 
 export type SecurityLevel = 'only-trusted' | 'non-malicious' | 'all';
 
 export const checkSecurity = (
-  state: SecurityActionState,
+  state: SecurityBlinkState,
   securityLevel: SecurityLevel,
 ): boolean => {
   switch (securityLevel) {

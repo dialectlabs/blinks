@@ -8,7 +8,7 @@ import {
   proxifyImage,
 } from '../../utils';
 import { isUrlSameOrigin } from '../../utils/security.ts';
-import type { ActionAdapter } from '../ActionConfig.ts';
+import type { BlinkAdapter } from '../BlinkConfig.ts';
 import type {
   ActionGetResponse,
   ActionParameterType,
@@ -29,17 +29,17 @@ import {
   SingleValueActionComponent,
 } from './action-components';
 import {
-  type ActionSupportStrategy,
-  BASELINE_ACTION_BLOCKCHAIN_IDS,
+  type BlinkSupportStrategy,
   BASELINE_ACTION_VERSION,
-  defaultActionSupportStrategy,
-} from './action-supportability.ts';
+  BASELINE_BLINK_BLOCKCHAIN_IDS,
+  defaultBlinkSupportStrategy,
+} from './blink-supportability.ts';
 
 const MULTI_VALUE_TYPES: ActionParameterType[] = ['checkbox'];
 
 const EXPERIMENTAL_LIVE_DATA_DEFAULT_DELAY_MS = 1000;
 
-type ActionChainMetadata =
+type BlinkChainMetadata =
   | {
       isChained: true;
       isInline: boolean;
@@ -57,15 +57,15 @@ interface ExperimentalFeatures {
   liveData?: LiveData;
 }
 
-export class Action {
+export class BlinkInstance {
   private readonly _actions: AbstractActionComponent[];
 
   private constructor(
     private readonly _url: string,
     private readonly _data: NextAction,
     private readonly _metadata: Supportability,
-    private readonly _supportStrategy: ActionSupportStrategy,
-    private readonly _chainMetadata: ActionChainMetadata = { isChained: false },
+    private readonly _supportStrategy: BlinkSupportStrategy,
+    private readonly _chainMetadata: BlinkChainMetadata = { isChained: false },
     private readonly _id?: string,
     private readonly _experimental?: ExperimentalFeatures,
   ) {
@@ -172,12 +172,12 @@ export class Action {
     // TODO: Remove fallback to baseline version after a few weeks after compatibility is adopted
     return {
       blockchainIds:
-        this._metadata.blockchainIds ?? BASELINE_ACTION_BLOCKCHAIN_IDS,
+        this._metadata.blockchainIds ?? BASELINE_BLINK_BLOCKCHAIN_IDS,
       version: this._metadata.version ?? BASELINE_ACTION_VERSION,
     };
   }
 
-  public async isSupported(adapter: ActionAdapter) {
+  public async isSupported(adapter: BlinkAdapter) {
     try {
       return await this._supportStrategy(this, adapter);
     } catch (e) {
@@ -199,11 +199,11 @@ export class Action {
       ? MessageNextActionPostRequest | NextActionPostRequest
       : never,
     lifecycleData?: OnActionSuccess,
-  ): Promise<Action | null> {
+  ): Promise<BlinkInstance | null> {
     const id = nanoid();
 
     if (next.type === 'inline') {
-      return new Action(
+      return new BlinkInstance(
         this.url,
         lifecycleData
           ? mergeLifecycleData(next.action, lifecycleData)
@@ -252,7 +252,7 @@ export class Action {
     const data = (await response.json()) as NextAction;
     const metadata = getBlinkSupportabilityMetadata(response);
 
-    return new Action(
+    return new BlinkInstance(
       href,
       lifecycleData ? mergeLifecycleData(data, lifecycleData) : data,
       metadata,
@@ -265,13 +265,13 @@ export class Action {
     );
   }
 
-  public safeInlineChain(lifecycleData?: OnActionSuccess): Action {
+  public safeInlineChain(lifecycleData?: OnActionSuccess): BlinkInstance {
     if (!lifecycleData) {
       return this;
     }
 
     const id = nanoid();
-    return new Action(
+    return new BlinkInstance(
       this.url,
       mergeLifecycleData(this._data, lifecycleData),
       this.metadata,
@@ -289,10 +289,10 @@ export class Action {
     url: string,
     data: NextAction,
     metadata: Supportability,
-    supportStrategy: ActionSupportStrategy,
+    supportStrategy: BlinkSupportStrategy,
   ) {
     const id = nanoid();
-    return new Action(
+    return new BlinkInstance(
       url,
       data,
       metadata,
@@ -304,8 +304,8 @@ export class Action {
 
   private static async _fetch(
     apiUrl: string,
-    supportStrategy: ActionSupportStrategy = defaultActionSupportStrategy,
-    chainMetadata?: ActionChainMetadata,
+    supportStrategy: BlinkSupportStrategy = defaultBlinkSupportStrategy,
+    chainMetadata?: BlinkChainMetadata,
     id?: string,
   ) {
     const { url: proxyUrl, headers: proxyHeaders } = proxify(apiUrl);
@@ -325,7 +325,7 @@ export class Action {
     const data = (await response.json()) as ActionGetResponse;
     const metadata = getBlinkSupportabilityMetadata(response);
 
-    return new Action(
+    return new BlinkInstance(
       apiUrl,
       { ...data, type: 'action' },
       metadata,
@@ -338,10 +338,10 @@ export class Action {
 
   static async fetch(
     apiUrl: string,
-    supportStrategy: ActionSupportStrategy = defaultActionSupportStrategy,
+    supportStrategy: BlinkSupportStrategy = defaultBlinkSupportStrategy,
   ) {
     const id = nanoid();
-    return Action._fetch(
+    return BlinkInstance._fetch(
       apiUrl,
       supportStrategy,
       {
@@ -352,7 +352,7 @@ export class Action {
   }
 
   refresh() {
-    return Action._fetch(
+    return BlinkInstance._fetch(
       this.url,
       this._supportStrategy,
       this._chainMetadata,
@@ -360,8 +360,8 @@ export class Action {
     );
   }
 
-  withUpdate(update: { supportStrategy?: ActionSupportStrategy }) {
-    return new Action(
+  withUpdate(update: { supportStrategy?: BlinkSupportStrategy }) {
+    return new BlinkInstance(
       this._url,
       this._data,
       this._metadata,
@@ -374,7 +374,7 @@ export class Action {
 }
 
 const componentFactory = (
-  parent: Action,
+  parent: BlinkInstance,
   label: string,
   href: string,
   type: LinkedActionType,
@@ -428,3 +428,6 @@ const mergeLifecycleData = (
     links: links.length > 0 ? { actions: links } : undefined,
   };
 };
+
+// For backward compatibility. Will be removed in future releases
+export { BlinkInstance as Action };
