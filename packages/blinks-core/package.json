@@ -17,6 +17,11 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
+    "./api": {
+      "import": "./dist/service-api/index.js",
+      "require": "./dist/service-api/index.cjs",
+      "types": "./dist/service-api/index.d.ts"
+    },
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",

@@ -17,6 +17,7 @@ export default defineConfig([
       'src/ext/twitter.tsx',
       'src/hooks/solana/index.ts',
       'src/hooks/evm/index.ts',
+      'src/api/index.ts',
     ],
     dts: {
       entry: [
@@ -24,6 +25,7 @@ export default defineConfig([
         'src/ext/twitter.tsx',
         'src/hooks/solana/index.ts',
         'src/hooks/evm/index.ts',
+        'src/api/index.ts',
       ],
     },
   },

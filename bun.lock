@@ -46,7 +46,7 @@
     },
     "packages/blinks": {
       "name": "@dialectlabs/blinks",
-      "version": "0.20.1",
+      "version": "0.20.2",
       "dependencies": {
         "@dialectlabs/blinks-core": "packages/blinks-core",
         "bs58": "^6.0.0",

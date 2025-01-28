@@ -11,19 +11,19 @@ import {
 } from 'react';
 import {
   AbstractActionComponent,
-  Action,
-  type ActionAdapter,
-  type ActionCallbacksConfig,
-  type ActionContext,
-  type ActionSupportability,
+  type BlinkAdapter,
+  type BlinkCallbacksConfig,
+  type BlinkExecutionContext,
+  BlinkInstance,
+  type BlinkSupportability,
   FormActionComponent,
-  getExtendedActionState,
+  getExtendedBlinkState,
   getExtendedInterstitialState,
   getExtendedWebsiteState,
   type LinkedActionType,
-  mergeActionStates,
+  mergeBlinkStates,
   MultiValueActionComponent,
-  type SecurityActionState,
+  type SecurityBlinkState,
   SingleValueActionComponent,
 } from './api';
 import { checkSecurity, isInterstitial, type SecurityLevel } from './utils';
@@ -35,7 +35,7 @@ import {
 } from './utils/type-guards.ts';
 import { isURL } from './utils/validators.ts';
 
-export type BlinkSecurityState = SecurityActionState;
+export type BlinkSecurityState = SecurityBlinkState;
 
 export enum DisclaimerType {
   BLOCKED = 'blocked',
@@ -71,10 +71,11 @@ export type ExtraExecutionData = {
 export interface BaseBlinkLayoutProps {
   id?: string;
   securityState: BlinkSecurityState;
-  action: Action;
+  blink: BlinkInstance;
   component?: AbstractActionComponent | null;
   websiteUrl?: string | null;
-  websiteText?: string | null;
+  // if passed as false, it will completely hide the row with the website url
+  websiteText?: string | false | null;
   disclaimer?: Disclaimer | null;
   caption?: BlinkCaption | null;
   executeFn: (
@@ -83,7 +84,7 @@ export interface BaseBlinkLayoutProps {
   ) => Promise<ExtraExecutionData | void>;
   executionStatus: ExecutionStatus;
   executingAction?: AbstractActionComponent | null;
-  supportability: ActionSupportability;
+  supportability: BlinkSupportability;
 }
 
 export type ExecutionStatus =
@@ -205,60 +206,60 @@ const executionReducer = (
   }
 };
 
-type ActionStateWithOrigin =
+type BlinkStateWithOrigin =
   | {
-      action: SecurityActionState;
+      blink: SecurityBlinkState;
       origin?: never;
     }
   | {
-      action: SecurityActionState;
-      origin: SecurityActionState;
+      blink: SecurityBlinkState;
+      origin: SecurityBlinkState;
       originType: Source;
     };
 
-const getOverallActionState = (
-  action: Action,
+const getOverallBlinkState = (
+  blink: BlinkInstance,
   websiteUrl?: string | null,
-): ActionStateWithOrigin => {
-  const actionState = getExtendedActionState(action);
+): BlinkStateWithOrigin => {
+  const blinkState = getExtendedBlinkState(blink);
   const originalUrlData = websiteUrl ? isInterstitial(websiteUrl) : null;
 
   if (!originalUrlData) {
     return {
-      action: actionState,
+      blink: blinkState,
     };
   }
 
   if (originalUrlData.isInterstitial) {
     return {
-      action: actionState,
+      blink: blinkState,
       origin: getExtendedInterstitialState(websiteUrl!),
       originType: 'interstitials' as Source,
     };
   }
 
   return {
-    action: actionState,
+    blink: blinkState,
     origin: getExtendedWebsiteState(websiteUrl!),
     originType: 'websites' as Source,
   };
 };
 
-const checkSecurityFromActionState = (
-  state: ActionStateWithOrigin,
+const checkSecurityFromBlinkState = (
+  state: BlinkStateWithOrigin,
   normalizedSecurityLevel: NormalizedSecurityLevel,
 ): boolean => {
-  const checkAction = checkSecurity(
-    state.action,
+  const checkBlink = checkSecurity(
+    state.blink,
     normalizedSecurityLevel.actions,
   );
 
   if (!state.origin) {
-    return checkAction;
+    return checkBlink;
   }
 
   return (
-    checkAction &&
+    checkBlink &&
     checkSecurity(state.origin, normalizedSecurityLevel[state.originType])
   );
 };
@@ -269,19 +270,19 @@ type Source = 'websites' | 'interstitials' | 'actions';
 type NormalizedSecurityLevel = Record<Source, SecurityLevel>;
 
 export interface BlinkContainerProps {
-  action: Action;
-  adapter: ActionAdapter;
-  selector?: (currentAction: Action) => AbstractActionComponent | null;
+  blink: BlinkInstance;
+  adapter: BlinkAdapter;
+  selector?: (currentAction: BlinkInstance) => AbstractActionComponent | null;
   websiteUrl?: string | null;
-  websiteText?: string | null;
-  callbacks?: Partial<ActionCallbacksConfig>;
+  websiteText?: string | false | null;
+  callbacks?: Partial<BlinkCallbacksConfig>;
   securityLevel?: SecurityLevel | NormalizedSecurityLevel;
   Layout: ComponentType<BaseBlinkLayoutProps>;
 }
 
 // overall flow: check-supportability -> idle/block -> executing -> success/error or chain
 export const BlinkContainer = ({
-  action: initialAction,
+  blink: initialBlink,
   adapter,
   websiteUrl,
   websiteText,
@@ -290,9 +291,9 @@ export const BlinkContainer = ({
   Layout,
   selector,
 }: BlinkContainerProps) => {
-  const [action, setAction] = useState(initialAction);
-  const singleComponent = useMemo(() => selector?.(action), [action, selector]);
-  const isPartialAction = typeof selector === 'function';
+  const [blink, setBlink] = useState(initialBlink);
+  const singleComponent = useMemo(() => selector?.(blink), [blink, selector]);
+  const isPartialBlink = typeof selector === 'function';
 
   const normalizedSecurityLevel: NormalizedSecurityLevel = useMemo(() => {
     if (typeof securityLevel === 'string') {
@@ -306,69 +307,69 @@ export const BlinkContainer = ({
     return securityLevel;
   }, [securityLevel]);
 
-  const [actionState, setActionState] = useState(
-    getOverallActionState(action, websiteUrl),
+  const [blinkState, setBlinkState] = useState(
+    getOverallBlinkState(blink, websiteUrl),
   );
 
-  const [supportability, setSupportability] = useState<ActionSupportability>({
+  const [supportability, setSupportability] = useState<BlinkSupportability>({
     isSupported: true,
   });
 
   const overallState = useMemo(
     () =>
-      mergeActionStates(
-        ...([actionState.action, actionState.origin].filter(
+      mergeBlinkStates(
+        ...([blinkState.blink, blinkState.origin].filter(
           Boolean,
-        ) as SecurityActionState[]),
+        ) as SecurityBlinkState[]),
       ),
-    [actionState],
+    [blinkState],
   );
 
-  // adding ui check as well, to make sure, that on runtime registry lookups, we are not allowing the action to be executed
-  // if partial action - we skip the security check, since we assume the user want's to control the flow
-  const isPassingSecurityCheck = isPartialAction
+  // adding ui check as well, to make sure, that on runtime registry lookups, we are not allowing the blink to be executed
+  // if partial blink - we skip the security check, since we assume the user want's to control the flow
+  const isPassingSecurityCheck = isPartialBlink
     ? true
-    : checkSecurityFromActionState(actionState, normalizedSecurityLevel);
+    : checkSecurityFromBlinkState(blinkState, normalizedSecurityLevel);
 
   const [executionState, dispatch] = useReducer(executionReducer, {
-    status: isPartialAction ? 'idle' : 'checking-supportability',
+    status: isPartialBlink ? 'idle' : 'checking-supportability',
   });
 
-  // in case, where initialAction or websiteUrl changes, we need to reset the action state
+  // in case, where initialBlink or websiteUrl changes, we need to reset the blink state
   useEffect(() => {
-    // just in case, to not reset initial action
-    if (action === initialAction) {
+    // just in case, to not reset initial blink
+    if (blink === initialBlink) {
       return;
     }
 
-    setAction(initialAction);
-    setActionState(getOverallActionState(initialAction, websiteUrl));
+    setBlink(initialBlink);
+    setBlinkState(getOverallBlinkState(initialBlink, websiteUrl));
     dispatch({
-      type: isPartialAction
+      type: isPartialBlink
         ? ExecutionType.RESET
         : ExecutionType.CHECK_SUPPORTABILITY,
     });
     // we want to run this one when initialAction or websiteUrl changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialAction, websiteUrl]);
+  }, [initialBlink, websiteUrl]);
 
   useEffect(() => {
     callbacks.onActionMount?.(
-      initialAction,
-      websiteUrl ?? initialAction.url,
-      actionState.action,
+      initialBlink,
+      websiteUrl ?? initialBlink.url,
+      blinkState.blink,
     );
     // we run this effect ONLY once
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    const liveDataConfig = action.liveData_experimental;
+    const liveDataConfig = blink.liveData_experimental;
     if (
       !liveDataConfig ||
       !liveDataConfig.enabled ||
       executionState.status !== 'idle' ||
-      action.isChained
+      blink.isChained
     ) {
       return;
     }
@@ -376,15 +377,15 @@ export const BlinkContainer = ({
     let timeout: any; // NodeJS.Timeout
     const fetcher = async () => {
       try {
-        const newAction = await action.refresh();
+        const newBlink = await blink.refresh();
 
         // if after refresh user clicked started execution, we should not update the action
         if (executionState.status === 'idle') {
-          setAction(newAction);
+          setBlink(newBlink);
         }
       } catch (e) {
         console.error(
-          `[@dialectlabs/blinks] Failed to fetch live data for action ${action.url}`,
+          `[@dialectlabs/blinks] Failed to fetch live data for blink ${blink.url}`,
         );
         // if fetch failed, we retry after the same delay
         timeout = setTimeout(fetcher, liveDataConfig.delayMs);
@@ -397,18 +398,18 @@ export const BlinkContainer = ({
     return () => {
       clearTimeout(timeout);
     };
-  }, [action, executionState.status, isPartialAction]);
+  }, [blink, executionState.status, isPartialBlink]);
 
   useEffect(() => {
-    const checkSupportability = async (action: Action) => {
+    const checkSupportability = async (blink: BlinkInstance) => {
       if (
-        action.isChained ||
+        blink.isChained ||
         executionState.status !== 'checking-supportability'
       ) {
         return;
       }
       try {
-        const supportability = await action.isSupported(adapter);
+        const supportability = await blink.isSupported(adapter);
         setSupportability(supportability);
       } finally {
         dispatch({
@@ -420,9 +421,9 @@ export const BlinkContainer = ({
       }
     };
 
-    checkSupportability(action);
+    checkSupportability(blink);
   }, [
-    action,
+    blink,
     adapter,
     executionState.status,
     overallState,
@@ -454,21 +455,21 @@ export const BlinkContainer = ({
       }
     }
 
-    const newActionState = getOverallActionState(action, websiteUrl);
-    const newIsPassingSecurityCheck = checkSecurityFromActionState(
-      newActionState,
+    const newBlinkState = getOverallBlinkState(blink, websiteUrl);
+    const newIsPassingSecurityCheck = checkSecurityFromBlinkState(
+      newBlinkState,
       normalizedSecurityLevel,
     );
 
     // if action state has changed or origin's state has changed, and it doesn't pass the security check or became malicious, block the action
     if (
-      (newActionState.action !== actionState.action ||
-        newActionState.origin !== actionState.origin) &&
+      (newBlinkState.blink !== blinkState.blink ||
+        newBlinkState.origin !== blinkState.origin) &&
       !newIsPassingSecurityCheck
     ) {
-      setActionState(newActionState);
+      setBlinkState(newBlinkState);
       dispatch({ type: ExecutionType.BLOCK });
-      callbacks.onActionCancel?.(action, component, 'security-state-changed');
+      callbacks.onActionCancel?.(blink, component, 'security-state-changed');
       return;
     }
 
@@ -493,9 +494,9 @@ export const BlinkContainer = ({
 
     dispatch({ type: ExecutionType.INITIATE, executingAction: component });
 
-    const context: ActionContext = {
+    const context: BlinkExecutionContext = {
       action: component.parent,
-      actionType: actionState.action,
+      actionType: blinkState.blink,
       originalUrl: websiteUrl ?? component.parent.url,
       triggeredLinkedAction: component,
     };
@@ -504,7 +505,7 @@ export const BlinkContainer = ({
       const account = await adapter.connect(context);
       if (!account) {
         dispatch({ type: ExecutionType.RESET });
-        callbacks?.onActionCancel?.(action, component, 'wallet-not-connected');
+        callbacks?.onActionCancel?.(blink, component, 'wallet-not-connected');
         return;
       }
 
@@ -519,7 +520,7 @@ export const BlinkContainer = ({
             ? response.error
             : 'Transaction data missing',
         });
-        callbacks.onActionError?.(action, component, 'post-request-error');
+        callbacks.onActionError?.(blink, component, 'post-request-error');
         return;
       }
 
@@ -536,7 +537,7 @@ export const BlinkContainer = ({
             type: ExecutionType.FINISH,
             successMessage: response.message,
           });
-          callbacks.onActionComplete?.(action, component, signature);
+          callbacks.onActionComplete?.(blink, component, signature);
           return;
         }
 
@@ -548,7 +549,7 @@ export const BlinkContainer = ({
               'Missing signature for message',
           });
           callbacks.onActionError?.(
-            action,
+            blink,
             component,
             'message-signature-missing',
           );
@@ -568,30 +569,30 @@ export const BlinkContainer = ({
                 signature: signature,
                 account: account,
               };
-        const nextAction = response.links?.next
-          ? await action.chain(
+        const nextBlink = response.links?.next
+          ? await blink.chain(
               response.links.next,
               chainData,
               response.lifecycle?.success,
             )
-          : action.safeInlineChain(response.lifecycle?.success);
+          : blink.safeInlineChain(response.lifecycle?.success);
 
         // if this is running in partial action mode, then we end the chain, if passed fn returns a null value for the next action
         // this also ignores the lifecycle.success for now, since still in development
-        if (!nextAction || (isPartialAction && !selector?.(nextAction))) {
+        if (!nextBlink || (isPartialBlink && !selector?.(nextBlink))) {
           dispatch({
             type: ExecutionType.FINISH,
             successMessage: response.message,
           });
-          callbacks.onActionComplete?.(action, component, signature);
+          callbacks.onActionComplete?.(blink, component, signature);
           return;
         }
 
-        setAction(nextAction);
+        setBlink(nextBlink);
         dispatch({ type: ExecutionType.RESET });
         callbacks.onActionChain?.(
-          action,
-          nextAction,
+          blink,
+          nextBlink,
           component,
           response.type,
           signature,
@@ -607,7 +608,7 @@ export const BlinkContainer = ({
         if (!signResult || isSignTransactionError(signResult)) {
           dispatch({ type: ExecutionType.RESET });
           callbacks.onActionCancel?.(
-            action,
+            blink,
             component,
             'transaction-sign-cancel',
           );
@@ -628,7 +629,7 @@ export const BlinkContainer = ({
               'Unknown error, please try again',
           });
           callbacks.onActionError?.(
-            action,
+            blink,
             component,
             'transaction-confirmation-failed',
             signResult.signature,
@@ -645,7 +646,7 @@ export const BlinkContainer = ({
 
         if (!signResult || isSignMessageError(signResult)) {
           dispatch({ type: ExecutionType.RESET });
-          callbacks.onActionCancel?.(action, component, 'message-sign-cancel');
+          callbacks.onActionCancel?.(blink, component, 'message-sign-cancel');
           return;
         }
 
@@ -678,7 +679,7 @@ export const BlinkContainer = ({
         type: ExecutionType.SOFT_RESET,
         errorMessage: (e as Error).message ?? 'Unknown error, please try again',
       });
-      callbacks.onActionError?.(action, component, 'unknown-error');
+      callbacks.onActionError?.(blink, component, 'unknown-error');
     }
   };
 
@@ -705,8 +706,8 @@ export const BlinkContainer = ({
   }, [executionState.status, isPassingSecurityCheck, overallState]);
 
   const blinkCaption: BlinkCaption | null = useMemo(() => {
-    const error = executionState.errorMessage ?? action.error;
-    const generalMessage = executionState.generalMessage ?? action.message;
+    const error = executionState.errorMessage ?? blink.error;
+    const generalMessage = executionState.generalMessage ?? blink.message;
 
     if (error) {
       return { type: 'error', text: error };
@@ -725,8 +726,8 @@ export const BlinkContainer = ({
     executionState.errorMessage,
     executionState.successMessage,
     executionState.generalMessage,
-    action.error,
-    action.message,
+    blink.error,
+    blink.message,
   ]);
 
   return (
@@ -734,7 +735,7 @@ export const BlinkContainer = ({
       securityState={overallState}
       websiteUrl={websiteUrl}
       websiteText={websiteText}
-      action={action}
+      blink={blink}
       component={singleComponent}
       caption={blinkCaption}
       executionStatus={executionState.status}
@@ -742,7 +743,7 @@ export const BlinkContainer = ({
       executeFn={execute}
       disclaimer={disclaimer}
       supportability={supportability}
-      id={action.id}
+      id={blink.id}
     />
   );
 };

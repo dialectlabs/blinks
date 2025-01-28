@@ -3,7 +3,7 @@ import type {
   LinkedActionType,
   TypedActionParameter,
 } from '../../actions-spec.ts';
-import { Action } from '../Action.ts';
+import { BlinkInstance } from '../BlinkInstance.ts';
 import { AbstractActionComponent } from './AbstractActionComponent.ts';
 import { ButtonActionComponent } from './ButtonActionComponent.ts';
 import { SingleValueActionComponent } from './SingleValueActionComponent.ts';
@@ -12,7 +12,7 @@ export class FormActionComponent extends AbstractActionComponent {
   private parameterValues: Record<string, string | string[]> = {};
 
   constructor(
-    protected _parent: Action,
+    protected _parent: BlinkInstance,
     protected _label: string,
     protected _href: string,
     protected _type: LinkedActionType,

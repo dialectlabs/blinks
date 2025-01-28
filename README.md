@@ -103,10 +103,10 @@ Package provides an entrypoint function with styled for X Blink components
 ```ts
 // contentScript.ts
 import { setupTwitterObserver } from "@dialectlabs/blinks/ext/twitter";
-import { ActionConfig } from "@dialectlabs/blinks";
+import { BlinkSolanaConfig } from "@dialectlabs/blinks";
 
 // your RPC_URL is used to create a connection to confirm the transaction after action execution
-setupTwitterObserver(new ActionConfig(RPC_URL, {
+setupTwitterObserver(new BlinkSolanaConfig(RPC_URL, {
   metadata: {
     supportedBlockchainIds: [BlockchainIds.SOLANA_MAINNET]
   },
@@ -116,21 +116,25 @@ setupTwitterObserver(new ActionConfig(RPC_URL, {
 
 // or
 
-import { type ActionAdapter } from "@dialectlabs/blinks";
+import type { BlinkAdapter, BlinkAdapterMetadata } from "@dialectlabs/blinks";
 
-class MyActionAdapter implements ActionAdapter {
+class MyBlinkAdapter implements BlinkAdapter {
   async connect() { ... }
+
   async signTransaction(tx: string) { ... }
+
   async confirmTransaction(sig: string) { ... }
-  get metadata(): ActionAdapterMetadata {
+
+  get metadata(): BlinkAdapterMetadata {
     return {
       supportedBlockchainIds: [BlockchainIds.SOLANA_MAINNET],
     };
   }
+
   async signMessage(data: string | SignMessageData) { ... }
 }
 
-setupTwitterObserver(new MyActionAdapter());
+setupTwitterObserver(new MyBlinkAdapter());
 ```
 
 #### Manifest

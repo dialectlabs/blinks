@@ -17,7 +17,7 @@ export const useIsolatedLayoutPropNormalizer = ({
   executeFn,
   executionStatus,
   executingAction,
-  action,
+  blink,
   component,
   caption,
   ...props
@@ -30,12 +30,12 @@ export const useIsolatedLayoutPropNormalizer = ({
           executionStatus === 'executing' &&
           (it === executingAction || it.parentComponent === executingAction),
         disabled:
-          action.disabled ||
-          action.type === 'completed' ||
+          blink.disabled ||
+          blink.type === 'completed' ||
           executionStatus !== 'idle',
         variant:
           buttonVariantMap[
-            action.type === 'completed' ? 'success' : executionStatus
+            blink.type === 'completed' ? 'success' : executionStatus
           ],
         ctaType:
           (it.type === 'external-link' || it.type === 'inline-link') &&
@@ -68,7 +68,7 @@ export const useIsolatedLayoutPropNormalizer = ({
         },
       };
     },
-    [action.disabled, action.type, executeFn, executingAction, executionStatus],
+    [blink.disabled, blink.type, executeFn, executingAction, executionStatus],
   );
 
   const asInputProps = useCallback(
@@ -82,8 +82,8 @@ export const useIsolatedLayoutPropNormalizer = ({
         type: it.parameter.type ?? 'text',
         placeholder: it.parameter.label,
         disabled:
-          action.disabled ||
-          action.type === 'completed' ||
+          blink.disabled ||
+          blink.type === 'completed' ||
           executionStatus !== 'idle',
         name: it.parameter.name,
         required: it.parameter.required,
@@ -104,7 +104,7 @@ export const useIsolatedLayoutPropNormalizer = ({
             : undefined,
       };
     },
-    [action.disabled, action.type, asButtonProps, executionStatus],
+    [blink.disabled, blink.type, asButtonProps, executionStatus],
   );
 
   const asFormProps = useCallback(
@@ -178,7 +178,10 @@ export const useIsolatedLayoutPropNormalizer = ({
 
   return {
     ...props,
-    websiteText: props.websiteText ?? props.websiteUrl ?? action.url,
+    websiteText:
+      (props.websiteText === false ? '' : props.websiteText) ??
+      props.websiteUrl ??
+      blink.url,
     ...elementProps,
     ...normalizedCaption,
   };

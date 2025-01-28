@@ -60,6 +60,7 @@ export const ActionEmailInput = ({
 
   return (
     <BaseInputContainer
+      className="blink-input-email"
       standalone={isStandalone}
       description={
         description ??

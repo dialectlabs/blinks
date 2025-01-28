@@ -56,6 +56,7 @@ export const ActionSelect = ({
 
   return (
     <BaseInputContainer
+      className="blink-input-select"
       standalone={isStandalone}
       description={description}
       rightAdornment={

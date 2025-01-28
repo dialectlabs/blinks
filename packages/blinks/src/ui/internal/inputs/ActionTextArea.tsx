@@ -56,6 +56,7 @@ export const ActionTextArea = ({
 
   return (
     <BaseInputContainer
+      className="blink-input-textarea"
       standalone={false}
       description={
         description ??

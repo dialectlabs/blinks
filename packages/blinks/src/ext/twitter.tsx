@@ -1,14 +1,14 @@
 import {
-  Action,
-  type ActionAdapter,
-  type ActionCallbacksConfig,
   type ActionsJsonConfig,
-  ActionsRegistry,
-  type ActionSupportStrategy,
-  ActionsURLMapper,
+  type BlinkAdapter,
+  type BlinkCallbacksConfig,
+  BlinkInstance,
+  BlinksRegistry,
+  type BlinkSupportStrategy,
+  BlinksURLMapper,
   checkSecurity,
-  defaultActionSupportStrategy,
-  getExtendedActionState,
+  defaultBlinkSupportStrategy,
+  getExtendedBlinkState,
   getExtendedInterstitialState,
   getExtendedWebsiteState,
   isInterstitial,
@@ -27,7 +27,7 @@ export interface ObserverOptions {
   securityLevel:
     | ObserverSecurityLevel
     | Record<'websites' | 'interstitials' | 'actions', ObserverSecurityLevel>;
-  supportStrategy: ActionSupportStrategy;
+  supportStrategy: BlinkSupportStrategy;
 }
 
 interface NormalizedObserverOptions {
@@ -35,12 +35,12 @@ interface NormalizedObserverOptions {
     'websites' | 'interstitials' | 'actions',
     ObserverSecurityLevel
   >;
-  supportStrategy: ActionSupportStrategy;
+  supportStrategy: BlinkSupportStrategy;
 }
 
 const DEFAULT_OPTIONS: ObserverOptions = {
   securityLevel: 'only-trusted',
-  supportStrategy: defaultActionSupportStrategy,
+  supportStrategy: defaultBlinkSupportStrategy,
 };
 
 const normalizeOptions = (
@@ -72,15 +72,15 @@ const normalizeOptions = (
 };
 
 export function setupTwitterObserver(
-  config: ActionAdapter,
-  callbacks: Partial<ActionCallbacksConfig> = {},
+  config: BlinkAdapter,
+  callbacks: Partial<BlinkCallbacksConfig> = {},
   options: Partial<ObserverOptions> = DEFAULT_OPTIONS,
 ) {
   const mergedOptions = normalizeOptions(options);
   const twitterReactRoot = document.getElementById('react-root')!;
 
   const refreshRegistry = async () => {
-    return ActionsRegistry.getInstance().init();
+    return BlinksRegistry.getInstance().init();
   };
 
   // if we don't have the registry, then we don't show anything
@@ -112,8 +112,8 @@ export function setupTwitterObserver(
 
 async function handleNewNode(
   node: Element,
-  config: ActionAdapter,
-  callbacks: Partial<ActionCallbacksConfig>,
+  config: BlinkAdapter,
+  callbacks: Partial<BlinkCallbacksConfig>,
   options: NormalizedObserverOptions,
 ) {
   const element = node as Element;
@@ -148,14 +148,12 @@ async function handleNewNode(
   if (!anchor || !container) return;
 
   const shortenedUrl = anchor.href;
-  const actionUrl = await resolveTwitterShortenedUrl(shortenedUrl);
-  const interstitialData = isInterstitial(actionUrl);
+  const blinkUrl = await resolveTwitterShortenedUrl(shortenedUrl);
+  const interstitialData = isInterstitial(blinkUrl);
 
-  let actionApiUrl: string | null;
+  let blinkApiUrl: string | null;
   if (interstitialData.isInterstitial) {
-    const interstitialState = getExtendedInterstitialState(
-      actionUrl.toString(),
-    );
+    const interstitialState = getExtendedInterstitialState(blinkUrl.toString());
 
     if (
       !checkSecurity(interstitialState, options.securityLevel.interstitials)
@@ -163,60 +161,60 @@ async function handleNewNode(
       return;
     }
 
-    actionApiUrl = interstitialData.decodedActionUrl;
+    blinkApiUrl = interstitialData.decodedActionUrl;
   } else {
-    const websiteState = getExtendedWebsiteState(actionUrl.toString());
+    const websiteState = getExtendedWebsiteState(blinkUrl.toString());
 
     if (!checkSecurity(websiteState, options.securityLevel.websites)) {
       return;
     }
 
-    const actionsJsonUrl = actionUrl.origin + '/actions.json';
+    const actionsJsonUrl = blinkUrl.origin + '/actions.json';
     const { url: proxyUrl, headers: proxyHeaders } = proxify(actionsJsonUrl);
     const actionsJson = await fetch(proxyUrl, {
       headers: proxyHeaders,
     }).then((res) => res.json() as Promise<ActionsJsonConfig>);
 
-    const actionsUrlMapper = new ActionsURLMapper(actionsJson);
+    const blinksUrlMapper = new BlinksURLMapper(actionsJson);
 
-    actionApiUrl = actionsUrlMapper.mapUrl(actionUrl);
+    blinkApiUrl = blinksUrlMapper.mapUrl(blinkUrl);
   }
 
-  const state = actionApiUrl ? getExtendedActionState(actionApiUrl) : null;
+  const state = blinkApiUrl ? getExtendedBlinkState(blinkApiUrl) : null;
   if (
-    !actionApiUrl ||
+    !blinkApiUrl ||
     !state ||
     !checkSecurity(state, options.securityLevel.actions)
   ) {
     return;
   }
 
-  const action = await Action.fetch(
-    actionApiUrl,
+  const blink = await BlinkInstance.fetch(
+    blinkApiUrl,
     options.supportStrategy,
   ).catch(noop);
 
-  if (!action) {
+  if (!blink) {
     return;
   }
 
-  const { container: actionContainer, reactRoot } = createAction({
+  const { container: blinkContainer, reactRoot } = createBlink({
     config,
-    originalUrl: actionUrl,
-    action,
+    originalUrl: blinkUrl,
+    blink,
     callbacks,
     options,
     isInterstitial: interstitialData.isInterstitial,
   });
 
-  addStyles(container).replaceChildren(actionContainer);
+  addStyles(container).replaceChildren(blinkContainer);
 
   new MutationObserver((mutations, observer) => {
     for (const mutation of mutations) {
       for (const removedNode of Array.from(mutation.removedNodes)) {
         if (
-          removedNode === actionContainer ||
-          !document.body.contains(actionContainer)
+          removedNode === blinkContainer ||
+          !document.body.contains(blinkContainer)
         ) {
           reactRoot.unmount();
           observer.disconnect();
@@ -226,31 +224,31 @@ async function handleNewNode(
   }).observe(document.body, { childList: true, subtree: true });
 }
 
-function createAction({
+function createBlink({
   originalUrl,
-  action,
+  blink,
   callbacks,
   options,
   config,
 }: {
   originalUrl: URL;
-  action: Action;
-  callbacks: Partial<ActionCallbacksConfig>;
+  blink: BlinkInstance;
+  callbacks: Partial<BlinkCallbacksConfig>;
   options: NormalizedObserverOptions;
   isInterstitial: boolean;
-  config: ActionAdapter;
+  config: BlinkAdapter;
 }) {
   const container = document.createElement('div');
-  container.className = 'dialect-action-root-container';
+  container.className = 'dialect-blink-root-container';
 
-  const actionRoot = createRoot(container);
+  const blinkRoot = createRoot(container);
 
-  actionRoot.render(
+  blinkRoot.render(
     <div onClick={(e) => e.stopPropagation()}>
       <Blink
         adapter={config}
         stylePreset={resolveXStylePreset()}
-        action={action}
+        blink={blink}
         websiteUrl={originalUrl.toString()}
         websiteText={originalUrl.hostname}
         callbacks={callbacks}
@@ -259,7 +257,7 @@ function createAction({
     </div>,
   );
 
-  return { container, reactRoot: actionRoot };
+  return { container, reactRoot: blinkRoot };
 }
 
 const resolveXStylePreset = (): StylePreset => {

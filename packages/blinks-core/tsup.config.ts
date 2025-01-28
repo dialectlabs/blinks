@@ -11,9 +11,9 @@ const commonCfg: Partial<Options> = {
 export default defineConfig([
   {
     ...commonCfg,
-    entry: ['src/index.ts'],
+    entry: ['src/index.ts', 'src/service-api/index.ts'],
     dts: {
-      entry: ['src/index.ts'],
+      entry: ['src/index.ts', 'src/service-api/index.ts'],
     },
   },
 ]);

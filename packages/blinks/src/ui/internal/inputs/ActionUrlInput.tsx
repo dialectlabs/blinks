@@ -60,6 +60,7 @@ export const ActionUrlInput = ({
 
   return (
     <BaseInputContainer
+      className="blink-input-url"
       standalone={isStandalone}
       description={
         description ??

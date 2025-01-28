@@ -10,7 +10,7 @@ export type ProxifiedResult = {
 export function setProxyUrl(url: string): void {
   if (!url) {
     console.warn(
-      '[@dialectlabs/blinks] Proxy URL is not set, proxy will be disabled',
+      '[@dialectlabs/blinks-core] Proxy URL is not set, proxy will be disabled',
     );
     proxyUrl = null;
     return;
@@ -19,7 +19,7 @@ export function setProxyUrl(url: string): void {
   try {
     new URL(url);
   } catch (e) {
-    console.warn('[@dialectlabs/blinks] Invalid proxy URL', e);
+    console.warn('[@dialectlabs/blinks-core] Invalid proxy URL', e);
     return;
   }
 
@@ -51,6 +51,13 @@ function createProxifiedUrl(url: string, endpoint?: string): ProxifiedResult {
     };
   }
 
+  if (shouldPreserveOriginal(incomingUrl)) {
+    return {
+      url: incomingUrl,
+      headers: getProxifiedHeaders(),
+    };
+  }
+
   const proxifiedUrl = endpoint
     ? new URL(endpoint, proxyUrl)
     : new URL(proxyUrl);
@@ -68,6 +75,12 @@ function getProxifiedHeaders(): Record<string, string> {
   };
 }
 
+// completely disable proxy
 function shouldIgnoreProxy(url: URL): boolean {
   return url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+}
+
+// preserve headers but since the request is already going to a dial.to service, we don't need to wrap it with a proxy
+function shouldPreserveOriginal(url: URL): boolean {
+  return url.hostname === 'api.dial.to';
 }

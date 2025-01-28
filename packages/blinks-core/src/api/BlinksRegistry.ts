@@ -1,19 +1,20 @@
-import { Action } from './Action';
+import { BlinkInstance } from './BlinkInstance';
 
-export type LookupType = 'action' | 'website' | 'interstitial';
+// NOTE: `action` lookup type is replaced by `blink`, and will be removed in future versions
+export type LookupType = 'action' | 'blink' | 'website' | 'interstitial';
 
 const DEFAULT_REFRESH_INTERVAL = 10 * 60 * 1000; // 10 minutes
 
-export class ActionsRegistry {
-  private static instance: ActionsRegistry | null = null;
-  private actionsByHost: Record<string, RegisteredEntity>;
+export class BlinksRegistry {
+  private static instance: BlinksRegistry | null = null;
+  private blinksByHost: Record<string, RegisteredEntity>;
   private websitesByHost: Record<string, RegisteredEntity>;
   private interstitialsByHost: Record<string, RegisteredEntity>;
 
   private intervalId: NodeJS.Timeout | null = null;
 
-  private constructor(config?: ActionsRegistryConfig) {
-    this.actionsByHost = config
+  private constructor(config?: BlinksRegistryConfig) {
+    this.blinksByHost = config
       ? Object.fromEntries(
           config.actions.map((action) => [action.host, action]),
         )
@@ -35,9 +36,9 @@ export class ActionsRegistry {
       : {};
   }
 
-  public static getInstance(config?: ActionsRegistryConfig): ActionsRegistry {
+  public static getInstance(config?: BlinksRegistryConfig): BlinksRegistry {
     if (this.instance === null || config) {
-      this.instance = new ActionsRegistry(config);
+      this.instance = new BlinksRegistry(config);
     }
     return this.instance;
   }
@@ -61,8 +62,8 @@ export class ActionsRegistry {
   }
 
   public async refresh(): Promise<void> {
-    const config = await fetchActionsRegistryConfig();
-    this.actionsByHost = Object.fromEntries(
+    const config = await fetchBlinksRegistryConfig();
+    this.blinksByHost = Object.fromEntries(
       config.actions.map((action) => [action.host, action]),
     );
     this.websitesByHost = Object.fromEntries(
@@ -80,8 +81,8 @@ export class ActionsRegistry {
     url: string | URL,
     type: LookupType = 'action',
   ): RegisteredEntity | null {
-    if (type === 'action') {
-      return this.lookupAction(url);
+    if (type === 'action' || type === 'blink') {
+      return this.lookupBlink(url);
     }
 
     if (type === 'website') {
@@ -95,11 +96,11 @@ export class ActionsRegistry {
     return null;
   }
 
-  private lookupAction(url: string | URL): RegisteredEntity | null {
+  private lookupBlink(url: string | URL): RegisteredEntity | null {
     try {
       const urlObj = new URL(url);
       const host = urlObj.host;
-      return this.actionsByHost[host] ?? null;
+      return this.blinksByHost[host] ?? null;
     } catch (e) {
       console.error(
         `[@dialectlabs/blinks] Failed to lookup action for URL: ${url}`,
@@ -138,7 +139,7 @@ export class ActionsRegistry {
   }
 }
 
-export interface ActionsRegistryConfig {
+export interface BlinksRegistryConfig {
   actions: RegisteredEntity[];
   websites: RegisteredEntity[];
   interstitials: RegisteredEntity[];
@@ -149,11 +150,11 @@ export interface RegisteredEntity {
   state: 'trusted' | 'malicious';
 }
 
-export type SecurityActionState = RegisteredEntity['state'] | 'unknown';
+export type SecurityBlinkState = RegisteredEntity['state'] | 'unknown';
 
-export const mergeActionStates = (
-  ...states: SecurityActionState[]
-): SecurityActionState => {
+export const mergeBlinkStates = (
+  ...states: SecurityBlinkState[]
+): SecurityBlinkState => {
   if (states.includes('malicious')) {
     return 'malicious';
   }
@@ -165,33 +166,32 @@ export const mergeActionStates = (
   return 'trusted';
 };
 
-export const getExtendedActionState = (
-  actionOrUrl: Action | string,
-): SecurityActionState => {
+export const getExtendedBlinkState = (
+  blinkOrUrl: BlinkInstance | string,
+): SecurityBlinkState => {
   return (
-    ActionsRegistry.getInstance().lookup(
-      typeof actionOrUrl === 'string' ? actionOrUrl : actionOrUrl.url,
-      'action',
+    BlinksRegistry.getInstance().lookup(
+      typeof blinkOrUrl === 'string' ? blinkOrUrl : blinkOrUrl.url,
+      'blink',
     )?.state ?? 'unknown'
   );
 };
 
-export const getExtendedWebsiteState = (url: string): SecurityActionState => {
+export const getExtendedWebsiteState = (url: string): SecurityBlinkState => {
   return (
-    ActionsRegistry.getInstance().lookup(url, 'website')?.state ?? 'unknown'
+    BlinksRegistry.getInstance().lookup(url, 'website')?.state ?? 'unknown'
   );
 };
 
 export const getExtendedInterstitialState = (
   url: string,
-): SecurityActionState => {
+): SecurityBlinkState => {
   return (
-    ActionsRegistry.getInstance().lookup(url, 'interstitial')?.state ??
-    'unknown'
+    BlinksRegistry.getInstance().lookup(url, 'interstitial')?.state ?? 'unknown'
   );
 };
 
-async function fetchActionsRegistryConfig(): Promise<ActionsRegistryConfig> {
+async function fetchBlinksRegistryConfig(): Promise<BlinksRegistryConfig> {
   try {
     const response = await fetch('https://actions-registry.dial.to/all');
 
@@ -212,3 +212,13 @@ async function fetchActionsRegistryConfig(): Promise<ActionsRegistryConfig> {
     return { actions: [], interstitials: [], websites: [] };
   }
 }
+
+// backwards compatibility
+export {
+  BlinksRegistry as ActionsRegistry,
+  fetchBlinksRegistryConfig as fetchActionsRegistryConfig,
+  getExtendedBlinkState as getExtendedActionState,
+  mergeBlinkStates as mergeActionStates,
+  type BlinksRegistryConfig as ActionsRegistryConfig,
+  type SecurityBlinkState as SecurityActionState,
+};

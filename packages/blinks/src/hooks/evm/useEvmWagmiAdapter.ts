@@ -1,4 +1,4 @@
-import { type ActionAdapter } from '@dialectlabs/blinks-core';
+import { type BlinkAdapter } from '@dialectlabs/blinks-core';
 import type { SignMessageData } from '@solana/actions-spec';
 import { useMemo } from 'react';
 import { deserialize, useAccount, useChains, useConnectorClient } from 'wagmi';
@@ -28,7 +28,7 @@ interface EvmWagmiAdapterParams {
  *
  * @param {EvmWagmiAdapterParams} params - Parameters for the adapter.
  * @returns {Object} - Returns an object containing the adapter.
- * @returns {ActionAdapter} adapter - The adapter object with methods for connecting, signing transactions, signing messages, and confirming transactions.
+ * @returns {BlinkAdapter} adapter - The adapter object with methods for connecting, signing transactions, signing messages, and confirming transactions.
  *
  * The adapter object contains the following methods:
  * - `connect`: Connects to the wallet and returns the wallet address.
@@ -40,7 +40,7 @@ interface EvmWagmiAdapterParams {
  */
 export function useEvmWagmiAdapter({
   onConnectWalletRequest,
-}: EvmWagmiAdapterParams): { adapter: ActionAdapter } {
+}: EvmWagmiAdapterParams): { adapter: BlinkAdapter } {
   const chains = useChains();
   const { address } = useAccount();
   const { data: client } = useConnectorClient();
@@ -122,7 +122,7 @@ export function useEvmWagmiAdapter({
             throw new Error('Transaction confirmation failed');
           }
         },
-      }) satisfies ActionAdapter,
+      }) satisfies BlinkAdapter,
     [address, chains, client],
   );
 

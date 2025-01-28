@@ -1,11 +1,11 @@
 import { describe, expect, test } from 'bun:test';
-import { ActionsRegistry, type ActionsRegistryConfig } from '../../src';
+import { BlinksRegistry, type BlinksRegistryConfig } from '../../src';
 
-describe('ActionsRegistry', () => {
+describe('BlinksRegistry', () => {
   describe('actions lookup', () => {
     test('should return the correct RegisteredAction for a known host', () => {
       // arrange
-      const actionsConfig: ActionsRegistryConfig = {
+      const actionsConfig: BlinksRegistryConfig = {
         actions: [
           { host: 'trusted.com', state: 'trusted' },
           { host: 'malicious.com', state: 'malicious' },
@@ -14,7 +14,7 @@ describe('ActionsRegistry', () => {
         interstitials: [],
       };
 
-      const actionsRegistry = ActionsRegistry.getInstance(actionsConfig);
+      const actionsRegistry = BlinksRegistry.getInstance(actionsConfig);
       const input = 'https://trusted.com/some-path';
 
       // act
@@ -26,7 +26,7 @@ describe('ActionsRegistry', () => {
 
     test('should return null for an unknown host', () => {
       // arrange
-      const actionsConfig: ActionsRegistryConfig = {
+      const actionsConfig: BlinksRegistryConfig = {
         actions: [
           { host: 'trusted.com', state: 'trusted' },
           { host: 'malicious.com', state: 'malicious' },
@@ -34,7 +34,7 @@ describe('ActionsRegistry', () => {
         websites: [],
         interstitials: [],
       };
-      const actionsRegistry = ActionsRegistry.getInstance(actionsConfig);
+      const actionsRegistry = BlinksRegistry.getInstance(actionsConfig);
       const input = 'https://unknown.com/some-path';
 
       // act
@@ -46,7 +46,7 @@ describe('ActionsRegistry', () => {
 
     test('should correctly handle URL objects', () => {
       // arrange
-      const actionsConfig: ActionsRegistryConfig = {
+      const actionsConfig: BlinksRegistryConfig = {
         actions: [
           { host: 'trusted.com', state: 'trusted' },
           { host: 'malicious.com', state: 'malicious' },
@@ -54,7 +54,7 @@ describe('ActionsRegistry', () => {
         websites: [],
         interstitials: [],
       };
-      const actionsRegistry = ActionsRegistry.getInstance(actionsConfig);
+      const actionsRegistry = BlinksRegistry.getInstance(actionsConfig);
       const input = new URL('https://malicious.com/some-path');
 
       // act
@@ -66,7 +66,7 @@ describe('ActionsRegistry', () => {
 
     test('should return null for an invalid URL string', () => {
       // arrange
-      const actionsConfig: ActionsRegistryConfig = {
+      const actionsConfig: BlinksRegistryConfig = {
         actions: [
           { host: 'trusted.com', state: 'trusted' },
           { host: 'malicious.com', state: 'malicious' },
@@ -74,7 +74,7 @@ describe('ActionsRegistry', () => {
         websites: [],
         interstitials: [],
       };
-      const actionsRegistry = ActionsRegistry.getInstance(actionsConfig);
+      const actionsRegistry = BlinksRegistry.getInstance(actionsConfig);
       const input = 'not-a-valid-url';
 
       // act
@@ -88,7 +88,7 @@ describe('ActionsRegistry', () => {
   describe('websites lookup', () => {
     test('should return the correct RegisteredEntity for a known host', () => {
       // arrange
-      const actionsConfig: ActionsRegistryConfig = {
+      const actionsConfig: BlinksRegistryConfig = {
         actions: [],
         websites: [
           { host: 'trusted.com', state: 'trusted' },
@@ -96,7 +96,7 @@ describe('ActionsRegistry', () => {
         ],
         interstitials: [],
       };
-      const actionsRegistry = ActionsRegistry.getInstance(actionsConfig);
+      const actionsRegistry = BlinksRegistry.getInstance(actionsConfig);
       const input = 'https://trusted.com/some-path';
 
       // act
@@ -108,7 +108,7 @@ describe('ActionsRegistry', () => {
 
     test('should return null for an unknown host', () => {
       // arrange
-      const actionsConfig: ActionsRegistryConfig = {
+      const actionsConfig: BlinksRegistryConfig = {
         actions: [],
         websites: [
           { host: 'trusted.com', state: 'trusted' },
@@ -116,7 +116,7 @@ describe('ActionsRegistry', () => {
         ],
         interstitials: [],
       };
-      const actionsRegistry = ActionsRegistry.getInstance(actionsConfig);
+      const actionsRegistry = BlinksRegistry.getInstance(actionsConfig);
       const input = 'https://unknown.com/some-path';
 
       // act
@@ -128,7 +128,7 @@ describe('ActionsRegistry', () => {
 
     test('should correctly handle URL objects', () => {
       // arrange
-      const actionsConfig: ActionsRegistryConfig = {
+      const actionsConfig: BlinksRegistryConfig = {
         actions: [],
         websites: [
           { host: 'trusted.com', state: 'trusted' },
@@ -136,7 +136,7 @@ describe('ActionsRegistry', () => {
         ],
         interstitials: [],
       };
-      const actionsRegistry = ActionsRegistry.getInstance(actionsConfig);
+      const actionsRegistry = BlinksRegistry.getInstance(actionsConfig);
       const input = new URL('https://malicious.com/some-path');
 
       // act
@@ -148,7 +148,7 @@ describe('ActionsRegistry', () => {
 
     test('should return null for an invalid URL string', () => {
       // arrange
-      const actionsConfig: ActionsRegistryConfig = {
+      const actionsConfig: BlinksRegistryConfig = {
         actions: [],
         websites: [
           { host: 'trusted.com', state: 'trusted' },
@@ -156,7 +156,7 @@ describe('ActionsRegistry', () => {
         ],
         interstitials: [],
       };
-      const actionsRegistry = ActionsRegistry.getInstance(actionsConfig);
+      const actionsRegistry = BlinksRegistry.getInstance(actionsConfig);
       const input = 'not-a-valid-url';
 
       // act
@@ -170,7 +170,7 @@ describe('ActionsRegistry', () => {
   describe('interstitials lookup', () => {
     test('should return the correct RegisteredEntity for a known host', () => {
       // arrange
-      const actionsConfig: ActionsRegistryConfig = {
+      const actionsConfig: BlinksRegistryConfig = {
         actions: [],
         websites: [],
         interstitials: [
@@ -178,7 +178,7 @@ describe('ActionsRegistry', () => {
           { host: 'malicious.com', state: 'malicious' },
         ],
       };
-      const actionsRegistry = ActionsRegistry.getInstance(actionsConfig);
+      const actionsRegistry = BlinksRegistry.getInstance(actionsConfig);
       const input = 'https://trusted.com/some-path';
 
       // act
@@ -190,7 +190,7 @@ describe('ActionsRegistry', () => {
 
     test('should return null for an unknown host', () => {
       // arrange
-      const actionsConfig: ActionsRegistryConfig = {
+      const actionsConfig: BlinksRegistryConfig = {
         actions: [],
         websites: [],
         interstitials: [
@@ -198,7 +198,7 @@ describe('ActionsRegistry', () => {
           { host: 'malicious.com', state: 'malicious' },
         ],
       };
-      const actionsRegistry = ActionsRegistry.getInstance(actionsConfig);
+      const actionsRegistry = BlinksRegistry.getInstance(actionsConfig);
       const input = 'https://unknown.com/some-path';
 
       // act
@@ -210,7 +210,7 @@ describe('ActionsRegistry', () => {
 
     test('should correctly handle URL objects', () => {
       // arrange
-      const actionsConfig: ActionsRegistryConfig = {
+      const actionsConfig: BlinksRegistryConfig = {
         actions: [],
         websites: [],
         interstitials: [
@@ -218,7 +218,7 @@ describe('ActionsRegistry', () => {
           { host: 'malicious.com', state: 'malicious' },
         ],
       };
-      const actionsRegistry = ActionsRegistry.getInstance(actionsConfig);
+      const actionsRegistry = BlinksRegistry.getInstance(actionsConfig);
       const input = new URL('https://malicious.com/some-path');
 
       // act
@@ -230,7 +230,7 @@ describe('ActionsRegistry', () => {
 
     test('should return null for an invalid URL string', () => {
       // arrange
-      const actionsConfig: ActionsRegistryConfig = {
+      const actionsConfig: BlinksRegistryConfig = {
         actions: [],
         websites: [],
         interstitials: [
@@ -238,7 +238,7 @@ describe('ActionsRegistry', () => {
           { host: 'malicious.com', state: 'malicious' },
         ],
       };
-      const actionsRegistry = ActionsRegistry.getInstance(actionsConfig);
+      const actionsRegistry = BlinksRegistry.getInstance(actionsConfig);
       const input = 'not-a-valid-url';
 
       // act

@@ -20,21 +20,21 @@ export const useBaseLayoutPropNormalizer = ({
   executeFn,
   executionStatus,
   executingAction,
-  action,
+  blink,
   caption,
   ...props
 }: BaseBlinkLayoutProps): InnerLayoutProps => {
   const buttons = useMemo(
     () =>
-      action?.actions
+      blink?.actions
         .filter((it) => it instanceof ButtonActionComponent)
         .filter((it) => (executingAction ? executingAction === it : true))
         .toSpliced(SOFT_LIMIT_BUTTONS) ?? [],
-    [action, executingAction],
+    [blink, executingAction],
   );
   const inputs = useMemo(
     () =>
-      action?.actions
+      blink?.actions
         .filter(
           (it) =>
             it instanceof SingleValueActionComponent ||
@@ -42,17 +42,17 @@ export const useBaseLayoutPropNormalizer = ({
         )
         .filter((it) => (executingAction ? executingAction === it : true))
         .toSpliced(SOFT_LIMIT_INPUTS) ?? [],
-    [action, executingAction],
+    [blink, executingAction],
   );
   const form = useMemo(() => {
     const [formComponent] =
-      action?.actions
+      blink?.actions
         .filter((it) => it instanceof FormActionComponent)
         .filter((it) => (executingAction ? executingAction === it : true)) ??
       [];
 
     return formComponent;
-  }, [action, executingAction]);
+  }, [blink, executingAction]);
 
   const asButtonProps = (it: ButtonActionComponent) => {
     return {
@@ -61,12 +61,12 @@ export const useBaseLayoutPropNormalizer = ({
         executionStatus === 'executing' &&
         (it === executingAction || it.parentComponent === executingAction),
       disabled:
-        action.disabled ||
-        action.type === 'completed' ||
+        blink.disabled ||
+        blink.type === 'completed' ||
         executionStatus !== 'idle',
       variant:
         buttonVariantMap[
-          action.type === 'completed' ? 'success' : executionStatus
+          blink.type === 'completed' ? 'success' : executionStatus
         ],
       ctaType:
         (it.type === 'external-link' || it.type === 'inline-link') &&
@@ -108,8 +108,8 @@ export const useBaseLayoutPropNormalizer = ({
       type: it.parameter.type ?? 'text',
       placeholder: it.parameter.label,
       disabled:
-        action.disabled ||
-        action.type === 'completed' ||
+        blink.disabled ||
+        blink.type === 'completed' ||
         executionStatus !== 'idle',
       name: it.parameter.name,
       required: it.parameter.required,
@@ -170,13 +170,17 @@ export const useBaseLayoutPropNormalizer = ({
 
   return {
     ...props,
-    title: action.title,
-    description: action.description,
-    image: action.icon,
+    title: blink.title,
+    description: blink.description,
+    image: blink.icon,
     buttons: buttons.map(asButtonProps),
     inputs: inputs.map((i) => asInputProps(i)),
     form: form ? asFormProps(form) : undefined,
-    websiteText: props.websiteText ?? props.websiteUrl ?? action.url,
+    websiteText:
+      (props.websiteText === false ? '' : props.websiteText) ??
+      props.websiteUrl ??
+      blink.url,
+    shouldShowWebsiteLink: props.websiteText !== false,
     ...normalizedCaption,
   };
 };

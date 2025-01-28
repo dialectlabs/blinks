@@ -55,13 +55,13 @@ export const ActionRadioGroup = ({
 
   return (
     <div
-      className={clsx('py-1.5', {
+      className={clsx('blink-input blink-input-radio-group py-1.5', {
         'bg-bg-secondary rounded-input px-1.5 pt-2': isStandalone,
       })}
     >
       <div className={clsx(isStandalone && 'px-2')}>
         {label && (
-          <div className="mb-1">
+          <div className="blink-input-label mb-1">
             <label className="text-subtext text-text-input block font-semibold">
               {label}
               {required ? '*' : ''}
@@ -103,7 +103,7 @@ export const ActionRadioGroup = ({
       {description && (
         <span
           className={clsx(
-            'text-caption font-medium',
+            'blink-input-description text-caption font-medium',
             touched && !isValid ? 'text-text-error' : 'text-text-secondary',
             isStandalone ? 'mb-2 mt-2.5' : 'mt-3',
           )}

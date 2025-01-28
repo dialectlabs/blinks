@@ -11,7 +11,7 @@ export type ActionsJsonConfig = {
   rules: Action[];
 };
 
-export class ActionsURLMapper {
+export class BlinksURLMapper {
   private config: ActionsJsonConfig;
 
   constructor(config: ActionsJsonConfig) {
@@ -85,7 +85,7 @@ export class ActionsURLMapper {
   }
 }
 
-export async function unfurlUrlToActionApiUrl(
+export async function unfurlUrlToBlinkApiUrl(
   actionUrl: URL | string,
 ): Promise<string | null> {
   const url = new URL(actionUrl);
@@ -111,7 +111,12 @@ export async function unfurlUrlToActionApiUrl(
     },
   }).then((res) => res.json() as Promise<ActionsJsonConfig>);
 
-  const actionsUrlMapper = new ActionsURLMapper(actionsJson);
+  const actionsUrlMapper = new BlinksURLMapper(actionsJson);
 
   return actionsUrlMapper.mapUrl(url);
 }
+
+export {
+  BlinksURLMapper as ActionsURLMapper,
+  unfurlUrlToBlinkApiUrl as unfurlUrlToActionApiUrl,
+};

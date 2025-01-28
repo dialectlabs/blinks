@@ -33,6 +33,7 @@ export const ActionButton = ({
       disabled={disabled}
       variant={variant}
       ctaType={ctaType}
+      className="blink-action-button"
     >
       <span className="min-w-0 truncate">
         <ButtonContent />
