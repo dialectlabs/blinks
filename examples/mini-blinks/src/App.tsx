@@ -14,7 +14,7 @@ function App() {
   const { adapter } = useBlinkSolanaWalletAdapter(
     import.meta.env.VITE_PUBLIC_RPC_URL,
   );
-  const { action, isLoading } = useBlink({
+  const { blink, isLoading } = useBlink({
     url: 'solana-action:https://dial.to/api/donate',
   });
 
@@ -23,7 +23,7 @@ function App() {
       <div className="flex min-w-[400px] flex-col items-center">
         <h1 className="mb-4 text-center text-4xl font-bold">Mini Blinks</h1>
         <div className="mb-4 w-full">
-          {isLoading || !action ? (
+          {isLoading || !blink ? (
             <span>Loading</span>
           ) : (
             <Miniblink
@@ -31,7 +31,7 @@ function App() {
               selector={(currentAction) =>
                 currentAction.actions.find((a) => a.label === 'Donate')!
               }
-              blink={action}
+              blink={blink}
             />
           )}
         </div>
