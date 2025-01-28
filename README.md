@@ -102,33 +102,28 @@ Package provides an entrypoint function with styled for X Blink components
 
 ```ts
 // contentScript.ts
-import {setupTwitterObserver} from "@dialectlabs/blinks/ext/twitter";
-import {BlinkSolanaConfig} from "@dialectlabs/blinks";
+import { setupTwitterObserver } from "@dialectlabs/blinks/ext/twitter";
+import { BlinkSolanaConfig } from "@dialectlabs/blinks";
 
 // your RPC_URL is used to create a connection to confirm the transaction after action execution
 setupTwitterObserver(new BlinkSolanaConfig(RPC_URL, {
   metadata: {
     supportedBlockchainIds: [BlockchainIds.SOLANA_MAINNET]
   },
-  connect: async () => { ...
-  },
-  signTransaction: async (tx: string) => { ...
-  }
+  connect: async () => { ... },
+  signTransaction: async (tx: string) => { ... }
 }))
 
 // or
 
-import type {BlinkAdapter, BlinkAdapterMetadata} from "@dialectlabs/blinks";
+import type { BlinkAdapter, BlinkAdapterMetadata } from "@dialectlabs/blinks";
 
 class MyBlinkAdapter implements BlinkAdapter {
-  async connect() { ...
-  }
+  async connect() { ... }
 
-  async signTransaction(tx: string) { ...
-  }
+  async signTransaction(tx: string) { ... }
 
-  async confirmTransaction(sig: string) { ...
-  }
+  async confirmTransaction(sig: string) { ... }
 
   get metadata(): BlinkAdapterMetadata {
     return {
@@ -136,8 +131,7 @@ class MyBlinkAdapter implements BlinkAdapter {
     };
   }
 
-  async signMessage(data: string | SignMessageData) { ...
-  }
+  async signMessage(data: string | SignMessageData) { ... }
 }
 
 setupTwitterObserver(new MyBlinkAdapter());
