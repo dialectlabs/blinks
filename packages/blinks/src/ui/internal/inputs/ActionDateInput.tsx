@@ -73,6 +73,7 @@ export const ActionDateInput = ({
 
   return (
     <BaseInputContainer
+      className="blink-input-date"
       standalone={isStandalone}
       description={
         description ??

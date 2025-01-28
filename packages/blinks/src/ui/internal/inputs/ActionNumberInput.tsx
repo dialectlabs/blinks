@@ -58,6 +58,7 @@ export const ActionNumberInput = ({
 
   return (
     <BaseInputContainer
+      className="blink-input-number"
       standalone={isStandalone}
       description={
         description ??

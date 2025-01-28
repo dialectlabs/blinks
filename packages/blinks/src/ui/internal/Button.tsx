@@ -8,11 +8,13 @@ export const Button = ({
   variant = 'default',
   children,
   ctaType = 'button',
+  className,
 }: {
   onClick: () => void;
   disabled?: boolean;
   variant?: 'success' | 'error' | 'default';
   ctaType?: 'button' | 'link';
+  className?: string;
 } & PropsWithChildren) => {
   const isLink = ctaType === 'link';
   return (
@@ -27,6 +29,7 @@ export const Button = ({
             !disabled && variant !== 'success',
           'bg-button-success text-text-button-success': variant === 'success', // success is likely to be always disabled
         },
+        className,
       )}
       disabled={disabled}
       onClick={onClick}

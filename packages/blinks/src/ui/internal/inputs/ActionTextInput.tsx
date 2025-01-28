@@ -58,6 +58,7 @@ export const ActionTextInput = ({
 
   return (
     <BaseInputContainer
+      className="blink-input-text"
       standalone={isStandalone}
       description={
         description ??

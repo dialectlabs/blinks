@@ -93,7 +93,7 @@ const NotSupportedBlock = ({
   className?: string;
 }) => {
   return (
-    <div className={className}>
+    <div className={clsx('blink-not-supported-block', className)}>
       <div
         className={clsx(
           'bg-bg-secondary text-subtext text-text-secondary rounded-xl border border-none p-3',
@@ -210,7 +210,7 @@ export const BaseBlinkLayout = ({
         {image && (
           <Linkable
             url={websiteUrl}
-            className="px-padding pt-padding block max-h-[100cqw] overflow-y-hidden"
+            className="blink-image px-padding pt-padding block max-h-[100cqw] overflow-y-hidden"
           >
             <img
               className={clsx(
@@ -228,7 +228,7 @@ export const BaseBlinkLayout = ({
                 <a
                   href={websiteUrl}
                   target="_blank"
-                  className="text-subtext group flex min-w-0 items-center gap-2 hover:cursor-pointer"
+                  className="blink-provider-url text-subtext group flex min-w-0 items-center gap-2 hover:cursor-pointer"
                   rel="noopener noreferrer"
                 >
                   <LinkIcon className="text-icon-primary group-hover:text-icon-primary-hover h-4 min-w-4 transition-colors motion-reduce:transition-none" />
@@ -238,7 +238,7 @@ export const BaseBlinkLayout = ({
                 </a>
               )}
               {websiteText && !websiteUrl && (
-                <span className="text-subtext text-text-link min-w-0 truncate">
+                <span className="blink-provider-url text-subtext text-text-link min-w-0 truncate">
                   {websiteText}
                 </span>
               )}
@@ -246,7 +246,7 @@ export const BaseBlinkLayout = ({
                 href="https://docs.dialect.to/documentation/actions/security"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mb-0.5 flex items-center"
+                className="blink-security-badge mb-0.5 flex items-center"
               >
                 {securityState === 'malicious' && (
                   <Badge
@@ -271,10 +271,10 @@ export const BaseBlinkLayout = ({
               </a>
             </div>
           ) : null}
-          <span className="text-text text-text-primary mb-1 mt-1.5 break-words font-semibold">
+          <span className="blink-title text-text text-text-primary mb-1 mt-1.5 break-words font-semibold">
             {title}
           </span>
-          <span className="text-subtext text-text-secondary mb-gap break-words">
+          <span className="blink-description text-subtext text-text-secondary mb-gap break-words">
             {description && <SimpleMarkdown text={description} />}
           </span>
           {!supportability.isSupported ? (
@@ -283,7 +283,7 @@ export const BaseBlinkLayout = ({
             <>
               {disclaimer && (
                 <DisclaimerBlock
-                  className="mb-gap"
+                  className="blink-disclaimer-block mb-gap"
                   type={disclaimer.type}
                   ignorable={disclaimer.ignorable}
                   hidden={
@@ -305,23 +305,23 @@ export const BaseBlinkLayout = ({
                 buttons={buttons}
               />
               {success && (
-                <span className="text-subtext text-text-success mt-between-inputs break-words text-center">
+                <span className="blink-message-success text-subtext text-text-success mt-between-inputs break-words text-center">
                   {success}
                 </span>
               )}
               {error && !success && (
-                <span className="text-subtext text-text-error mt-between-inputs break-words text-center">
+                <span className="blink-message-error text-subtext text-text-error mt-between-inputs break-words text-center">
                   {error}
                 </span>
               )}
               {message && !success && !error && (
-                <span className="text-subtext text-text-secondary mt-between-inputs break-words text-center">
+                <span className="blink-message-default text-subtext text-text-secondary mt-between-inputs break-words text-center">
                   {message}
                 </span>
               )}
             </>
           )}
-          <div className="mt-4 flex justify-center">
+          <div className="blink-powered-by mt-4 flex justify-center">
             <a
               href="https://dialect.to"
               target="_blank"
