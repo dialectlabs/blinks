@@ -3,7 +3,7 @@ import { BLINK_CLIENT_KEY_HEADER, clientKey } from '../utils/client-key.ts';
 import type { BlinkPreview } from './types.ts';
 
 export type BlinkPreviewResponse = BlinkPreview & {
-  links?: {
+  links: {
     blink: string;
     dataTable?: string;
   };
