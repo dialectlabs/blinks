@@ -22,6 +22,11 @@
       "require": "./dist/service-api/index.cjs",
       "types": "./dist/service-api/index.d.ts"
     },
+    "./solana": {
+      "import": "./dist/solana/index.js",
+      "require": "./dist/solana/index.cjs",
+      "types": "./dist/solana/index.d.ts"
+    },
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
@@ -56,7 +61,7 @@
     "@solana/web3.js": "^1.95.3"
   },
   "dependencies": {
-    "nanoid": "^5.0.7"
+    "nanoid": "^5.0.9"
   },
   "peerDependenciesMeta": {
     "@solana/web3.js": {

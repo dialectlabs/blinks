@@ -1,10 +1,10 @@
 'use client';
 import {
-  BlinkSolanaConfig,
   createSignMessageText,
   type SignMessageVerificationOptions,
   verifySignMessageData,
 } from '@dialectlabs/blinks-core';
+import { BlinkSolanaConfig } from '@dialectlabs/blinks-core/solana';
 
 import type { SignMessageData } from '@solana/actions-spec';
 import { useWallet } from '@solana/wallet-adapter-react';

@@ -1,11 +1,11 @@
 import { Connection } from '@solana/web3.js';
-import type { SignMessageData } from './actions-spec.ts';
 import type {
   BlinkAdapter,
   BlinkAdapterMetadata,
   BlinkExecutionContext,
-} from './BlinkAdapter.ts';
-import { DEFAULT_SUPPORTED_BLOCKCHAIN_IDS } from './BlinkInstance';
+  SignMessageData,
+} from '../api';
+import { DEFAULT_SUPPORTED_BLOCKCHAIN_IDS } from '../api';
 
 export interface IncomingBlinkConfig {
   rpcUrl: string;
