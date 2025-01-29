@@ -16,7 +16,7 @@ import {
   type SecurityLevel,
 } from '@dialectlabs/blinks-core';
 import { createRoot } from 'react-dom/client';
-import { Blink, type StylePreset } from '../ui';
+import { BlinkComponent, type StylePreset } from '../ui';
 
 type ObserverSecurityLevel = SecurityLevel;
 
@@ -245,7 +245,7 @@ function createBlink({
 
   blinkRoot.render(
     <div onClick={(e) => e.stopPropagation()}>
-      <Blink
+      <BlinkComponent
         adapter={config}
         stylePreset={resolveXStylePreset()}
         blink={blink}

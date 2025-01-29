@@ -14,7 +14,7 @@ export interface BlinkProps
   stylePreset?: StylePreset;
 }
 
-export const Blink = ({
+export const BlinkComponent = ({
   _Layout: Layout = NormalizedBaseBlinkLayout,
   stylePreset,
   ...props
@@ -42,3 +42,6 @@ export const NormalizedBaseBlinkLayout = (
 
   return <BaseBlinkLayout {...normalizedProps} />;
 };
+
+// backwards compatibility
+export { BlinkComponent as Blink };
