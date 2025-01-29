@@ -10,7 +10,6 @@ import { useBlinksRegistryInterval } from './useBlinksRegistryInterval.ts';
 
 interface UseBlinkOptions {
   url: string | URL;
-  securityRegistryRefreshInterval?: number;
   supportStrategy?: BlinkSupportStrategy;
 }
 
@@ -23,6 +22,8 @@ export function useBlink({
   url,
   supportStrategy = defaultBlinkSupportStrategy,
 }: UseBlinkOptions) {
+  const { isRegistryLoaded } = useBlinksRegistryInterval();
+
   const {
     blink: blinkJson,
     isLoading,
@@ -33,7 +34,7 @@ export function useBlink({
 
   const blink = useMemo(
     () =>
-      blinkApiUrl && blinkJson && metadata
+      isRegistryLoaded && blinkApiUrl && blinkJson && metadata
         ? BlinkInstance.hydrate(
             blinkApiUrl,
             blinkJson,
@@ -41,7 +42,7 @@ export function useBlink({
             supportStrategy,
           )
         : null,
-    [blinkApiUrl, blinkJson, metadata, supportStrategy],
+    [blinkApiUrl, blinkJson, metadata, supportStrategy, isRegistryLoaded],
   );
 
   return {
@@ -49,7 +50,7 @@ export function useBlink({
     blinkJson,
     metadata,
     blinkApiUrl,
-    isLoading,
+    isLoading: isLoading || !isRegistryLoaded,
     refresh,
   };
 }
