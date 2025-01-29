@@ -3,7 +3,7 @@ import {
   BlinkContainer,
 } from '@dialectlabs/blinks-core';
 import { useCallback } from 'react';
-import type { BlinkProps } from './Blink.tsx';
+import type { BlinkProps } from './BlinkComponent.tsx';
 import { useBaseLayoutPropNormalizer } from './hooks';
 import { ActionsOnlyBlinkLayout } from './layouts/ActionsOnlyBlinkLayout.tsx';
 import type { StylePreset } from './types.ts';

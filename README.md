@@ -20,7 +20,7 @@ npm add @dialectlabs/blinks viem wagmi
 
 #### Style Presets
 
-`Blink` component contains a `stylePreset` prop that accepts the following values:
+`BlinkComponent` component contains a `stylePreset` prop that accepts the following values:
 
 - `default` - [dial.to](https://dial.to)-styled blink (light)
 - `x-dark` - [X](https://x.com/)-styled blink (dark)
@@ -29,9 +29,9 @@ npm add @dialectlabs/blinks viem wagmi
 
 ```tsx
 import '@dialectlabs/blinks/index.css';
-import { Blink } from "@dialectlabs/blinks";
+import { BlinkComponent } from "@dialectlabs/blinks";
 
-<Blink stylePreset="x-dark" ... />
+<BlinkComponent stylePreset="x-dark" ... />
 ```
 
 #### Overriding Theme
