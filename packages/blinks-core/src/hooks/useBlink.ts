@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   BlinkInstance,
   defaultBlinkSupportStrategy,
   type BlinkSupportStrategy,
 } from '../api';
+import { useBlink as useApiBlink } from '../service-api';
 import { useBlinkApiUrl } from './useBlinkApiUrl.ts';
 import { useBlinksRegistryInterval } from './useBlinksRegistryInterval.ts';
 
@@ -14,9 +15,50 @@ interface UseBlinkOptions {
 }
 
 /**
- * NOTE: returned `action` property will be removed in the nearest future in favor of `blink`
+ * Newer version of `useAction` hook, that returns a `BlinkInstance` and uses Dialect API
+ * @param url - blink url (api url, interstitial or to-be-mapped from actions.json
+ * @param supportStrategy {BlinkSupportStrategy} - support strategy function
  */
 export function useBlink({
+  url,
+  supportStrategy = defaultBlinkSupportStrategy,
+}: UseBlinkOptions) {
+  const {
+    blink: blinkJson,
+    isLoading,
+    metadata,
+    refresh,
+    blinkApiUrl,
+  } = useApiBlink({ url: url.toString() });
+
+  const blink = useMemo(
+    () =>
+      blinkApiUrl && blinkJson && metadata
+        ? BlinkInstance.hydrate(
+            blinkApiUrl,
+            blinkJson,
+            metadata,
+            supportStrategy,
+          )
+        : null,
+    [blinkApiUrl, blinkJson, metadata, supportStrategy],
+  );
+
+  return {
+    blink,
+    blinkJson,
+    metadata,
+    blinkApiUrl,
+    isLoading,
+    refresh,
+  };
+}
+
+/**
+ * NOTE: returned `action` property will be removed in the nearest future in favor of `blink`
+ * left for backwards compatibility
+ */
+export function useAction({
   url,
   supportStrategy = defaultBlinkSupportStrategy,
 }: UseBlinkOptions) {
@@ -97,6 +139,3 @@ export function useBlink({
     refresh: fetchAction,
   };
 }
-
-// backwards compatibility
-export { useBlink as useAction };
