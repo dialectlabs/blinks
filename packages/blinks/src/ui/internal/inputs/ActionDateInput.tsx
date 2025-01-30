@@ -59,7 +59,7 @@ export const ActionDateInput = ({
   );
 
   const placeholderWithRequired =
-    (placeholder || 'Enter a date') + (required ? '*' : '');
+    (placeholder || 'Enter a date') + (required && !isStandalone ? '*' : '');
 
   const validationProps = useMemo(
     () => ({

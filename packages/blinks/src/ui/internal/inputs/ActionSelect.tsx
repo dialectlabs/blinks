@@ -20,7 +20,7 @@ export const ActionSelect = ({
   const isStandalone = !!button;
   const placeholderValueId = useId();
   const placeholderWithRequired =
-    (placeholder || 'Select...') + (required ? '*' : '');
+    (placeholder || 'Select...') + (required && !isStandalone ? '*' : '');
 
   const initiallySelectedOption = useMemo(
     () => options.find((option) => option.selected),

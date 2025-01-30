@@ -43,7 +43,7 @@ export const ActionTextArea = ({
   };
 
   const placeholderWithRequired =
-    (placeholder || 'Type here...') + (required ? '*' : '');
+    (placeholder || 'Type here...') + (required && !isStandalone ? '*' : '');
 
   const validationProps = useMemo(
     () => ({

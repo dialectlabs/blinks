@@ -46,7 +46,8 @@ export const ActionEmailInput = ({
   };
 
   const placeholderWithRequired =
-    (placeholder || 'hello@example.com') + (required ? '*' : '');
+    (placeholder || 'hello@example.com') +
+    (required && !isStandalone ? '*' : '');
 
   const validationProps = useMemo(
     () => ({

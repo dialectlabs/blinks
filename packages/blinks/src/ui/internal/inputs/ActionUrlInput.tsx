@@ -46,7 +46,7 @@ export const ActionUrlInput = ({
   };
 
   const placeholderWithRequired =
-    (placeholder || 'https://') + (required ? '*' : '');
+    (placeholder || 'https://') + (required && !isStandalone ? '*' : '');
 
   const validationProps = useMemo(
     () => ({

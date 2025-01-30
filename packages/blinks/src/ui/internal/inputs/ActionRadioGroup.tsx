@@ -64,7 +64,7 @@ export const ActionRadioGroup = ({
           <div className="blink-input-label mb-1">
             <label className="text-subtext text-text-input block font-semibold">
               {label}
-              {required ? '*' : ''}
+              {required && !isStandalone ? '*' : ''}
             </label>
           </div>
         )}
