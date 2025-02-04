@@ -76,7 +76,7 @@ function getProxifiedHeaders(): Record<string, string> {
 }
 
 // completely disable proxy
-function shouldIgnoreProxy(url: URL): boolean {
+export function shouldIgnoreProxy(url: URL): boolean {
   return url.hostname === 'localhost' || url.hostname === '127.0.0.1';
 }
 

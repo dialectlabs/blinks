@@ -3,6 +3,7 @@ import type { LinkedAction, TypedAction } from '../api';
 import { useBlinkApiUrl } from '../hooks';
 import { type Supportability, getBlinkSupportabilityMetadata } from '../utils';
 import { BLINK_CLIENT_KEY_HEADER, clientKey } from '../utils/client-key.ts';
+import { shouldIgnoreProxy } from '../utils/proxify.ts';
 import type { BlinkContext, BlinkPreview } from './types.ts';
 
 export type Blink = TypedAction & {
@@ -84,8 +85,15 @@ export const fetchBlink = async (
   apiUrl: string,
   options: { abortController?: AbortController } = {},
 ): Promise<{ blink: Blink; metadata: Supportability }> => {
-  const url = new URL(`https://api.dial.to/v1/blink`);
-  url.searchParams.append('apiUrl', apiUrl);
+  let url: URL;
+
+  // if the URL is a local one, we don't use the service
+  if (shouldIgnoreProxy(new URL(apiUrl))) {
+    url = new URL(apiUrl);
+  } else {
+    url = new URL(`https://api.dial.to/v1/blink`);
+    url.searchParams.append('apiUrl', apiUrl);
+  }
 
   const response = await fetch(url, {
     method: 'GET',

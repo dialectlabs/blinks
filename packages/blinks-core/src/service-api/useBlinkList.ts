@@ -18,6 +18,8 @@ export type BlinkListEntry = BlinkPreview & {
 
 /**
  * Slightly modified version of the useBlinkList hook, which used Dialect API to fetch the blink list.
+ *
+ * NOTE: not intended to be used with local urls (e.g. `localhost`)
  */
 export const useBlinkList = ({
   id,
