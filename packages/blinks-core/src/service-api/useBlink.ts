@@ -3,7 +3,7 @@ import type { LinkedAction, TypedAction } from '../api';
 import { useBlinkApiUrl } from '../hooks';
 import { type Supportability, getBlinkSupportabilityMetadata } from '../utils';
 import { BLINK_CLIENT_KEY_HEADER, clientKey } from '../utils/client-key.ts';
-import { shouldIgnoreProxy } from '../utils/proxify.ts';
+import { shouldIgnoreProxy, shouldPreserveOriginal } from '../utils/proxify.ts';
 import type { BlinkContext, BlinkPreview } from './types.ts';
 
 export type Blink = TypedAction & {
@@ -26,6 +26,7 @@ export const useBlink = ({ url }: { url?: string | null }) => {
   const [blinkData, setBlinkData] = useState<{
     blink: Blink;
     metadata: Supportability;
+    url: string; // url used to fetch the blink, likely to be different from the original and the blinkApiUrl
   } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -73,7 +74,8 @@ export const useBlink = ({ url }: { url?: string | null }) => {
   return {
     // raw blink data
     blink: blinkData?.blink ?? null,
-    blinkApiUrl: blinkApiUrl ?? null,
+    blinkApiUrl: blinkData?.url ?? null,
+    originalBlinkApiUrl: blinkApiUrl,
     // blink metadata, such as blockchain and solana actions version (if specified in blink response)
     metadata: blinkData?.metadata ?? null,
     isLoading: isLoading || isUrlLoading,
@@ -84,11 +86,14 @@ export const useBlink = ({ url }: { url?: string | null }) => {
 export const fetchBlink = async (
   apiUrl: string,
   options: { abortController?: AbortController } = {},
-): Promise<{ blink: Blink; metadata: Supportability }> => {
+): Promise<{ blink: Blink; metadata: Supportability; url: string }> => {
   let url: URL;
 
   // if the URL is a local one, we don't use the service
-  if (shouldIgnoreProxy(new URL(apiUrl))) {
+  if (
+    shouldIgnoreProxy(new URL(apiUrl)) ||
+    shouldPreserveOriginal(new URL(apiUrl))
+  ) {
     url = new URL(apiUrl);
   } else {
     url = new URL(`https://api.dial.to/v1/blink`);
@@ -111,5 +116,5 @@ export const fetchBlink = async (
   const blink = await response.json();
   const metadata = getBlinkSupportabilityMetadata(response);
 
-  return { blink, metadata };
+  return { blink, metadata, url: url.toString() };
 };

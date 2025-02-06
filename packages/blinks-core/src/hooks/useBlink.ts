@@ -30,6 +30,7 @@ export function useBlink({
     metadata,
     refresh,
     blinkApiUrl,
+    originalBlinkApiUrl,
   } = useApiBlink({ url: url.toString() });
 
   const blink = useMemo(
@@ -50,6 +51,7 @@ export function useBlink({
     blinkJson,
     metadata,
     blinkApiUrl,
+    originalBlinkApiUrl,
     isLoading: isLoading || !isRegistryLoaded,
     refresh,
   };
