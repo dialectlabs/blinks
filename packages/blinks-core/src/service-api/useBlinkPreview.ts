@@ -9,6 +9,11 @@ export type BlinkPreviewResponse = BlinkPreview & {
   };
 };
 
+/**
+ * Hook to fetch blink preview - a lightweight version of the blink and not actionable, only for visual representation.
+ *
+ * NOTE: not intended to be used with local urls (e.g. `localhost`)
+ */
 export const useBlinkPreview = ({
   blinkApiUrl,
 }: {

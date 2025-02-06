@@ -21,6 +21,8 @@ export interface BlinkDataTable {
 
 /**
  * This is a new version of the useMetadata hook, which uses Dialect's API to fetch updated models
+ *
+ * NOTE: not intended to be used with local urls (e.g. `localhost`)
  */
 export const useBlinkDataTable = ({
   blinkApiUrl,

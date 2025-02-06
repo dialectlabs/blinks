@@ -76,11 +76,11 @@ function getProxifiedHeaders(): Record<string, string> {
 }
 
 // completely disable proxy
-function shouldIgnoreProxy(url: URL): boolean {
+export function shouldIgnoreProxy(url: URL): boolean {
   return url.hostname === 'localhost' || url.hostname === '127.0.0.1';
 }
 
 // preserve headers but since the request is already going to a dial.to service, we don't need to wrap it with a proxy
-function shouldPreserveOriginal(url: URL): boolean {
+export function shouldPreserveOriginal(url: URL): boolean {
   return url.hostname === 'api.dial.to';
 }
