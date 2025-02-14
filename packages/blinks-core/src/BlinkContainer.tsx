@@ -481,10 +481,7 @@ export const BlinkContainer = ({
           data: {
             externalLink: component.href,
           },
-          onNext: () =>
-            dispatch({
-              type: ExecutionType.FINISH,
-            }),
+          onNext: () => {},
           onCancel: () => {},
         };
       }
