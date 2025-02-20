@@ -603,7 +603,10 @@ export const BlinkContainer = ({
         );
 
         if (!signResult || isSignTransactionError(signResult)) {
-          dispatch({ type: ExecutionType.RESET });
+          dispatch({
+            type: ExecutionType.SOFT_RESET,
+            errorMessage: signResult.error ?? 'Unable to sign transaction',
+          });
           callbacks.onActionCancel?.(
             blink,
             component,

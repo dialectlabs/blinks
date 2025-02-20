@@ -3,7 +3,12 @@ import type { SignMessageData } from '@solana/actions-spec';
 import { useMemo } from 'react';
 import { deserialize, useAccount, useChains, useConnectorClient } from 'wagmi';
 
-import type { ByteArray, Hex, SignableMessage } from 'viem';
+import {
+  TransactionExecutionError,
+  type ByteArray,
+  type Hex,
+  type SignableMessage,
+} from 'viem';
 import {
   sendTransaction,
   signMessage,
@@ -79,7 +84,10 @@ export function useEvmWagmiAdapter({
             return { signature: hash };
           } catch (e) {
             console.error('Blink wagmi adapter sign transaction failed:', e);
-            return { error: 'Signing failed.' };
+            if (e instanceof TransactionExecutionError) {
+              return { error: `Unable to sign: ${e.shortMessage}` };
+            }
+            return { error: 'Signing failed' };
           }
         },
         signMessage: async (
