@@ -138,7 +138,11 @@ export class BlinkInstance {
   }
 
   public get icon() {
-    if (this._data.icon.startsWith('data:') || isProxified(this._data.icon)) {
+    if (
+      this._data.icon.startsWith('data:') ||
+      isProxified(this._data.icon) ||
+      !this._data.icon
+    ) {
       return this._data.icon;
     }
     return proxifyImage(this._data.icon).url.toString();
