@@ -75,6 +75,12 @@ export class BlinkSolanaConfig implements BlinkAdapter {
             '[@dialectlabs/blinks-core] Error confirming transaction',
             e,
           );
+          rej(
+            new Error(
+              'Error confirming transaction. Please check your RPC connection and transaction status',
+            ),
+          );
+          return;
         }
 
         setTimeout(confirm, 3000);
