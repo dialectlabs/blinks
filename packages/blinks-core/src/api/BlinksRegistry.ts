@@ -99,6 +99,12 @@ export class BlinksRegistry {
   private lookupBlink(url: string | URL): RegisteredEntity | null {
     try {
       const urlObj = new URL(url);
+      if (urlObj.protocol !== 'https:') {
+        console.error(
+          `[@dialectlabs/blinks] URL protocol must be https: ${url}`,
+        );
+        return null;
+      }
       const host = urlObj.host;
       return this.blinksByHost[host] ?? null;
     } catch (e) {
@@ -113,6 +119,12 @@ export class BlinksRegistry {
   private lookupWebsite(url: string | URL): RegisteredEntity | null {
     try {
       const urlObj = new URL(url);
+      if (urlObj.protocol !== 'https:') {
+        console.error(
+          `[@dialectlabs/blinks] URL protocol must be https: ${url}`,
+        );
+        return null;
+      }
       const host = urlObj.host;
       return this.websitesByHost[host] ?? null;
     } catch (e) {
@@ -127,6 +139,12 @@ export class BlinksRegistry {
   private lookupInterstitial(url: string | URL): RegisteredEntity | null {
     try {
       const urlObj = new URL(url);
+      if (urlObj.protocol !== 'https:') {
+        console.error(
+          `[@dialectlabs/blinks] URL protocol must be https: ${url}`,
+        );
+        return null;
+      }
       const host = urlObj.host;
       return this.interstitialsByHost[host] ?? null;
     } catch (e) {
