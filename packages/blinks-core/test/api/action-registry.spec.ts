@@ -165,6 +165,18 @@ describe('BlinksRegistry', () => {
       // assert
       expect(result).toBeNull();
     });
+    
+    test('should validate underlying URL when apiUrl param is used', () => {
+      const config: BlinksRegistryConfig = {
+        actions: [{ host: 'example.com', state: 'trusted' }],
+        websites: [],
+        interstitials: [],
+      };
+      const registry = BlinksRegistry.getInstance(config);
+      const proxied = 'https://api.dial.to/v1/blink?apiUrl=https://example.com/path';
+      const result = registry.lookup(proxied);
+      expect(result).toEqual({ host: 'example.com', state: 'trusted' });
+    });
   });
 
   describe('interstitials lookup', () => {

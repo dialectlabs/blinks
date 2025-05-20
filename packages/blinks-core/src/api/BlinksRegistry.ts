@@ -81,6 +81,17 @@ export class BlinksRegistry {
     url: string | URL,
     type: LookupType = 'action',
   ): RegisteredEntity | null {
+    // If apiUrl param is present, lookup the underlying URL
+    try {
+      const probe = new URL(url.toString());
+      const apiUrlParam = probe.searchParams.get('apiUrl');
+      if (apiUrlParam) {
+        return this.lookup(apiUrlParam, type);
+      }
+    } catch {
+      // ignore malformed URL
+    }
+
     if (type === 'action' || type === 'blink') {
       return this.lookupBlink(url);
     }
