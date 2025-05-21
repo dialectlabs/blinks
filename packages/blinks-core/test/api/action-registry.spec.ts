@@ -21,10 +21,10 @@ describe('BlinksRegistry', () => {
       const result = actionsRegistry.lookup(input);
 
       // assert
-      expect(result).toEqual({ host: 'trusted.com', state: 'trusted' });
+      expect(result).toEqual({ state: 'trusted' });
     });
 
-    test('should return null for an unknown host', () => {
+    test('should return unknown for an unknown host', () => {
       // arrange
       const actionsConfig: BlinksRegistryConfig = {
         actions: [
@@ -41,7 +41,7 @@ describe('BlinksRegistry', () => {
       const result = actionsRegistry.lookup(input);
 
       // assert
-      expect(result).toBeNull();
+      expect(result).toEqual({ state: 'unknown' });
     });
 
     test('should correctly handle URL objects', () => {
@@ -61,10 +61,10 @@ describe('BlinksRegistry', () => {
       const result = actionsRegistry.lookup(input);
 
       // assert
-      expect(result).toEqual({ host: 'malicious.com', state: 'malicious' });
+      expect(result).toEqual({ state: 'malicious' });
     });
 
-    test('should return null for an invalid URL string', () => {
+    test('should return unknown for an invalid URL string', () => {
       // arrange
       const actionsConfig: BlinksRegistryConfig = {
         actions: [
@@ -81,7 +81,7 @@ describe('BlinksRegistry', () => {
       const result = actionsRegistry.lookup(input);
 
       // assert
-      expect(result).toBeNull();
+      expect(result).toEqual({ state: 'unknown' });
     });
   });
 
@@ -103,10 +103,10 @@ describe('BlinksRegistry', () => {
       const result = actionsRegistry.lookup(input, 'website');
 
       // assert
-      expect(result).toEqual({ host: 'trusted.com', state: 'trusted' });
+      expect(result).toEqual({ state: 'trusted' });
     });
 
-    test('should return null for an unknown host', () => {
+    test('should return unknownm for an unknown host', () => {
       // arrange
       const actionsConfig: BlinksRegistryConfig = {
         actions: [],
@@ -123,7 +123,7 @@ describe('BlinksRegistry', () => {
       const result = actionsRegistry.lookup(input, 'website');
 
       // assert
-      expect(result).toBeNull();
+      expect(result).toEqual({ state: 'unknown' });
     });
 
     test('should correctly handle URL objects', () => {
@@ -143,10 +143,10 @@ describe('BlinksRegistry', () => {
       const result = actionsRegistry.lookup(input, 'website');
 
       // assert
-      expect(result).toEqual({ host: 'malicious.com', state: 'malicious' });
+      expect(result).toEqual({ state: 'malicious' });
     });
 
-    test('should return null for an invalid URL string', () => {
+    test('should return unknown for an invalid URL string', () => {
       // arrange
       const actionsConfig: BlinksRegistryConfig = {
         actions: [],
@@ -163,20 +163,34 @@ describe('BlinksRegistry', () => {
       const result = actionsRegistry.lookup(input);
 
       // assert
-      expect(result).toBeNull();
+      expect(result).toEqual({ state: 'unknown' });
     });
-    
-    test('should validate underlying URL when apiUrl param is used', () => {
+
+    test('should return unknown when interstitial is not found when apiUrl param is used', () => {
       const config: BlinksRegistryConfig = {
         actions: [{ host: 'example.com', state: 'trusted' }],
         websites: [],
         interstitials: [],
       };
       const registry = BlinksRegistry.getInstance(config);
-      const proxied = 'https://api.dial.to/v1/blink?apiUrl=https://example.com/path';
+      const proxied =
+        'https://api.dial.to/v1/blink?apiUrl=https://example.com/path';
       const result = registry.lookup(proxied);
-      expect(result).toEqual({ host: 'example.com', state: 'trusted' });
+      expect(result).toEqual({ state: 'unknown' });
     });
+  });
+
+  test('should validate both current and target URLs when apiUrl param is used', () => {
+    const config: BlinksRegistryConfig = {
+      actions: [{ host: 'example.com', state: 'trusted' }],
+      websites: [],
+      interstitials: [{ host: 'api.dial.to', state: 'trusted' }],
+    };
+    const registry = BlinksRegistry.getInstance(config);
+    const proxied =
+      'https://api.dial.to/v1/blink?apiUrl=https://example.com/path';
+    const result = registry.lookup(proxied);
+    expect(result).toEqual({ state: 'trusted' });
   });
 
   describe('interstitials lookup', () => {
@@ -197,10 +211,10 @@ describe('BlinksRegistry', () => {
       const result = actionsRegistry.lookup(input, 'interstitial');
 
       // assert
-      expect(result).toEqual({ host: 'trusted.com', state: 'trusted' });
+      expect(result).toEqual({ state: 'trusted' });
     });
 
-    test('should return null for an unknown host', () => {
+    test('should return unknown for an unknown host', () => {
       // arrange
       const actionsConfig: BlinksRegistryConfig = {
         actions: [],
@@ -217,7 +231,7 @@ describe('BlinksRegistry', () => {
       const result = actionsRegistry.lookup(input, 'interstitial');
 
       // assert
-      expect(result).toBeNull();
+      expect(result).toEqual({ state: 'unknown' });
     });
 
     test('should correctly handle URL objects', () => {
@@ -237,10 +251,10 @@ describe('BlinksRegistry', () => {
       const result = actionsRegistry.lookup(input, 'interstitial');
 
       // assert
-      expect(result).toEqual({ host: 'malicious.com', state: 'malicious' });
+      expect(result).toEqual({ state: 'malicious' });
     });
 
-    test('should return null for an invalid URL string', () => {
+    test('should return unknown for an invalid URL string', () => {
       // arrange
       const actionsConfig: BlinksRegistryConfig = {
         actions: [],
@@ -257,7 +271,7 @@ describe('BlinksRegistry', () => {
       const result = actionsRegistry.lookup(input, 'interstitial');
 
       // assert
-      expect(result).toBeNull();
+      expect(result).toEqual({ state: 'unknown' });
     });
   });
 });
