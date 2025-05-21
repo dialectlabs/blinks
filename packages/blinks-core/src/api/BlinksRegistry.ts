@@ -80,13 +80,27 @@ export class BlinksRegistry {
   public lookup(
     url: string | URL,
     type: LookupType = 'action',
-  ): RegisteredEntity | null {
-    // If apiUrl param is present, lookup the underlying URL
+  ): Pick<RegisteredEntity, 'state'> | null {
+    // If apiUrl param is present, check both URLs
     try {
       const probe = new URL(url.toString());
       const apiUrlParam = probe.searchParams.get('apiUrl');
+
       if (apiUrlParam) {
-        return this.lookup(apiUrlParam, type);
+        // Check both current URL and target URL
+        const currentUrlState =
+          this.lookupInterstitial(probe)?.state ?? 'unknown';
+        const targetUrlState =
+          this.lookupBlink(apiUrlParam)?.state ?? 'unknown';
+
+        const mergedState = mergeBlinkStates(currentUrlState, targetUrlState);
+        if (mergedState === 'unknown') {
+          return null;
+        }
+
+        return {
+          state: mergedState,
+        };
       }
     } catch {
       // ignore malformed URL
