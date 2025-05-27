@@ -80,79 +80,110 @@ export class BlinksRegistry {
   public lookup(
     url: string | URL,
     type: LookupType = 'action',
-  ): RegisteredEntity | null {
+  ): { state: SecurityBlinkState } {
+    // If apiUrl param is present, check both URLs
+    try {
+      const probe = new URL(url.toString());
+      const apiUrlParam = probe.searchParams.get('apiUrl');
+
+      if (apiUrlParam) {
+        // Check both current URL and target URL
+        const currentUrlState = this.lookupInterstitialState(probe);
+        const targetUrlState = this.lookupBlinkState(apiUrlParam);
+
+        const mergedState = mergeBlinkStates(currentUrlState, targetUrlState);
+
+        return {
+          state: mergedState,
+        };
+      }
+    } catch {
+      // ignore malformed URL
+    }
+
     if (type === 'action' || type === 'blink') {
-      return this.lookupBlink(url);
+      const state = this.lookupBlinkState(url);
+      return {
+        state,
+      };
     }
 
     if (type === 'website') {
-      return this.lookupWebsite(url);
+      const state = this.lookupWebsiteState(url);
+      return {
+        state,
+      };
     }
 
     if (type === 'interstitial') {
-      return this.lookupInterstitial(url);
+      const state = this.lookupInterstitialState(url);
+      return {
+        state,
+      };
     }
 
-    return null;
+    return {
+      state: 'unknown',
+    };
   }
 
-  private lookupBlink(url: string | URL): RegisteredEntity | null {
+  private lookupBlinkState(url: string | URL): SecurityBlinkState {
     try {
       const urlObj = new URL(url);
       if (urlObj.protocol !== 'https:') {
         console.error(
           `[@dialectlabs/blinks] URL protocol must be https: ${url}`,
         );
-        return null;
+        return 'unknown';
       }
       const host = urlObj.host;
-      return this.blinksByHost[host] ?? null;
+      return this.blinksByHost[host]?.state ?? 'unknown';
     } catch (e) {
       console.error(
         `[@dialectlabs/blinks] Failed to lookup action for URL: ${url}`,
         e,
       );
-      return null;
+      return 'unknown';
     }
   }
 
-  private lookupWebsite(url: string | URL): RegisteredEntity | null {
+  private lookupWebsiteState(url: string | URL): SecurityBlinkState {
     try {
       const urlObj = new URL(url);
       if (urlObj.protocol !== 'https:') {
         console.error(
           `[@dialectlabs/blinks] URL protocol must be https: ${url}`,
         );
-        return null;
+        return 'unknown';
       }
       const host = urlObj.host;
-      return this.websitesByHost[host] ?? null;
+      return this.websitesByHost[host]?.state ?? 'unknown';
     } catch (e) {
       console.error(
         `[@dialectlabs/blinks] Failed to lookup website for URL: ${url}`,
         e,
       );
-      return null;
+      return 'unknown';
     }
   }
 
-  private lookupInterstitial(url: string | URL): RegisteredEntity | null {
+  private lookupInterstitialState(url: string | URL): SecurityBlinkState {
     try {
       const urlObj = new URL(url);
       if (urlObj.protocol !== 'https:') {
         console.error(
           `[@dialectlabs/blinks] URL protocol must be https: ${url}`,
         );
-        return null;
+        return 'unknown';
       }
       const host = urlObj.host;
-      return this.interstitialsByHost[host] ?? null;
+      return this.interstitialsByHost[host]?.state ?? 'unknown';
     } catch (e) {
       console.error(
         `[@dialectlabs/blinks] Failed to lookup interstitial for URL: ${url}`,
         e,
       );
-      return null;
+      return 'unknown';
     }
   }
 }
