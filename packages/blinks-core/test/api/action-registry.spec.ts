@@ -106,7 +106,7 @@ describe('BlinksRegistry', () => {
       expect(result).toEqual({ state: 'trusted' });
     });
 
-    test('should return unknownm for an unknown host', () => {
+    test('should return unknown for an unknown host', () => {
       // arrange
       const actionsConfig: BlinksRegistryConfig = {
         actions: [],
