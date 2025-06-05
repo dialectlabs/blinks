@@ -6,3 +6,4 @@ export { isProxified, proxify, proxifyImage, setProxyUrl } from './proxify';
 export { checkSecurity, type SecurityLevel } from './security';
 export * from './supportability.ts';
 export * from './url-mapper.ts';
+export * from './secure-fetch.ts';

@@ -6,6 +6,7 @@ import {
   isProxified,
   proxify,
   proxifyImage,
+  secureFetch,
 } from '../../utils';
 import { isUrlSameOrigin } from '../../utils/security.ts';
 import type { BlinkAdapter } from '../BlinkAdapter.ts';
@@ -313,7 +314,7 @@ export class BlinkInstance {
     id?: string,
   ) {
     const { url: proxyUrl, headers: proxyHeaders } = proxify(apiUrl);
-    const response = await fetch(proxyUrl, {
+    const response = await secureFetch(proxyUrl.toString(), {
       headers: {
         Accept: 'application/json',
         ...proxyHeaders,
