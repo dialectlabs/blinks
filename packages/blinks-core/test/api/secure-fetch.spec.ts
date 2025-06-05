@@ -1,17 +1,9 @@
-import { describe, expect, test } from 'bun:test';
+import { describe, expect, test, jest } from 'bun:test';
 import { secureFetch, BlinksRegistry, type BlinksRegistryConfig } from '../../src';
-
-function withMockedFetch(mock: typeof fetch, fn: () => Promise<void>) {
-  const originalFetch = globalThis.fetch;
-  globalThis.fetch = mock as any;
-  return fn().finally(() => {
-    globalThis.fetch = originalFetch;
-  });
-}
 
 describe('secureFetch', () => {
   test('follows redirect when target is trusted', async () => {
-    const fetchMock = async (url: RequestInfo | URL): Promise<Response> => {
+    const fetchMock = jest.fn(async (url: RequestInfo | URL): Promise<Response> => {
       const u = url.toString();
       if (u.endsWith('/redirect')) {
         return new Response(null, { status: 302, headers: { location: '/final' } });
@@ -23,7 +15,7 @@ describe('secureFetch', () => {
         });
       }
       return new Response(null, { status: 404 });
-    };
+    });
 
     const config: BlinksRegistryConfig = {
       actions: [{ host: 'example.com', state: 'trusted' }],
@@ -32,15 +24,19 @@ describe('secureFetch', () => {
     };
     BlinksRegistry.getInstance(config);
 
-    await withMockedFetch(fetchMock, async () => {
+    const spy = jest.spyOn(globalThis, 'fetch').mockImplementation(fetchMock);
+
+    try {
       const response = await secureFetch('https://example.com/redirect');
       const data = await response.json();
       expect(data).toEqual({ ok: true });
-    });
+    } finally {
+      spy.mockRestore();
+    }
   });
 
   test('throws on redirect to malicious url', async () => {
-    const fetchMock = async (url: RequestInfo | URL): Promise<Response> => {
+    const fetchMock = jest.fn(async (url: RequestInfo | URL): Promise<Response> => {
       const u = url.toString();
       if (u.endsWith('/redirect')) {
         return new Response(null, {
@@ -49,7 +45,7 @@ describe('secureFetch', () => {
         });
       }
       return new Response(null, { status: 404 });
-    };
+    });
 
     const config: BlinksRegistryConfig = {
       actions: [
@@ -61,8 +57,12 @@ describe('secureFetch', () => {
     };
     BlinksRegistry.getInstance(config);
 
-    await withMockedFetch(fetchMock, async () => {
+    const spy = jest.spyOn(globalThis, 'fetch').mockImplementation(fetchMock);
+
+    try {
       await expect(secureFetch('https://example.com/redirect')).rejects.toThrow();
-    });
+    } finally {
+      spy.mockRestore();
+    }
   });
 });
