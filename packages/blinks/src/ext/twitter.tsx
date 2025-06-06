@@ -192,6 +192,7 @@ async function handleNewNode(
   const blink = await BlinkInstance.fetch(
     blinkApiUrl,
     options.supportStrategy,
+    options.securityLevel.actions,
   ).catch(noop);
 
   if (!blink) {

@@ -65,4 +65,45 @@ describe('secureFetch', () => {
       spy.mockRestore();
     }
   });
+
+  test('allows redirect to unknown url when securityLevel is non-malicious', async () => {
+    const fetchMock = jest.fn(async (url: RequestInfo | URL): Promise<Response> => {
+      const u = url.toString();
+      if (u.endsWith('/redirect')) {
+        return new Response(null, {
+          status: 302,
+          headers: { location: 'https://unknown.com/final' },
+        });
+      }
+      if (u.endsWith('/final')) {
+        return new Response(JSON.stringify({ ok: true }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+      return new Response(null, { status: 404 });
+    });
+
+    const config: BlinksRegistryConfig = {
+      actions: [{ host: 'example.com', state: 'trusted' }],
+      websites: [],
+      interstitials: [],
+    };
+    BlinksRegistry.getInstance(config);
+
+    const spy = jest.spyOn(globalThis, 'fetch').mockImplementation(fetchMock);
+
+    try {
+      const response = await secureFetch(
+        'https://example.com/redirect',
+        {},
+        'blink',
+        'non-malicious',
+      );
+      const data = await response.json();
+      expect(data).toEqual({ ok: true });
+    } finally {
+      spy.mockRestore();
+    }
+  });
 });

@@ -1,4 +1,5 @@
 import { BlinksRegistry, type LookupType } from '../api';
+import { checkSecurity, type SecurityLevel } from './security.ts';
 
 /**
  * Fetch a resource while validating any redirect URL using BlinksRegistry.
@@ -9,6 +10,7 @@ export async function secureFetch(
   url: string,
   init: RequestInit & { abortController?: AbortController } = {},
   lookupType: LookupType = 'blink',
+  securityLevel: SecurityLevel = 'only-trusted',
 ): Promise<Response> {
   let currentUrl = url;
   let redirectCount = 0;
@@ -29,7 +31,7 @@ export async function secureFetch(
       const locationHeader = response.headers.get('location')!;
       const nextUrl = new URL(locationHeader, currentUrl).toString();
       const { state } = BlinksRegistry.getInstance().lookup(nextUrl, lookupType);
-      if (state !== 'trusted') {
+      if (!checkSecurity(state, securityLevel)) {
         throw new Error(
           `Redirect target failed security validation: ${nextUrl}`,
         );
