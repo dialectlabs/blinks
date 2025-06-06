@@ -6,6 +6,8 @@ import {
   isProxified,
   proxify,
   proxifyImage,
+  secureFetch,
+  type SecurityLevel,
 } from '../../utils';
 import { isUrlSameOrigin } from '../../utils/security.ts';
 import type { BlinkAdapter } from '../BlinkAdapter.ts';
@@ -311,14 +313,20 @@ export class BlinkInstance {
     supportStrategy: BlinkSupportStrategy = defaultBlinkSupportStrategy,
     chainMetadata?: BlinkChainMetadata,
     id?: string,
+    securityLevel: SecurityLevel = 'only-trusted',
   ) {
     const { url: proxyUrl, headers: proxyHeaders } = proxify(apiUrl);
-    const response = await fetch(proxyUrl, {
-      headers: {
-        Accept: 'application/json',
-        ...proxyHeaders,
+    const response = await secureFetch(
+      proxyUrl.toString(),
+      {
+        headers: {
+          Accept: 'application/json',
+          ...proxyHeaders,
+        },
       },
-    });
+      'blink',
+      securityLevel,
+    );
 
     if (!response.ok) {
       throw new Error(
@@ -343,6 +351,7 @@ export class BlinkInstance {
   static async fetch(
     apiUrl: string,
     supportStrategy: BlinkSupportStrategy = defaultBlinkSupportStrategy,
+    securityLevel: SecurityLevel = 'only-trusted',
   ) {
     const id = nanoid();
     return BlinkInstance._fetch(
@@ -352,15 +361,17 @@ export class BlinkInstance {
         isChained: false,
       },
       id,
+      securityLevel,
     );
   }
 
-  refresh() {
+  refresh(securityLevel: SecurityLevel = 'only-trusted') {
     return BlinkInstance._fetch(
       this.url,
       this._supportStrategy,
       this._chainMetadata,
       this._id,
+      securityLevel,
     );
   }
 
