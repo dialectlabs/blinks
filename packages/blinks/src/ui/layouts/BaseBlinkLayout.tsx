@@ -243,7 +243,7 @@ export const BaseBlinkLayout = ({
                 </span>
               )}
               <a
-                href="https://docs.dialect.to/documentation/actions/security"
+                href="https://docs.dialect.to/blinks/blinks-provider/blink-registry"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="blink-security-badge mb-0.5 flex items-center"
