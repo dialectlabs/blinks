@@ -1,6 +1,3 @@
-> [!WARNING]
-> Dialect is sunsetting its Alerts, Blockchain Links, Markets and Positions products. If you are using these products you will need to find alternative solutions.
-
 # @dialectlabs/blinks &mdash; the [Actions](https://github.com/dialectlabs/actions) Interface
 
 ## Usage
