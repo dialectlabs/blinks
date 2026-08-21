@@ -377,7 +377,9 @@ export const BlinkContainer = ({
     let timeout: any; // NodeJS.Timeout
     const fetcher = async () => {
       try {
-        const newBlink = await blink.refresh();
+        const newBlink = await blink.refresh(
+          normalizedSecurityLevel.actions,
+        );
 
         // if after refresh user clicked started execution, we should not update the action
         if (executionState.status === 'idle') {
